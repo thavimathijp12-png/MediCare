@@ -1,0 +1,2097 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MediCare - Premier Hospital & Healthcare Management System</title>
+  <meta name="description" content="MediCare is a state-of-the-art hospital and clinical healthcare management platform offering world-class patient care, appointment scheduling, and clinical diagnostics.">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container-custom"></div>
+
+  <!-- =========================================================================
+       1. PUBLIC HOSPITAL WEBSITE VIEW
+       ========================================================================= -->
+  <div id="public-view">
+
+    <!-- Top Emergency & Info Bar -->
+    <div class="top-notice-bar d-none d-md-block">
+      <div class="container-fluid px-xl-5 px-lg-4 px-3 d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-4">
+          <span><i class="bi bi-telephone-fill me-1 text-danger"></i> Emergency 24/7: <strong>+1 (800) 555-CARE</strong></span>
+          <span><i class="bi bi-geo-alt-fill me-1"></i> 100 Healthcare Blvd, Metro City, NY</span>
+          <span><i class="bi bi-clock-fill me-1"></i> OPD Hours: 8:00 AM - 9:00 PM</span>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+          <button class="btn btn-sm btn-link text-decoration-none text-primary fw-bold p-0" onclick="switchMainView('admin')">
+            <i class="bi bi-shield-lock-fill me-1"></i> Staff / Admin Portal
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Navigation Bar -->
+    <nav class="navbar navbar-expand-lg public-navbar">
+      <div class="container-fluid px-xl-5 px-lg-4 px-3">
+        <!-- Brand Logo -->
+        <a class="brand-logo-wrap" href="#section-hero">
+          <div class="brand-icon-box">
+            <i class="bi bi-heart-pulse-fill"></i>
+          </div>
+          <div class="brand-name">
+            Medi<span>Care</span>
+          </div>
+        </a>
+
+        <!-- Mobile Toggle Button -->
+        <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#publicNavContent">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Navbar Links -->
+        <div class="collapse navbar-collapse" id="publicNavContent">
+          <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link nav-link-custom active" href="#section-hero">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link nav-link-custom" href="#section-about">About Us</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link nav-link-custom" href="#section-services">Services</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link nav-link-custom" href="#section-departments">Departments</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link nav-link-custom" href="#section-doctors">Doctors</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link nav-link-custom" href="#section-why-us">Why Choose Us</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link nav-link-custom" href="#section-testimonials">Testimonials</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link nav-link-custom" href="#section-contact">Contact</a>
+            </li>
+          </ul>
+
+          <!-- Nav Right CTAs -->
+          <div class="nav-right-ctas">
+            <button class="btn btn-medicare-secondary d-none d-xl-inline-flex" onclick="switchMainView('admin')">
+              <i class="bi bi-grid-fill"></i> Portal Dashboard
+            </button>
+            <button class="btn btn-medicare-primary" onclick="openAppointmentModal()">
+              <i class="bi bi-calendar-check-fill"></i> Book Appointment
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="section-hero" class="hero-section">
+      <div class="hero-glow-blob hero-blob-1"></div>
+      <div class="hero-glow-blob hero-blob-2"></div>
+
+      <div class="container position-relative" style="z-index: 2;">
+        <div class="row align-items-center g-5">
+          <div class="col-lg-6">
+            <span class="badge-pill-pastel badge-mint mb-3">
+              <i class="bi bi-shield-check"></i> JCI Accredited Hospital System
+            </span>
+            <h1 class="hero-title">
+              Your Health, <br><span class="highlight">Our Priority</span>
+            </h1>
+            <p class="hero-subtitle">
+              Experience compassionate, world-class healthcare powered by leading medical specialists, cutting-edge surgical robotics, and modern digital diagnostics tailored to your well-being.
+            </p>
+            <div class="d-flex flex-wrap gap-3 mb-4">
+              <button class="btn btn-medicare-primary btn-lg px-4" onclick="openAppointmentModal()">
+                <i class="bi bi-calendar2-plus"></i> Book Appointment
+              </button>
+              <a href="#section-services" class="btn btn-medicare-secondary btn-lg px-4">
+                <i class="bi bi-compass"></i> Explore Services
+              </a>
+            </div>
+
+            <!-- Hero Highlights -->
+            <div class="row g-3 pt-3 border-top">
+              <div class="col-4">
+                <h4 class="fw-bold mb-0 text-primary">50+</h4>
+                <div class="small text-secondary">Expert Specialists</div>
+              </div>
+              <div class="col-4">
+                <h4 class="fw-bold mb-0 text-primary">99.4%</h4>
+                <div class="small text-secondary">Patient Satisfaction</div>
+              </div>
+              <div class="col-4">
+                <h4 class="fw-bold mb-0 text-primary">24/7</h4>
+                <div class="small text-secondary">Emergency Response</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="hero-image-container">
+              <!-- Floating Badge Top -->
+              <div class="hero-floating-badge hero-badge-top">
+                <div class="floating-icon-circle badge-mint">
+                  <i class="bi bi-check2-circle"></i>
+                </div>
+                <div>
+                  <div class="fw-bold text-dark" style="font-size: 0.95rem;">99.2% Positive Outcome</div>
+                  <div class="text-muted small">Over 45,000 Treated Patients</div>
+                </div>
+              </div>
+
+              <!-- Main Hero Image -->
+              <div class="hero-main-img-card">
+                <img src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1000&q=80" alt="MediCare Hospital Doctors and Facilities">
+              </div>
+
+              <!-- Floating Badge Bottom -->
+              <div class="hero-floating-badge hero-badge-bottom">
+                <div class="floating-icon-circle badge-lavender">
+                  <i class="bi bi-person-fill-check"></i>
+                </div>
+                <div>
+                  <div class="fw-bold text-dark" style="font-size: 0.95rem;">Dr. Sarah Jenkins</div>
+                  <div class="text-success small fw-semibold"><i class="bi bi-circle-fill me-1" style="font-size: 0.5rem;"></i>On Duty Today</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Features Ribbon -->
+    <section class="py-4">
+      <div class="container">
+        <div class="row g-4">
+          <div class="col-md-3 col-sm-6">
+            <div class="quick-feature-box">
+              <div class="feature-icon-wrapper badge-mint">
+                <i class="bi bi-truck-front"></i>
+              </div>
+              <div>
+                <h6 class="fw-bold mb-1">Emergency 24/7</h6>
+                <div class="small text-muted">Swift rapid response units</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-6">
+            <div class="quick-feature-box">
+              <div class="feature-icon-wrapper badge-blue">
+                <i class="bi bi-person-check-fill"></i>
+              </div>
+              <div>
+                <h6 class="fw-bold mb-1">Qualified Doctors</h6>
+                <div class="small text-muted">Board-certified clinicians</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-6">
+            <div class="quick-feature-box">
+              <div class="feature-icon-wrapper badge-lavender">
+                <i class="bi bi-calendar2-week"></i>
+              </div>
+              <div>
+                <h6 class="fw-bold mb-1">Easy Booking</h6>
+                <div class="small text-muted">Instant online appointments</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-6">
+            <div class="quick-feature-box">
+              <div class="feature-icon-wrapper badge-cream">
+                <i class="bi bi-cpu"></i>
+              </div>
+              <div>
+                <h6 class="fw-bold mb-1">Modern Diagnostics</h6>
+                <div class="small text-muted">Next-gen imaging & labs</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- About MediCare Section -->
+    <section id="section-about" class="py-5 my-4">
+      <div class="container">
+        <div class="row align-items-center g-5">
+          <div class="col-lg-6">
+            <div class="position-relative">
+              <img src="https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=800&q=80" alt="Hospital Operating Theater" class="img-fluid rounded-4 shadow-sm" style="border: 4px solid #FFFFFF;">
+              <div class="p-3 bg-white rounded-3 shadow-md position-absolute bottom-0 start-0 m-4 border" style="max-width: 260px;">
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bi bi-award-fill text-warning fs-3"></i>
+                  <div>
+                    <div class="fw-bold text-dark">Excellence Award</div>
+                    <div class="small text-muted">Top Healthcare Provider 2026</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <span class="section-tag badge-lavender">About MediCare</span>
+            <h2 class="section-title">Setting The Benchmark In Patient-Centered Healing</h2>
+            <p class="text-secondary mb-4">
+              Founded with the vision to humanize healthcare, MediCare brings together compassionate clinical practitioners, pioneering surgical robotics, and advanced outpatient facilities under one peaceful sanctuary.
+            </p>
+
+            <div class="row g-3 mb-4">
+              <div class="col-sm-6">
+                <div class="d-flex align-items-start gap-3">
+                  <div class="rounded-circle p-2 badge-mint">
+                    <i class="bi bi-shield-fill-check fs-5"></i>
+                  </div>
+                  <div>
+                    <h6 class="fw-bold mb-1">JCI Certified Standards</h6>
+                    <div class="small text-muted">Internationally validated patient safety protocols.</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="d-flex align-items-start gap-3">
+                  <div class="rounded-circle p-2 badge-blue">
+                    <i class="bi bi-hospital fs-5"></i>
+                  </div>
+                  <div>
+                    <h6 class="fw-bold mb-1">150+ Inpatient Suites</h6>
+                    <div class="small text-muted">Serene recovery rooms with 24/7 nursing.</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="d-flex align-items-start gap-3">
+                  <div class="rounded-circle p-2 badge-cream">
+                    <i class="bi bi-robot fs-5"></i>
+                  </div>
+                  <div>
+                    <h6 class="fw-bold mb-1">Robotic Surgery</h6>
+                    <div class="small text-muted">Minimally invasive incisions for rapid healing.</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="d-flex align-items-start gap-3">
+                  <div class="rounded-circle p-2 badge-pink">
+                    <i class="bi bi-file-earmark-medical fs-5"></i>
+                  </div>
+                  <div>
+                    <h6 class="fw-bold mb-1">100% Digital Records</h6>
+                    <div class="small text-muted">Instant electronic health chart access.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button class="btn btn-medicare-primary" onclick="openAppointmentModal()">
+              <i class="bi bi-chevron-right"></i> Meet Our Physicians
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Our Services Section -->
+    <section id="section-services" class="py-5 bg-white border-top border-bottom">
+      <div class="container">
+        <div class="text-center mb-5">
+          <span class="section-tag badge-mint">Our Services</span>
+          <h2 class="section-title">Comprehensive Clinical Care</h2>
+          <p class="section-desc">From emergency trauma medicine to preventive diagnostic evaluations, MediCare offers holistic healthcare for your entire family.</p>
+        </div>
+
+        <div class="row g-4">
+          <div class="col-lg-4 col-md-6">
+            <div class="service-card">
+              <div class="dept-icon-circle badge-mint">
+                <i class="bi bi-activity"></i>
+              </div>
+              <h5 class="fw-bold mb-2">Emergency & Trauma 24/7</h5>
+              <p class="text-secondary small mb-3">
+                Immediate intervention care equipped with cardiac monitors, ventilators, and dedicated resuscitation trauma suites.
+              </p>
+              <a href="#section-contact" class="fw-semibold text-primary small d-inline-flex align-items-center gap-1">
+                Learn More <i class="bi bi-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+
+          <div class="col-lg-4 col-md-6">
+            <div class="service-card">
+              <div class="dept-icon-circle badge-blue">
+                <i class="bi bi-clipboard2-pulse"></i>
+              </div>
+              <h5 class="fw-bold mb-2">Diagnostic Radiology & Labs</h5>
+              <p class="text-secondary small mb-3">
+                High-field 3T MRI, 128-slice CT scans, 4D ultrasound imaging, and automated clinical chemistry laboratories.
+              </p>
+              <a href="#section-contact" class="fw-semibold text-primary small d-inline-flex align-items-center gap-1">
+                Learn More <i class="bi bi-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+
+          <div class="col-lg-4 col-md-6">
+            <div class="service-card">
+              <div class="dept-icon-circle badge-lavender">
+                <i class="bi bi-scissors"></i>
+              </div>
+              <h5 class="fw-bold mb-2">Advanced Robotic Surgery</h5>
+              <p class="text-secondary small mb-3">
+                Precision minimally invasive procedures with shortened hospital stay, lower infection risk, and faster recovery.
+              </p>
+              <a href="#section-contact" class="fw-semibold text-primary small d-inline-flex align-items-center gap-1">
+                Learn More <i class="bi bi-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+
+          <div class="col-lg-4 col-md-6">
+            <div class="service-card">
+              <div class="dept-icon-circle badge-cream">
+                <i class="bi bi-shield-plus"></i>
+              </div>
+              <h5 class="fw-bold mb-2">Preventive Health Checkups</h5>
+              <p class="text-secondary small mb-3">
+                Structured executive health packages, cardiovascular stress tests, cancer screenings, and metabolic evaluations.
+              </p>
+              <a href="#section-contact" class="fw-semibold text-primary small d-inline-flex align-items-center gap-1">
+                Learn More <i class="bi bi-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+
+          <div class="col-lg-4 col-md-6">
+            <div class="service-card">
+              <div class="dept-icon-circle badge-pink">
+                <i class="bi bi-camera-video"></i>
+              </div>
+              <h5 class="fw-bold mb-2">Virtual Telemedicine</h5>
+              <p class="text-secondary small mb-3">
+                Connect securely from the comfort of home with our board-certified physicians for consults and prescription refills.
+              </p>
+              <a href="#section-contact" class="fw-semibold text-primary small d-inline-flex align-items-center gap-1">
+                Learn More <i class="bi bi-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+
+          <div class="col-lg-4 col-md-6">
+            <div class="service-card">
+              <div class="dept-icon-circle badge-mint">
+                <i class="bi bi-bandaid"></i>
+              </div>
+              <h5 class="fw-bold mb-2">Pediatric Intensive Care</h5>
+              <p class="text-secondary small mb-3">
+                Specialized child-friendly facilities staffed by board-certified pediatric intensivists and neonatal nurses.
+              </p>
+              <a href="#section-contact" class="fw-semibold text-primary small d-inline-flex align-items-center gap-1">
+                Learn More <i class="bi bi-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Medical Departments Section -->
+    <section id="section-departments" class="py-5">
+      <div class="container">
+        <div class="text-center mb-5">
+          <span class="section-tag badge-blue">Centers of Excellence</span>
+          <h2 class="section-title">Medical Departments</h2>
+          <p class="section-desc">Our dedicated departments unite multidisciplinary specialists to diagnose and treat complex medical conditions with exceptional care.</p>
+        </div>
+
+        <div class="row g-4">
+          <!-- Cardiology -->
+          <div class="col-lg-4 col-md-6">
+            <div class="dept-card">
+              <div class="dept-icon-circle badge-pink">
+                <i class="bi bi-heart-pulse"></i>
+              </div>
+              <h4 class="fw-bold mb-2">Cardiology</h4>
+              <p class="text-secondary small mb-4">
+                Comprehensive heart care including electrophysiology, angioplasty, heart failure clinic, and preventive cardiology.
+              </p>
+              <div class="mt-auto d-flex justify-content-between align-items-center pt-3 border-top">
+                <span class="small fw-semibold text-muted"><i class="bi bi-person-fill text-primary"></i> 4 Specialists</span>
+                <button class="btn btn-sm btn-outline-primary" onclick="openBookAppointmentForDoctor('Dr. Sarah Jenkins', 'Cardiology')">Book Consult</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Neurology -->
+          <div class="col-lg-4 col-md-6">
+            <div class="dept-card">
+              <div class="dept-icon-circle badge-lavender">
+                <i class="bi bi-diagram-3"></i>
+              </div>
+              <h4 class="fw-bold mb-2">Neurology</h4>
+              <p class="text-secondary small mb-4">
+                Pioneering treatments for neurovascular disorders, stroke rehabilitation, epilepsy, and minimally invasive brain surgery.
+              </p>
+              <div class="mt-auto d-flex justify-content-between align-items-center pt-3 border-top">
+                <span class="small fw-semibold text-muted"><i class="bi bi-person-fill text-primary"></i> 3 Specialists</span>
+                <button class="btn btn-sm btn-outline-primary" onclick="openBookAppointmentForDoctor('Dr. Alexander Chen', 'Neurology')">Book Consult</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Orthopedics -->
+          <div class="col-lg-4 col-md-6">
+            <div class="dept-card">
+              <div class="dept-icon-circle badge-cream">
+                <i class="bi bi-person-walking"></i>
+              </div>
+              <h4 class="fw-bold mb-2">Orthopedics</h4>
+              <p class="text-secondary small mb-4">
+                Robotic-assisted joint replacement, sports injury trauma, arthroscopy, and personalized spine therapy programs.
+              </p>
+              <div class="mt-auto d-flex justify-content-between align-items-center pt-3 border-top">
+                <span class="small fw-semibold text-muted"><i class="bi bi-person-fill text-primary"></i> 5 Specialists</span>
+                <button class="btn btn-sm btn-outline-primary" onclick="openBookAppointmentForDoctor('Dr. Marcus Vance', 'Orthopedics')">Book Consult</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pediatrics -->
+          <div class="col-lg-4 col-md-6">
+            <div class="dept-card">
+              <div class="dept-icon-circle badge-mint">
+                <i class="bi bi-balloon"></i>
+              </div>
+              <h4 class="fw-bold mb-2">Pediatrics</h4>
+              <p class="text-secondary small mb-4">
+                Nutritional wellness, newborn neonatal screening, pediatric immunizations, and chronic childhood illness management.
+              </p>
+              <div class="mt-auto d-flex justify-content-between align-items-center pt-3 border-top">
+                <span class="small fw-semibold text-muted"><i class="bi bi-person-fill text-primary"></i> 4 Specialists</span>
+                <button class="btn btn-sm btn-outline-primary" onclick="openBookAppointmentForDoctor('Dr. Elena Rostova', 'Pediatrics')">Book Consult</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dermatology -->
+          <div class="col-lg-4 col-md-6">
+            <div class="dept-card">
+              <div class="dept-icon-circle badge-pink">
+                <i class="bi bi-droplet-half"></i>
+              </div>
+              <h4 class="fw-bold mb-2">Dermatology</h4>
+              <p class="text-secondary small mb-4">
+                Specialized dermatologic surgeries, autoimmune skin therapies, photodynamic treatment, and aesthetic skincare.
+              </p>
+              <div class="mt-auto d-flex justify-content-between align-items-center pt-3 border-top">
+                <span class="small fw-semibold text-muted"><i class="bi bi-person-fill text-primary"></i> 3 Specialists</span>
+                <button class="btn btn-sm btn-outline-primary" onclick="openBookAppointmentForDoctor('Dr. Aisha Patel', 'Dermatology')">Book Consult</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- General Medicine -->
+          <div class="col-lg-4 col-md-6">
+            <div class="dept-card">
+              <div class="dept-icon-circle badge-blue">
+                <i class="bi bi-capsule"></i>
+              </div>
+              <h4 class="fw-bold mb-2">General Medicine</h4>
+              <p class="text-secondary small mb-4">
+                Comprehensive primary healthcare, metabolic disorder control, lifestyle risk assessment, and adult immunization.
+              </p>
+              <div class="mt-auto d-flex justify-content-between align-items-center pt-3 border-top">
+                <span class="small fw-semibold text-muted"><i class="bi bi-person-fill text-primary"></i> 6 Specialists</span>
+                <button class="btn btn-sm btn-outline-primary" onclick="openBookAppointmentForDoctor('Dr. David Sterling', 'General Medicine')">Book Consult</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured Doctors Section -->
+    <section id="section-doctors" class="py-5 bg-white border-top border-bottom">
+      <div class="container">
+        <div class="d-flex flex-wrap justify-content-between align-items-end mb-5">
+          <div>
+            <span class="section-tag badge-mint">Medical Staff</span>
+            <h2 class="section-title mb-0">Our Featured Specialists</h2>
+          </div>
+          <div class="mt-3 mt-md-0">
+            <button class="btn btn-medicare-secondary" onclick="switchMainView('admin'); switchAdminTab('doctors');">
+              <i class="bi bi-people-fill me-1"></i> View All Doctors
+            </button>
+          </div>
+        </div>
+
+        <div class="row g-4" id="public-featured-doctors-grid">
+          <!-- Populated dynamically by script.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Why Choose Us Section -->
+    <section id="section-why-us" class="py-5">
+      <div class="container">
+        <div class="text-center mb-5">
+          <span class="section-tag badge-lavender">Why Choose MediCare</span>
+          <h2 class="section-title">Patient Care Engineered For Peace of Mind</h2>
+          <p class="section-desc">We combine clinical acumen with heartfelt human empathy to create a healthcare experience where every patient is heard, respected, and healed.</p>
+        </div>
+
+        <div class="row g-4">
+          <div class="col-lg-3 col-md-6">
+            <div class="pillar-card text-center">
+              <div class="dept-icon-circle badge-mint mx-auto">
+                <i class="bi bi-award"></i>
+              </div>
+              <h5 class="fw-bold mb-2">Board-Certified Clinicians</h5>
+              <p class="text-secondary small mb-0">
+                Over 90% of our clinical leaders hold fellowships at globally renowned university medical centers.
+              </p>
+            </div>
+          </div>
+
+          <div class="col-lg-3 col-md-6">
+            <div class="pillar-card text-center">
+              <div class="dept-icon-circle badge-blue mx-auto">
+                <i class="bi bi-lightning-charge"></i>
+              </div>
+              <h5 class="fw-bold mb-2">Zero-Wait Emergency</h5>
+              <p class="text-secondary small mb-0">
+                Automated triage and dedicated trauma resuscitation teams ensure immediate bed assignment.
+              </p>
+            </div>
+          </div>
+
+          <div class="col-lg-3 col-md-6">
+            <div class="pillar-card text-center">
+              <div class="dept-icon-circle badge-cream mx-auto">
+                <i class="bi bi-shield-lock"></i>
+              </div>
+              <h5 class="fw-bold mb-2">Transparent Pricing</h5>
+              <p class="text-secondary small mb-0">
+                Clear, upfront billing estimations with direct insurance claims adjudication and no hidden fees.
+              </p>
+            </div>
+          </div>
+
+          <div class="col-lg-3 col-md-6">
+            <div class="pillar-card text-center">
+              <div class="dept-icon-circle badge-pink mx-auto">
+                <i class="bi bi-heart"></i>
+              </div>
+              <h5 class="fw-bold mb-2">Compassionate Environment</h5>
+              <p class="text-secondary small mb-0">
+                Private inpatient recovery rooms designed with natural lighting, quiet zones, and family amenities.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Patient Testimonials Section -->
+    <section id="section-testimonials" class="py-5 bg-white border-top border-bottom">
+      <div class="container">
+        <div class="text-center mb-5">
+          <span class="section-tag badge-cream">Patient Stories</span>
+          <h2 class="section-title">Trusted By Thousands of Families</h2>
+          <p class="section-desc">Read how our dedicated medical teams have made a profound difference in our patients' lives.</p>
+        </div>
+
+        <div class="row g-4">
+          <div class="col-lg-4">
+            <div class="testimonial-card">
+              <div>
+                <div class="d-flex text-warning mb-3">
+                  <i class="bi bi-star-fill me-1"></i>
+                  <i class="bi bi-star-fill me-1"></i>
+                  <i class="bi bi-star-fill me-1"></i>
+                  <i class="bi bi-star-fill me-1"></i>
+                  <i class="bi bi-star-fill"></i>
+                </div>
+                <p class="testimonial-quote">
+                  "Dr. Sarah Jenkins and the cardiology team at MediCare performed my valve procedure with such precision and empathy. The nursing staff kept my daughter updated every hour. Truly exceptional!"
+                </p>
+              </div>
+              <div class="testimonial-user">
+                <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80" alt="Patient Claire Mitchell" class="testimonial-avatar">
+                <div>
+                  <div class="fw-bold text-dark">Claire Mitchell</div>
+                  <div class="small text-muted">Cardiology Patient &bull; 6-Month Review</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4">
+            <div class="testimonial-card">
+              <div>
+                <div class="d-flex text-warning mb-3">
+                  <i class="bi bi-star-fill me-1"></i>
+                  <i class="bi bi-star-fill me-1"></i>
+                  <i class="bi bi-star-fill me-1"></i>
+                  <i class="bi bi-star-fill me-1"></i>
+                  <i class="bi bi-star-fill"></i>
+                </div>
+                <p class="testimonial-quote">
+                  "After my skiing accident, Dr. Vance operated on my knee using robotic arthroscopy. I was walking without crutches in three weeks! The rehab team was attentive and motivating."
+                </p>
+              </div>
+              <div class="testimonial-user">
+                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80" alt="Patient David Harrison" class="testimonial-avatar">
+                <div>
+                  <div class="fw-bold text-dark">David Harrison</div>
+                  <div class="small text-muted">Orthopedic Patient &bull; Sports Injury</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4">
+            <div class="testimonial-card">
+              <div>
+                <div class="d-flex text-warning mb-3">
+                  <i class="bi bi-star-fill me-1"></i>
+                  <i class="bi bi-star-fill me-1"></i>
+                  <i class="bi bi-star-fill me-1"></i>
+                  <i class="bi bi-star-fill me-1"></i>
+                  <i class="bi bi-star-fill"></i>
+                </div>
+                <p class="testimonial-quote">
+                  "Dr. Elena Rostova treated our little boy when he had severe bronchitis. She explained every medication clearly and made him laugh despite being in a hospital. We cannot thank MediCare enough."
+                </p>
+              </div>
+              <div class="testimonial-user">
+                <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=120&q=80" alt="Patient Maria Gonzalez" class="testimonial-avatar">
+                <div>
+                  <div class="fw-bold text-dark">Maria Gonzalez</div>
+                  <div class="small text-muted">Parent &bull; Pediatric Care</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="section-contact" class="py-5">
+      <div class="container">
+        <div class="row g-5 align-items-center">
+          <div class="col-lg-5">
+            <span class="section-tag badge-pink">Get In Touch</span>
+            <h2 class="section-title">We Are Here When You Need Us Most</h2>
+            <p class="text-secondary mb-4">
+              Have questions regarding inpatient admissions, health insurance approvals, or specialist consultations? Contact our round-the-clock hospital helpdesk.
+            </p>
+
+            <div class="d-flex flex-column gap-3 mb-4">
+              <div class="d-flex align-items-center gap-3">
+                <div class="rounded-circle p-3 badge-mint">
+                  <i class="bi bi-telephone-outbound fs-5"></i>
+                </div>
+                <div>
+                  <div class="small text-muted">24/7 Hospital Dispatch</div>
+                  <div class="fw-bold text-dark">+1 (800) 555-CARE / +1 (555) 019-2831</div>
+                </div>
+              </div>
+
+              <div class="d-flex align-items-center gap-3">
+                <div class="rounded-circle p-3 badge-blue">
+                  <i class="bi bi-envelope-at fs-5"></i>
+                </div>
+                <div>
+                  <div class="small text-muted">Inquiries & Clinical Support</div>
+                  <div class="fw-bold text-dark">care@medicare-hospital.org</div>
+                </div>
+              </div>
+
+              <div class="d-flex align-items-center gap-3">
+                <div class="rounded-circle p-3 badge-cream">
+                  <i class="bi bi-geo-alt fs-5"></i>
+                </div>
+                <div>
+                  <div class="small text-muted">Hospital Main Campus</div>
+                  <div class="fw-bold text-dark">100 Healthcare Boulevard, Metro City, NY 10001</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Emergency Box -->
+            <div class="p-3 rounded-4 bg-danger text-white bg-opacity-10 border border-danger border-opacity-25 d-flex align-items-center gap-3">
+              <i class="bi bi-exclamation-octagon-fill text-danger fs-2"></i>
+              <div>
+                <div class="fw-bold text-danger">Life-Threatening Emergency?</div>
+                <div class="small text-danger">Please dial 911 immediately or visit our Emergency Department entrance on East Wing.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-7">
+            <div class="card-custom p-4 p-md-5">
+              <h4 class="fw-bold mb-2">Send Us an Inquiry</h4>
+              <p class="small text-secondary mb-4">Our patient coordinator will contact you within 2 hours.</p>
+
+              <form onsubmit="handlePublicContactSubmit(event)" novalidate>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label class="form-label small fw-semibold">Your Full Name</label>
+                    <input type="text" class="form-control form-control-custom" placeholder="e.g. John Doe" required>
+                    <div class="invalid-feedback">Please enter your name.</div>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label small fw-semibold">Phone Number</label>
+                    <input type="tel" class="form-control form-control-custom" placeholder="+1 (555) 000-0000" required>
+                    <div class="invalid-feedback">Please provide a valid phone number.</div>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label small fw-semibold">Email Address</label>
+                    <input type="email" class="form-control form-control-custom" placeholder="name@example.com" required>
+                    <div class="invalid-feedback">Please enter a valid email.</div>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label small fw-semibold">Department of Interest</label>
+                    <select class="form-select form-select-custom" required>
+                      <option value="">Select Department</option>
+                      <option>Cardiology</option>
+                      <option>Neurology</option>
+                      <option>Orthopedics</option>
+                      <option>Pediatrics</option>
+                      <option>Dermatology</option>
+                      <option>General Medicine</option>
+                    </select>
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label small fw-semibold">Message / Medical Concern</label>
+                    <textarea class="form-control form-control-custom" rows="3" placeholder="Briefly describe your health question or symptom..." required></textarea>
+                    <div class="invalid-feedback">Please write your message.</div>
+                  </div>
+                  <div class="col-12 mt-4">
+                    <button type="submit" class="btn btn-medicare-primary w-100 py-3">
+                      <i class="bi bi-send-fill me-2"></i> Submit Inquiry
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Professional Footer -->
+    <footer class="public-footer">
+      <div class="container">
+        <div class="row g-5 mb-5">
+          <div class="col-lg-4 col-md-6">
+            <div class="d-flex align-items-center gap-2 mb-3">
+              <div class="brand-icon-box" style="width: 38px; height: 38px; font-size: 1.2rem;">
+                <i class="bi bi-heart-pulse-fill"></i>
+              </div>
+              <span class="fs-4 fw-bold text-white">Medi<span style="color: #60A5FA;">Care</span></span>
+            </div>
+            <p class="small text-muted mb-4">
+              MediCare is an internationally accredited hospital and research institution committed to delivering exceptional patient-first clinical outcomes with dignity, integrity, and warmth.
+            </p>
+            <div class="d-flex gap-2">
+              <a href="javascript:void(0)" class="btn btn-sm btn-outline-light rounded-circle p-2" style="width: 36px; height: 36px;"><i class="bi bi-facebook"></i></a>
+              <a href="javascript:void(0)" class="btn btn-sm btn-outline-light rounded-circle p-2" style="width: 36px; height: 36px;"><i class="bi bi-twitter-x"></i></a>
+              <a href="javascript:void(0)" class="btn btn-sm btn-outline-light rounded-circle p-2" style="width: 36px; height: 36px;"><i class="bi bi-linkedin"></i></a>
+              <a href="javascript:void(0)" class="btn btn-sm btn-outline-light rounded-circle p-2" style="width: 36px; height: 36px;"><i class="bi bi-instagram"></i></a>
+            </div>
+          </div>
+
+          <div class="col-lg-2 col-md-6 col-6">
+            <h6 class="footer-heading">Quick Links</h6>
+            <ul class="footer-links">
+              <li><a href="#section-hero">Home</a></li>
+              <li><a href="#section-about">About MediCare</a></li>
+              <li><a href="#section-services">Clinical Services</a></li>
+              <li><a href="#section-doctors">Find a Doctor</a></li>
+              <li><a href="javascript:void(0)" onclick="switchMainView('admin')">Staff Portal</a></li>
+            </ul>
+          </div>
+
+          <div class="col-lg-3 col-md-6 col-6">
+            <h6 class="footer-heading">Clinical Centers</h6>
+            <ul class="footer-links">
+              <li><a href="#section-departments">Heart & Vascular Institute</a></li>
+              <li><a href="#section-departments">Neurology & Spine Center</a></li>
+              <li><a href="#section-departments">Robotic Orthopedics</a></li>
+              <li><a href="#section-departments">Pediatric & Neonatal ICU</a></li>
+              <li><a href="#section-departments">Emergency Medicine 24/7</a></li>
+            </ul>
+          </div>
+
+          <div class="col-lg-3 col-md-6">
+            <h6 class="footer-heading">Hospital Accreditation</h6>
+            <p class="small text-muted mb-3">
+              Certified by the Joint Commission International (JCI), National Quality Forum (NQF), and AHA Gold Quality standards.
+            </p>
+            <div class="p-3 rounded bg-dark border border-secondary border-opacity-25">
+              <div class="d-flex align-items-center gap-2 text-white">
+                <i class="bi bi-shield-check text-success fs-4"></i>
+                <div>
+                  <div class="fw-bold small">HIPAA Compliant</div>
+                  <div class="small text-muted" style="font-size: 0.75rem;">100% Encrypted Medical Data</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-4 border-top border-secondary border-opacity-25 d-flex flex-wrap justify-content-between align-items-center small text-muted">
+          <div>&copy; 2026 MediCare Hospital & Healthcare Systems. All rights reserved.</div>
+          <div class="d-flex gap-3">
+            <a href="javascript:void(0)" class="text-muted">Privacy Policy</a>
+            <a href="javascript:void(0)" class="text-muted">Terms of Medical Care</a>
+            <a href="javascript:void(0)" class="text-muted">Patient Rights</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+
+  <!-- =========================================================================
+       2. ADMIN & CLINICAL DASHBOARD PORTAL VIEW (Toggled via switchMainView)
+       ========================================================================= -->
+  <div id="admin-view" class="d-none">
+
+    <!-- Admin Sidebar -->
+    <aside class="admin-sidebar">
+      <div class="sidebar-header">
+        <a class="brand-logo-wrap" href="javascript:void(0)" onclick="switchAdminTab('dashboard')">
+          <div class="brand-icon-box" style="width: 38px; height: 38px; font-size: 1.2rem;">
+            <i class="bi bi-heart-pulse-fill"></i>
+          </div>
+          <div class="brand-name" style="font-size: 1.25rem;">
+            Medi<span>Care</span>
+          </div>
+        </a>
+        <button class="btn btn-sm btn-light d-lg-none" onclick="toggleMobileSidebar()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <div class="sidebar-nav-container">
+        <div class="sidebar-group-label">Hospital Management</div>
+
+        <a class="sidebar-nav-link active" data-tab="dashboard" onclick="switchAdminTab('dashboard')">
+          <i class="bi bi-grid-1x2-fill"></i>
+          <span>Dashboard</span>
+        </a>
+
+        <a class="sidebar-nav-link" data-tab="patients" onclick="switchAdminTab('patients')">
+          <i class="bi bi-people-fill"></i>
+          <span>Patient Records</span>
+        </a>
+
+        <a class="sidebar-nav-link" data-tab="doctors" onclick="switchAdminTab('doctors')">
+          <i class="bi bi-person-badge-fill"></i>
+          <span>Doctor Directory</span>
+        </a>
+
+        <a class="sidebar-nav-link" data-tab="appointments" onclick="switchAdminTab('appointments')">
+          <i class="bi bi-calendar2-check-fill"></i>
+          <span>Appointments</span>
+        </a>
+
+        <a class="sidebar-nav-link" data-tab="departments" onclick="switchAdminTab('departments')">
+          <i class="bi bi-diagram-3-fill"></i>
+          <span>Departments</span>
+        </a>
+
+        <div class="sidebar-group-label mt-3">Administration</div>
+
+        <a class="sidebar-nav-link" data-tab="billing" onclick="switchAdminTab('billing')">
+          <i class="bi bi-receipt-cutoff"></i>
+          <span>Billing & Invoices</span>
+        </a>
+
+        <a class="sidebar-nav-link" data-tab="reports" onclick="switchAdminTab('reports')">
+          <i class="bi bi-graph-up-arrow"></i>
+          <span>Clinical Reports</span>
+        </a>
+
+        <a class="sidebar-nav-link" data-tab="settings" onclick="switchAdminTab('settings')">
+          <i class="bi bi-gear-fill"></i>
+          <span>Settings</span>
+        </a>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="user-mini-profile mb-3">
+          <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=120&q=80" alt="Dr. Robert Vance" class="user-avatar-circle">
+          <div class="overflow-hidden">
+            <div class="fw-bold text-dark text-truncate" style="font-size: 0.9rem;">Dr. Robert Vance</div>
+            <div class="text-muted text-truncate" style="font-size: 0.75rem;">Chief Medical Officer</div>
+          </div>
+        </div>
+        <button class="btn btn-sm btn-outline-secondary w-100" onclick="switchMainView('public')">
+          <i class="bi bi-box-arrow-left me-1"></i> Public Website
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <div class="admin-main-wrapper">
+
+      <!-- Topbar -->
+      <header class="admin-topbar">
+        <div class="d-flex align-items-center gap-3">
+          <button class="btn btn-sm btn-light d-lg-none" onclick="toggleMobileSidebar()">
+            <i class="bi bi-list fs-5"></i>
+          </button>
+
+          <!-- Global Dynamic Search -->
+          <div class="topbar-search-box">
+            <i class="bi bi-search"></i>
+            <input type="text" id="globalSearchInput" class="topbar-search-input" placeholder="Search patient, doctor, or record (Press Enter)...">
+          </div>
+        </div>
+
+        <div class="topbar-actions">
+          <!-- Reset Demo Data -->
+          <button class="btn btn-sm btn-medicare-outline d-none d-sm-inline-flex" title="Restore initial sample dataset" onclick="DB.reset()">
+            <i class="bi bi-arrow-clockwise"></i> Reset Data
+          </button>
+
+          <!-- Quick Action: Book Appointment -->
+          <button class="btn btn-sm btn-medicare-primary" onclick="openAppointmentModal()">
+            <i class="bi bi-calendar-plus"></i> <span class="d-none d-sm-inline">New Appointment</span>
+          </button>
+
+          <!-- Notification Bell -->
+          <div class="dropdown">
+            <button class="topbar-icon-btn" type="button" data-bs-toggle="dropdown" title="Notifications">
+              <i class="bi bi-bell"></i>
+              <span class="icon-badge-dot"></span>
+            </button>
+            <div class="dropdown-menu dropdown-menu-end shadow-md p-3" style="width: 300px;">
+              <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                <span class="fw-bold text-dark">Notifications</span>
+                <span class="badge badge-mint" style="font-size: 0.7rem;">3 New</span>
+              </div>
+              <div class="small mb-2 pb-2 border-bottom">
+                <div class="fw-semibold">Emergency Case Arrived</div>
+                <div class="text-muted" style="font-size: 0.75rem;">Trauma Suite 1 assigned &bull; 10m ago</div>
+              </div>
+              <div class="small mb-2 pb-2 border-bottom">
+                <div class="fw-semibold">Lab Diagnostics Complete</div>
+                <div class="text-muted" style="font-size: 0.75rem;">Blood panel for Eleanor Vance &bull; 25m ago</div>
+              </div>
+              <div class="small text-center pt-1">
+                <a href="javascript:void(0)" class="text-primary fw-semibold" style="font-size: 0.8rem;">Mark all as read</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Switch to Public Site -->
+          <button class="btn btn-sm btn-medicare-secondary d-none d-md-inline-flex" onclick="switchMainView('public')">
+            <i class="bi bi-house"></i> View Website
+          </button>
+        </div>
+      </header>
+
+      <!-- Content Views Area -->
+      <main class="admin-content-area">
+
+        <!-- TAB 1: DASHBOARD OVERVIEW -->
+        <div id="tab-dashboard" class="admin-tab-pane active-view">
+          <!-- Welcome Banner -->
+          <div class="card-custom p-4 mb-4" style="background: linear-gradient(135deg, #FAF9F7 0%, #EDE7F6 100%);">
+            <div class="row align-items-center g-3">
+              <div class="col-md-8">
+                <span class="badge-pill-pastel badge-blue mb-2">Hospital Command Center</span>
+                <h3 class="fw-bold mb-1">Good Day, Dr. Robert Vance</h3>
+                <p class="text-secondary mb-0">Here is your clinical snapshot for today: <strong>Thursday, November 12, 2026</strong>. All ICU wings and surgical suites operate normally.</p>
+              </div>
+              <div class="col-md-4 text-md-end">
+                <button class="btn btn-medicare-primary" onclick="openPatientModal()">
+                  <i class="bi bi-person-plus-fill"></i> Add Patient
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4 Pastel Statistic Cards -->
+          <div class="row g-4 mb-4">
+            <div class="col-xl-3 col-sm-6">
+              <div class="stat-card stat-mint">
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="stat-label">Total Patients</span>
+                  <div class="stat-icon-pill">
+                    <i class="bi bi-people-fill"></i>
+                  </div>
+                </div>
+                <div class="stat-number" id="stat-total-patients">0</div>
+                <div class="stat-growth text-success">
+                  <i class="bi bi-arrow-up-short"></i> +8.4% this month
+                </div>
+              </div>
+            </div>
+
+            <div class="col-xl-3 col-sm-6">
+              <div class="stat-card stat-lavender">
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="stat-label">Total Doctors</span>
+                  <div class="stat-icon-pill">
+                    <i class="bi bi-person-badge-fill"></i>
+                  </div>
+                </div>
+                <div class="stat-number" id="stat-total-doctors">0</div>
+                <div class="stat-growth text-primary">
+                  <i class="bi bi-check-circle-fill"></i> 100% active staff
+                </div>
+              </div>
+            </div>
+
+            <div class="col-xl-3 col-sm-6">
+              <div class="stat-card stat-blue">
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="stat-label">Today's Appointments</span>
+                  <div class="stat-icon-pill">
+                    <i class="bi bi-calendar-check-fill"></i>
+                  </div>
+                </div>
+                <div class="stat-number" id="stat-today-appointments">0</div>
+                <div class="stat-growth text-info">
+                  <i class="bi bi-clock-history"></i> 4 upcoming slots
+                </div>
+              </div>
+            </div>
+
+            <div class="col-xl-3 col-sm-6">
+              <div class="stat-card stat-cream">
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="stat-label">Total Revenue</span>
+                  <div class="stat-icon-pill">
+                    <i class="bi bi-currency-dollar"></i>
+                  </div>
+                </div>
+                <div class="stat-number" id="stat-total-revenue">$0</div>
+                <div class="stat-growth text-warning">
+                  <i class="bi bi-graph-up"></i> +14.2% collected
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts Row (Pure HTML5 Canvas) -->
+          <div class="row g-4 mb-4">
+            <div class="col-lg-8">
+              <div class="chart-container-box">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <div>
+                    <h5 class="fw-bold mb-0">Weekly Appointments & Patient Admissions</h5>
+                    <div class="small text-muted">Comparison of scheduled consultations vs. inpatient admissions</div>
+                  </div>
+                  <div class="d-flex align-items-center gap-3 small">
+                    <span><i class="bi bi-square-fill text-primary me-1"></i> Appointments</span>
+                    <span><i class="bi bi-square-fill text-success me-1"></i> Admissions</span>
+                  </div>
+                </div>
+                <div class="chart-canvas-wrap">
+                  <canvas id="appointmentsChart" class="chart-canvas"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-4">
+              <div class="chart-container-box">
+                <h5 class="fw-bold mb-1">Department Share</h5>
+                <div class="small text-muted mb-3">Distribution of clinical cases</div>
+                <div class="chart-canvas-wrap">
+                  <canvas id="departmentDonutChart" class="chart-canvas"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lower Row: Recent Appointments & Recent Activity -->
+          <div class="row g-4">
+            <div class="col-lg-8">
+              <div class="card-custom p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h5 class="fw-bold mb-0">Recent Appointments</h5>
+                  <button class="btn btn-sm btn-link text-primary fw-bold text-decoration-none" onclick="switchAdminTab('appointments')">
+                    View All <i class="bi bi-arrow-right"></i>
+                  </button>
+                </div>
+                <div class="table-responsive">
+                  <table class="table-custom">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Patient</th>
+                        <th>Doctor / Dept</th>
+                        <th>Date & Time</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody id="dashboard-recent-appointments-body">
+                      <!-- Rendered by script.js -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-4">
+              <div class="card-custom p-4">
+                <h5 class="fw-bold mb-3">Hospital Activity</h5>
+                <div id="dashboard-activity-feed">
+                  <!-- Rendered by script.js -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: PATIENT MANAGEMENT -->
+        <div id="tab-patients" class="admin-tab-pane">
+          <div class="card-custom p-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+              <div>
+                <div class="d-flex align-items-center gap-2">
+                  <h4 class="fw-bold mb-0">Patient Management</h4>
+                  <span id="patients-count-badge" class="badge-pill-pastel badge-blue">0 Patients</span>
+                </div>
+                <p class="small text-secondary mb-0">Maintain patient medical charts, contact info, and admission status.</p>
+              </div>
+              <button class="btn btn-medicare-primary" onclick="openPatientModal()">
+                <i class="bi bi-person-plus-fill"></i> Add New Patient
+              </button>
+            </div>
+
+            <!-- Filters -->
+            <div class="row g-3 mb-4">
+              <div class="col-md-5">
+                <div class="input-group">
+                  <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                  <input type="text" id="patientSearchInput" class="form-control form-control-custom border-start-0" placeholder="Search by name, ID, diagnosis..." oninput="renderPatientsTable()">
+                </div>
+              </div>
+              <div class="col-md-3">
+                <select id="patientFilterGender" class="form-select form-select-custom" onchange="renderPatientsTable()">
+                  <option value="">All Genders</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <select id="patientFilterStatus" class="form-select form-select-custom" onchange="renderPatientsTable()">
+                  <option value="">All Admission Statuses</option>
+                  <option value="Admitted">Admitted</option>
+                  <option value="Outpatient">Outpatient</option>
+                  <option value="Discharged">Discharged</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Patients Table -->
+            <div class="table-responsive">
+              <table class="table-custom">
+                <thead>
+                  <tr>
+                    <th>Patient ID</th>
+                    <th>Name & Email</th>
+                    <th>Age / Gender</th>
+                    <th>Phone & Blood</th>
+                    <th>Condition / Doctor</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="patients-table-body">
+                  <!-- Rendered by script.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: DOCTOR MANAGEMENT -->
+        <div id="tab-doctors" class="admin-tab-pane">
+          <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+            <div>
+              <div class="d-flex align-items-center gap-2">
+                <h4 class="fw-bold mb-0">Doctor & Specialist Directory</h4>
+                <span id="doctors-count-badge" class="badge-pill-pastel badge-lavender">0 Doctors</span>
+              </div>
+              <p class="small text-secondary mb-0">Manage hospital staff credentials, clinical availability, and consultation rates.</p>
+            </div>
+            <button class="btn btn-medicare-primary" onclick="openDoctorModal()">
+              <i class="bi bi-person-plus-fill"></i> Add Specialist
+            </button>
+          </div>
+
+          <!-- Filters -->
+          <div class="card-custom p-3 mb-4">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="input-group">
+                  <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                  <input type="text" id="doctorSearchInput" class="form-control form-control-custom border-start-0" placeholder="Search doctor by name or specialty..." oninput="renderDoctorsGrid()">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <select id="doctorFilterDept" class="form-select form-select-custom" onchange="renderDoctorsGrid()">
+                  <option value="">All Departments</option>
+                  <option value="Cardiology">Cardiology</option>
+                  <option value="Neurology">Neurology</option>
+                  <option value="Pediatrics">Pediatrics</option>
+                  <option value="Orthopedics">Orthopedics</option>
+                  <option value="Dermatology">Dermatology</option>
+                  <option value="General Medicine">General Medicine</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Doctor Cards Grid -->
+          <div class="row g-4" id="doctors-cards-grid">
+            <!-- Rendered by script.js -->
+          </div>
+        </div>
+
+        <!-- TAB 4: APPOINTMENT MANAGEMENT -->
+        <div id="tab-appointments" class="admin-tab-pane">
+          <div class="card-custom p-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+              <div>
+                <div class="d-flex align-items-center gap-2">
+                  <h4 class="fw-bold mb-0">Appointment Scheduler</h4>
+                  <span id="appointments-count-badge" class="badge-pill-pastel badge-mint">0 Bookings</span>
+                </div>
+                <p class="small text-secondary mb-0">Review patient reservations, confirm clinical slots, and update statuses.</p>
+              </div>
+              <button class="btn btn-medicare-primary" onclick="openAppointmentModal()">
+                <i class="bi bi-calendar2-plus-fill"></i> Book Appointment
+              </button>
+            </div>
+
+            <!-- Filters -->
+            <div class="row g-3 mb-4">
+              <div class="col-md-5">
+                <div class="input-group">
+                  <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                  <input type="text" id="appointmentSearchInput" class="form-control form-control-custom border-start-0" placeholder="Search by patient, ID, or doctor..." oninput="renderAppointmentsTable()">
+                </div>
+              </div>
+              <div class="col-md-3">
+                <select id="appointmentFilterStatus" class="form-select form-select-custom" onchange="renderAppointmentsTable()">
+                  <option value="">All Statuses</option>
+                  <option value="Confirmed">Confirmed</option>
+                  <option value="Pending">Pending</option>
+                  <option value="Completed">Completed</option>
+                  <option value="Cancelled">Cancelled</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <select id="appointmentFilterDept" class="form-select form-select-custom" onchange="renderAppointmentsTable()">
+                  <option value="">All Departments</option>
+                  <option value="Cardiology">Cardiology</option>
+                  <option value="Neurology">Neurology</option>
+                  <option value="Orthopedics">Orthopedics</option>
+                  <option value="Pediatrics">Pediatrics</option>
+                  <option value="Dermatology">Dermatology</option>
+                  <option value="General Medicine">General Medicine</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Appointments Table -->
+            <div class="table-responsive">
+              <table class="table-custom">
+                <thead>
+                  <tr>
+                    <th>Apt ID</th>
+                    <th>Patient Name</th>
+                    <th>Doctor & Dept</th>
+                    <th>Date & Time</th>
+                    <th>Reason / Mode</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="appointments-table-body">
+                  <!-- Rendered by script.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 5: DEPARTMENTS -->
+        <div id="tab-departments" class="admin-tab-pane">
+          <div class="mb-4">
+            <h4 class="fw-bold mb-1">Clinical Departments</h4>
+            <p class="small text-secondary mb-0">Overview of clinical infrastructure, bed capacities, and lead department chairs.</p>
+          </div>
+
+          <div class="row g-4">
+            <!-- Cardiology -->
+            <div class="col-lg-4 col-md-6">
+              <div class="card-custom p-4 h-100">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                  <div class="dept-icon-circle badge-pink mb-0" style="width: 52px; height: 52px; font-size: 1.4rem;">
+                    <i class="bi bi-heart-pulse"></i>
+                  </div>
+                  <div>
+                    <h5 class="fw-bold mb-0">Cardiology</h5>
+                    <span class="small text-muted">Building A &bull; Floors 2-3</span>
+                  </div>
+                </div>
+                <div class="p-3 bg-light rounded-3 mb-3 small">
+                  <div class="d-flex justify-content-between mb-1">
+                    <span class="text-secondary">Head of Dept:</span>
+                    <strong class="text-dark">Dr. Sarah Jenkins</strong>
+                  </div>
+                  <div class="d-flex justify-content-between mb-1">
+                    <span class="text-secondary">ICU Suites:</span>
+                    <strong class="text-dark">18 Beds (85% Occupied)</strong>
+                  </div>
+                  <div class="d-flex justify-content-between">
+                    <span class="text-secondary">Staff Physicians:</span>
+                    <strong class="text-dark">4 Specialists</strong>
+                  </div>
+                </div>
+                <button class="btn btn-sm btn-medicare-secondary w-100" onclick="openBookAppointmentForDoctor('Dr. Sarah Jenkins', 'Cardiology')">
+                  Schedule in Cardiology
+                </button>
+              </div>
+            </div>
+
+            <!-- Neurology -->
+            <div class="col-lg-4 col-md-6">
+              <div class="card-custom p-4 h-100">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                  <div class="dept-icon-circle badge-lavender mb-0" style="width: 52px; height: 52px; font-size: 1.4rem;">
+                    <i class="bi bi-diagram-3"></i>
+                  </div>
+                  <div>
+                    <h5 class="fw-bold mb-0">Neurology</h5>
+                    <span class="small text-muted">Building B &bull; Floor 4</span>
+                  </div>
+                </div>
+                <div class="p-3 bg-light rounded-3 mb-3 small">
+                  <div class="d-flex justify-content-between mb-1">
+                    <span class="text-secondary">Head of Dept:</span>
+                    <strong class="text-dark">Dr. Alexander Chen</strong>
+                  </div>
+                  <div class="d-flex justify-content-between mb-1">
+                    <span class="text-secondary">Neuro Rehab:</span>
+                    <strong class="text-dark">12 Beds (60% Occupied)</strong>
+                  </div>
+                  <div class="d-flex justify-content-between">
+                    <span class="text-secondary">Staff Physicians:</span>
+                    <strong class="text-dark">3 Specialists</strong>
+                  </div>
+                </div>
+                <button class="btn btn-sm btn-medicare-secondary w-100" onclick="openBookAppointmentForDoctor('Dr. Alexander Chen', 'Neurology')">
+                  Schedule in Neurology
+                </button>
+              </div>
+            </div>
+
+            <!-- Orthopedics -->
+            <div class="col-lg-4 col-md-6">
+              <div class="card-custom p-4 h-100">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                  <div class="dept-icon-circle badge-cream mb-0" style="width: 52px; height: 52px; font-size: 1.4rem;">
+                    <i class="bi bi-person-walking"></i>
+                  </div>
+                  <div>
+                    <h5 class="fw-bold mb-0">Orthopedics</h5>
+                    <span class="small text-muted">Building C &bull; Floor 1</span>
+                  </div>
+                </div>
+                <div class="p-3 bg-light rounded-3 mb-3 small">
+                  <div class="d-flex justify-content-between mb-1">
+                    <span class="text-secondary">Head of Dept:</span>
+                    <strong class="text-dark">Dr. Marcus Vance</strong>
+                  </div>
+                  <div class="d-flex justify-content-between mb-1">
+                    <span class="text-secondary">Surgical Suites:</span>
+                    <strong class="text-dark">3 Robotic Theaters</strong>
+                  </div>
+                  <div class="d-flex justify-content-between">
+                    <span class="text-secondary">Staff Physicians:</span>
+                    <strong class="text-dark">5 Specialists</strong>
+                  </div>
+                </div>
+                <button class="btn btn-sm btn-medicare-secondary w-100" onclick="openBookAppointmentForDoctor('Dr. Marcus Vance', 'Orthopedics')">
+                  Schedule in Orthopedics
+                </button>
+              </div>
+            </div>
+
+            <!-- Pediatrics -->
+            <div class="col-lg-4 col-md-6">
+              <div class="card-custom p-4 h-100">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                  <div class="dept-icon-circle badge-mint mb-0" style="width: 52px; height: 52px; font-size: 1.4rem;">
+                    <i class="bi bi-balloon"></i>
+                  </div>
+                  <div>
+                    <h5 class="fw-bold mb-0">Pediatrics</h5>
+                    <span class="small text-muted">Children's Pavilion &bull; Wing 2</span>
+                  </div>
+                </div>
+                <div class="p-3 bg-light rounded-3 mb-3 small">
+                  <div class="d-flex justify-content-between mb-1">
+                    <span class="text-secondary">Head of Dept:</span>
+                    <strong class="text-dark">Dr. Elena Rostova</strong>
+                  </div>
+                  <div class="d-flex justify-content-between mb-1">
+                    <span class="text-secondary">NICU & PICU:</span>
+                    <strong class="text-dark">16 Incubators / Cots</strong>
+                  </div>
+                  <div class="d-flex justify-content-between">
+                    <span class="text-secondary">Staff Physicians:</span>
+                    <strong class="text-dark">4 Specialists</strong>
+                  </div>
+                </div>
+                <button class="btn btn-sm btn-medicare-secondary w-100" onclick="openBookAppointmentForDoctor('Dr. Elena Rostova', 'Pediatrics')">
+                  Schedule in Pediatrics
+                </button>
+              </div>
+            </div>
+
+            <!-- Dermatology -->
+            <div class="col-lg-4 col-md-6">
+              <div class="card-custom p-4 h-100">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                  <div class="dept-icon-circle badge-pink mb-0" style="width: 52px; height: 52px; font-size: 1.4rem;">
+                    <i class="bi bi-droplet-half"></i>
+                  </div>
+                  <div>
+                    <h5 class="fw-bold mb-0">Dermatology</h5>
+                    <span class="small text-muted">Outpatient Clinic &bull; Wing 1</span>
+                  </div>
+                </div>
+                <div class="p-3 bg-light rounded-3 mb-3 small">
+                  <div class="d-flex justify-content-between mb-1">
+                    <span class="text-secondary">Head of Dept:</span>
+                    <strong class="text-dark">Dr. Aisha Patel</strong>
+                  </div>
+                  <div class="d-flex justify-content-between mb-1">
+                    <span class="text-secondary">Laser Suites:</span>
+                    <strong class="text-dark">4 Treatment Rooms</strong>
+                  </div>
+                  <div class="d-flex justify-content-between">
+                    <span class="text-secondary">Staff Physicians:</span>
+                    <strong class="text-dark">3 Specialists</strong>
+                  </div>
+                </div>
+                <button class="btn btn-sm btn-medicare-secondary w-100" onclick="openBookAppointmentForDoctor('Dr. Aisha Patel', 'Dermatology')">
+                  Schedule in Dermatology
+                </button>
+              </div>
+            </div>
+
+            <!-- General Medicine -->
+            <div class="col-lg-4 col-md-6">
+              <div class="card-custom p-4 h-100">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                  <div class="dept-icon-circle badge-blue mb-0" style="width: 52px; height: 52px; font-size: 1.4rem;">
+                    <i class="bi bi-capsule"></i>
+                  </div>
+                  <div>
+                    <h5 class="fw-bold mb-0">General Medicine</h5>
+                    <span class="small text-muted">Diagnostic Center &bull; Ground Floor</span>
+                  </div>
+                </div>
+                <div class="p-3 bg-light rounded-3 mb-3 small">
+                  <div class="d-flex justify-content-between mb-1">
+                    <span class="text-secondary">Head of Dept:</span>
+                    <strong class="text-dark">Dr. David Sterling</strong>
+                  </div>
+                  <div class="d-flex justify-content-between mb-1">
+                    <span class="text-secondary">OPD Daily Volume:</span>
+                    <strong class="text-dark">~120 Consultations</strong>
+                  </div>
+                  <div class="d-flex justify-content-between">
+                    <span class="text-secondary">Staff Physicians:</span>
+                    <strong class="text-dark">6 Specialists</strong>
+                  </div>
+                </div>
+                <button class="btn btn-sm btn-medicare-secondary w-100" onclick="openBookAppointmentForDoctor('Dr. David Sterling', 'General Medicine')">
+                  Schedule in Gen Medicine
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 6: BILLING & INVOICES -->
+        <div id="tab-billing" class="admin-tab-pane">
+          <!-- Billing Metric Cards -->
+          <div class="row g-4 mb-4">
+            <div class="col-md-4">
+              <div class="stat-card stat-blue">
+                <span class="stat-label">Total Invoiced Amount</span>
+                <div class="stat-number" id="billing-total-billed">$0</div>
+                <span class="small text-muted">Across all departments</span>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="stat-card stat-mint">
+                <span class="stat-label">Settled / Collected</span>
+                <div class="stat-number" id="billing-total-paid">$0</div>
+                <span class="small text-success fw-bold">Settled payments</span>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="stat-card stat-cream">
+                <span class="stat-label">Pending / Outstanding</span>
+                <div class="stat-number" id="billing-total-outstanding">$0</div>
+                <span class="small text-warning fw-bold">Unsettled claims</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-custom p-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+              <div>
+                <h4 class="fw-bold mb-0">Invoices & Financial Records</h4>
+                <p class="small text-secondary mb-0">View billing receipts, payment statuses, and claim disbursements.</p>
+              </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <div class="input-group">
+                  <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                  <input type="text" id="billingSearchInput" class="form-control form-control-custom border-start-0" placeholder="Search by Invoice ID or patient name..." oninput="renderBillingTable()">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <select id="billingFilterStatus" class="form-select form-select-custom" onchange="renderBillingTable()">
+                  <option value="">All Payment Statuses</option>
+                  <option value="Paid">Paid</option>
+                  <option value="Pending">Pending</option>
+                  <option value="Overdue">Overdue</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Invoices Table -->
+            <div class="table-responsive">
+              <table class="table-custom">
+                <thead>
+                  <tr>
+                    <th>Invoice #</th>
+                    <th>Patient & Dept</th>
+                    <th>Date</th>
+                    <th>Amount ($)</th>
+                    <th>Payment Method</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="billing-table-body">
+                  <!-- Rendered by script.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 7: CLINICAL REPORTS -->
+        <div id="tab-reports" class="admin-tab-pane">
+          <div class="card-custom p-4 mb-4">
+            <h4 class="fw-bold mb-1">Financial & Clinical Growth Analytics</h4>
+            <p class="small text-secondary mb-4">6-Month revenue performance and patient admission trajectory.</p>
+
+            <div class="chart-canvas-wrap" style="height: 280px;">
+              <canvas id="revenueTrendChart" class="chart-canvas"></canvas>
+            </div>
+          </div>
+
+          <!-- Key Operational Metrics -->
+          <div class="row g-4">
+            <div class="col-md-3 col-sm-6">
+              <div class="card-custom p-4 text-center">
+                <div class="fs-1 fw-bold text-primary mb-1">84%</div>
+                <div class="fw-semibold text-dark">Bed Occupancy Rate</div>
+                <div class="small text-muted">126 of 150 beds in use</div>
+              </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+              <div class="card-custom p-4 text-center">
+                <div class="fs-1 fw-bold text-success mb-1">3.4 Days</div>
+                <div class="fw-semibold text-dark">Average Length of Stay</div>
+                <div class="small text-muted">-0.6d better than national avg</div>
+              </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+              <div class="card-custom p-4 text-center">
+                <div class="fs-1 fw-bold text-info mb-1">98.8%</div>
+                <div class="fw-semibold text-dark">Positive Patient Rating</div>
+                <div class="small text-muted">Based on 1,420 exit surveys</div>
+              </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+              <div class="card-custom p-4 text-center">
+                <div class="fs-1 fw-bold text-warning mb-1">11 Mins</div>
+                <div class="fw-semibold text-dark">ER Triage Response</div>
+                <div class="small text-muted">Door-to-doctor average time</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 8: SETTINGS -->
+        <div id="tab-settings" class="admin-tab-pane">
+          <div class="card-custom p-4 p-md-5">
+            <h4 class="fw-bold mb-1">Hospital & Application Settings</h4>
+            <p class="small text-secondary mb-4">Configure hospital identity, notification policies, and medical portal preferences.</p>
+
+            <form onsubmit="handleSaveSettings(event)">
+              <div class="row g-4">
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold small">Hospital Name</label>
+                  <input type="text" class="form-control form-control-custom" value="MediCare Hospital & Research Institute">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold small">Hospital Registration Code</label>
+                  <input type="text" class="form-control form-control-custom" value="JCI-MED-NY-84920" readonly>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold small">Emergency Dispatch Hotline</label>
+                  <input type="text" class="form-control form-control-custom" value="+1 (800) 555-CARE">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold small">Hospital Contact Email</label>
+                  <input type="email" class="form-control form-control-custom" value="admin@medicare.health">
+                </div>
+                <div class="col-12">
+                  <label class="form-label fw-semibold small">Campus Physical Address</label>
+                  <input type="text" class="form-control form-control-custom" value="100 Healthcare Boulevard, Metro City, NY 10001">
+                </div>
+
+                <div class="col-12"><hr class="my-2"></div>
+
+                <div class="col-md-6">
+                  <h6 class="fw-bold mb-2">Automated Notifications</h6>
+                  <div class="form-check form-switch mb-2">
+                    <input class="form-check-input" type="checkbox" id="smsReminders" checked>
+                    <label class="form-check-label small" for="smsReminders">Send SMS appointment reminder to patients 24h prior</label>
+                  </div>
+                  <div class="form-check form-switch mb-2">
+                    <input class="form-check-input" type="checkbox" id="emailResults" checked>
+                    <label class="form-check-label small" for="emailResults">Auto-email lab diagnostic reports to patients upon sign-off</label>
+                  </div>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="doctorAlerts" checked>
+                    <label class="form-check-label small" for="doctorAlerts">Alert on-call specialist when emergency admission logged</label>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <h6 class="fw-bold mb-2">System Currency & Standards</h6>
+                  <div class="row g-2">
+                    <div class="col-6">
+                      <label class="form-label small text-muted">Currency</label>
+                      <select class="form-select form-select-custom">
+                        <option value="USD" selected>USD ($)</option>
+                        <option value="EUR">EUR (€)</option>
+                        <option value="GBP">GBP (£)</option>
+                      </select>
+                    </div>
+                    <div class="col-6">
+                      <label class="form-label small text-muted">Timezone</label>
+                      <select class="form-select form-select-custom">
+                        <option selected>Eastern Time (US & Canada)</option>
+                        <option>Central Time</option>
+                        <option>Pacific Time</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-12 pt-3">
+                  <button type="submit" class="btn btn-medicare-primary px-4">
+                    <i class="bi bi-floppy-fill me-1"></i> Save Preferences
+                  </button>
+                  <button type="button" class="btn btn-medicare-outline ms-2" onclick="DB.reset()">
+                    <i class="bi bi-arrow-counterclockwise me-1"></i> Reset To Factory Demo Data
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+
+  <!-- =========================================================================
+       3. MODALS (Add/Edit Patient, Doctor, Appointment, View Invoice, View Patient)
+       ========================================================================= -->
+
+  <!-- Add/Edit Patient Modal -->
+  <div class="modal fade" id="patientModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content border-0 shadow-lg rounded-4">
+        <div class="modal-header border-bottom px-4 pt-4 pb-3">
+          <h5 class="modal-title fw-bold" id="patientModalTitle">Add Patient</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form id="patientForm" onsubmit="savePatientForm(event)" novalidate>
+          <div class="modal-body p-4">
+            <input type="hidden" id="patientIdHidden">
+
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">Full Patient Name *</label>
+                <input type="text" id="patNameInput" class="form-control form-control-custom" placeholder="e.g. Michael Thorne" required>
+                <div class="invalid-feedback">Patient name is required.</div>
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label small fw-semibold">Age *</label>
+                <input type="number" id="patAgeInput" class="form-control form-control-custom" min="1" max="120" placeholder="42" required>
+                <div class="invalid-feedback">Valid age required.</div>
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label small fw-semibold">Gender *</label>
+                <select id="patGenderInput" class="form-select form-select-custom" required>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label small fw-semibold">Blood Group</label>
+                <select id="patBloodInput" class="form-select form-select-custom">
+                  <option value="O+">O+</option>
+                  <option value="O-">O-</option>
+                  <option value="A+">A+</option>
+                  <option value="A-">A-</option>
+                  <option value="B+">B+</option>
+                  <option value="B-">B-</option>
+                  <option value="AB+">AB+</option>
+                  <option value="AB-">AB-</option>
+                </select>
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label small fw-semibold">Phone Contact *</label>
+                <input type="tel" id="patPhoneInput" class="form-control form-control-custom" placeholder="+1 (555) 000-0000" required>
+                <div class="invalid-feedback">Phone is required.</div>
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label small fw-semibold">Email Address</label>
+                <input type="email" id="patEmailInput" class="form-control form-control-custom" placeholder="patient@example.com">
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">Primary Diagnosis / Condition</label>
+                <input type="text" id="patConditionInput" class="form-control form-control-custom" placeholder="e.g. Hypertension, Knee Arthritis">
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">Assigned Physician</label>
+                <select id="patDoctorInput" class="form-select form-select-custom">
+                  <!-- Dynamically populated -->
+                </select>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">Admission Status *</label>
+                <select id="patStatusInput" class="form-select form-select-custom" required>
+                  <option value="Admitted">Admitted</option>
+                  <option value="Outpatient" selected>Outpatient</option>
+                  <option value="Discharged">Discharged</option>
+                </select>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">Residential Address</label>
+                <input type="text" id="patAddressInput" class="form-control form-control-custom" placeholder="e.g. 120 Boston Post Rd">
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer border-top px-4 py-3">
+            <button type="button" class="btn btn-medicare-outline" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-medicare-primary">Save Patient Record</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- View Patient Profile Modal -->
+  <div class="modal fade" id="patientViewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg rounded-4">
+        <div class="modal-header border-bottom px-4 pt-4 pb-3">
+          <h5 class="modal-title fw-bold">Patient Health Chart</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4" id="patientViewModalContent">
+          <!-- Rendered by script.js -->
+        </div>
+        <div class="modal-footer border-top px-4 py-3">
+          <button type="button" class="btn btn-medicare-primary w-100" data-bs-dismiss="modal">Close Profile</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Doctor Modal -->
+  <div class="modal fade" id="doctorModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content border-0 shadow-lg rounded-4">
+        <div class="modal-header border-bottom px-4 pt-4 pb-3">
+          <h5 class="modal-title fw-bold" id="doctorModalTitle">Add Specialist</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form id="doctorForm" onsubmit="saveDoctorForm(event)" novalidate>
+          <div class="modal-body p-4">
+            <input type="hidden" id="doctorIdHidden">
+
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">Doctor Name *</label>
+                <input type="text" id="docNameInput" class="form-control form-control-custom" placeholder="e.g. Dr. Julian Vance" required>
+                <div class="invalid-feedback">Doctor name is required.</div>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">Department *</label>
+                <select id="docDeptInput" class="form-select form-select-custom" required>
+                  <option value="Cardiology">Cardiology</option>
+                  <option value="Neurology">Neurology</option>
+                  <option value="Orthopedics">Orthopedics</option>
+                  <option value="Pediatrics">Pediatrics</option>
+                  <option value="Dermatology">Dermatology</option>
+                  <option value="General Medicine">General Medicine</option>
+                </select>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">Degree / Credentials *</label>
+                <input type="text" id="docDegreeInput" class="form-control form-control-custom" placeholder="e.g. MD, FACC - Harvard Medical" required>
+                <div class="invalid-feedback">Degree is required.</div>
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label small fw-semibold">Experience</label>
+                <input type="text" id="docExpInput" class="form-control form-control-custom" placeholder="e.g. 12 Years" value="10 Years">
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label small fw-semibold">Consult Fee ($) *</label>
+                <input type="number" id="docFeeInput" class="form-control form-control-custom" min="10" placeholder="150" value="150" required>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">Contact Phone</label>
+                <input type="tel" id="docPhoneInput" class="form-control form-control-custom" placeholder="+1 (555) 000-0000" value="+1 (555) 300-8819">
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">Email Address</label>
+                <input type="email" id="docEmailInput" class="form-control form-control-custom" placeholder="doctor@medicare.health" value="doctor@medicare.health">
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">Availability Status *</label>
+                <select id="docStatusInput" class="form-select form-select-custom" required>
+                  <option value="Available">Available</option>
+                  <option value="In Surgery">In Surgery</option>
+                  <option value="On Leave">On Leave</option>
+                </select>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">Profile Photo URL</label>
+                <input type="url" id="docImageInput" class="form-control form-control-custom" placeholder="https://images.unsplash.com/...">
+              </div>
+
+              <div class="col-12">
+                <label class="form-label small fw-semibold">Professional Biography</label>
+                <textarea id="docAboutInput" class="form-control form-control-custom" rows="2" placeholder="Brief clinical background and areas of expertise..."></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer border-top px-4 py-3">
+            <button type="button" class="btn btn-medicare-outline" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-medicare-primary">Save Doctor Profile</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Book / Edit Appointment Modal -->
+  <div class="modal fade" id="appointmentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content border-0 shadow-lg rounded-4">
+        <div class="modal-header border-bottom px-4 pt-4 pb-3">
+          <h5 class="modal-title fw-bold" id="appointmentModalTitle">Book Appointment</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form id="appointmentForm" onsubmit="saveAppointmentForm(event)" novalidate>
+          <div class="modal-body p-4">
+            <input type="hidden" id="appointmentIdHidden">
+
+            <div class="row g-3">
+              <div class="col-12">
+                <label class="form-label small fw-semibold text-muted">Quick Pick: Existing Patient</label>
+                <select id="aptPatientSelect" class="form-select form-select-custom" onchange="onAptPatientSelected(this)">
+                  <!-- Dynamically populated -->
+                </select>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">Patient Name *</label>
+                <input type="text" id="aptPatientNameInput" class="form-control form-control-custom" placeholder="e.g. Eleanor Vance" required>
+                <div class="invalid-feedback">Patient name is required.</div>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">Patient Phone Contact *</label>
+                <input type="tel" id="aptPatientPhoneInput" class="form-control form-control-custom" placeholder="+1 (555) 000-0000" required>
+                <div class="invalid-feedback">Phone is required.</div>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">Assigned Specialist *</label>
+                <select id="aptDoctorInput" class="form-select form-select-custom" onchange="onAptDoctorSelected(this)" required>
+                  <!-- Dynamically populated -->
+                </select>
+                <div class="invalid-feedback">Please select a doctor.</div>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">Department *</label>
+                <select id="aptDeptInput" class="form-select form-select-custom" required>
+                  <option value="Cardiology">Cardiology</option>
+                  <option value="Neurology">Neurology</option>
+                  <option value="Orthopedics">Orthopedics</option>
+                  <option value="Pediatrics">Pediatrics</option>
+                  <option value="Dermatology">Dermatology</option>
+                  <option value="General Medicine">General Medicine</option>
+                </select>
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label small fw-semibold">Appointment Date *</label>
+                <input type="date" id="aptDateInput" class="form-control form-control-custom" required>
+                <div class="invalid-feedback">Please choose a date.</div>
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label small fw-semibold">Time Slot *</label>
+                <select id="aptTimeInput" class="form-select form-select-custom" required>
+                  <option>09:00 AM</option>
+                  <option>09:30 AM</option>
+                  <option selected>10:00 AM</option>
+                  <option>10:30 AM</option>
+                  <option>11:00 AM</option>
+                  <option>02:00 PM</option>
+                  <option>02:30 PM</option>
+                  <option>03:30 PM</option>
+                  <option>04:30 PM</option>
+                </select>
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label small fw-semibold">Consultation Mode</label>
+                <select id="aptTypeInput" class="form-select form-select-custom">
+                  <option value="In-Person" selected>In-Person Visit</option>
+                  <option value="Telehealth">Virtual Telehealth</option>
+                </select>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">Booking Status</label>
+                <select id="aptStatusInput" class="form-select form-select-custom">
+                  <option value="Confirmed" selected>Confirmed</option>
+                  <option value="Pending">Pending</option>
+                  <option value="Completed">Completed</option>
+                  <option value="Cancelled">Cancelled</option>
+                </select>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">Symptoms / Medical Reason</label>
+                <input type="text" id="aptReasonInput" class="form-control form-control-custom" placeholder="e.g. Chest discomfort, post-op review">
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer border-top px-4 py-3">
+            <button type="button" class="btn btn-medicare-outline" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-medicare-primary">Confirm Appointment</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- View Invoice / Printable Receipt Modal -->
+  <div class="modal fade" id="invoiceModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content border-0 shadow-lg rounded-4">
+        <div class="modal-header border-bottom px-4 pt-4 pb-3">
+          <h5 class="modal-title fw-bold">Official Billing Statement</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4" id="invoiceModalContent">
+          <!-- Rendered by script.js -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap 5 JS Bundle CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- MediCare Vanilla JS Application Controller -->
+  <script src="script.js"></script>
+</body>
+</html>
+
