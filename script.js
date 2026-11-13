@@ -1982,5 +1982,19 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   });
+
+  // Back to top button visibility toggle on scroll
+  const backToTopBtn = document.getElementById("btnBackToTop");
+  if (backToTopBtn) {
+    window.addEventListener("scroll", () => {
+      if (window.scrollY > 350) {
+        backToTopBtn.style.opacity = "0.95";
+        backToTopBtn.style.pointerEvents = "auto";
+      } else {
+        backToTopBtn.style.opacity = "0";
+        backToTopBtn.style.pointerEvents = "none";
+      }
+    });
+  }
 });
 

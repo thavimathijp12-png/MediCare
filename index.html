@@ -19,21 +19,27 @@
 
   <!-- Bootstrap Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <!-- Custom Stylesheet -->
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+  <!-- Toast Notification Container -->
   <div id="toast-container" class="toast-container-custom"></div>
 
-  
+  <!-- =========================================================================
+       1. PUBLIC HOSPITAL WEBSITE VIEW
+       ========================================================================= -->
   <div id="public-view">
 
     <!-- Top Emergency & Info Bar -->
     <div class="top-notice-bar d-none d-md-block">
       <div class="container-fluid px-xl-5 px-lg-4 px-3 d-flex justify-content-between align-items-center">
         <div class="d-flex align-items-center gap-4">
-          <span><i class="bi bi-telephone-fill me-1 text-danger"></i> Emergency 24/7: <strong>+1 (800) 555-CARE</strong></span>
-          <span><i class="bi bi-geo-alt-fill me-1"></i> 100 Healthcare Blvd, Metro City, NY</span>
-          <span><i class="bi bi-clock-fill me-1"></i> OPD Hours: 8:00 AM - 9:00 PM</span>
+          <span class="d-inline-flex align-items-center"><span class="pulse-dot-live pulse-dot-danger me-2"></span> Emergency 24/7: <strong class="ms-1">+1 (800) 555-CARE</strong></span>
+          <span><i class="bi bi-geo-alt-fill me-1 text-primary"></i> 100 Healthcare Blvd, Metro City, NY</span>
+          <span><i class="bi bi-clock-fill me-1 text-primary"></i> OPD Hours: 8:00 AM - 9:00 PM</span>
         </div>
         <div class="d-flex align-items-center gap-3">
           <button class="btn btn-sm btn-link text-decoration-none text-primary fw-bold p-0" onclick="switchMainView('admin')">
@@ -111,9 +117,12 @@
       <div class="container position-relative" style="z-index: 2;">
         <div class="row align-items-center g-5">
           <div class="col-lg-6">
-            <span class="badge-pill-pastel badge-mint mb-3">
-              <i class="bi bi-shield-check"></i> JCI Accredited Hospital System
-            </span>
+            <div class="d-inline-flex align-items-center gap-2 mb-3 py-1 px-3 rounded-pill bg-white shadow-sm border border-subtle">
+              <span class="pulse-dot-live pulse-dot-success"></span>
+              <span class="small fw-bold text-dark"><i class="bi bi-shield-fill-check text-success me-1"></i> JCI Accredited Hospital</span>
+              <span class="text-muted opacity-50">|</span>
+              <span class="small text-muted"><i class="bi bi-star-fill text-warning me-1"></i> 4.95 Rating (12k+ Reviews)</span>
+            </div>
             <h1 class="hero-title">
               Your Health, <br><span class="highlight">Our Priority</span>
             </h1>
@@ -171,7 +180,9 @@
                 </div>
                 <div>
                   <div class="fw-bold text-dark" style="font-size: 0.95rem;">Dr. Sarah Jenkins</div>
-                  <div class="text-success small fw-semibold"><i class="bi bi-circle-fill me-1" style="font-size: 0.5rem;"></i>On Duty Today</div>
+                  <div class="text-success small fw-semibold d-flex align-items-center gap-1">
+                    <span class="pulse-dot-live pulse-dot-success" style="width: 7px; height: 7px;"></span> On Duty Today
+                  </div>
                 </div>
               </div>
             </div>
@@ -626,12 +637,17 @@
           <div class="col-lg-4">
             <div class="testimonial-card">
               <div>
-                <div class="d-flex text-warning mb-3">
-                  <i class="bi bi-star-fill me-1"></i>
-                  <i class="bi bi-star-fill me-1"></i>
-                  <i class="bi bi-star-fill me-1"></i>
-                  <i class="bi bi-star-fill me-1"></i>
-                  <i class="bi bi-star-fill"></i>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <div class="d-flex text-warning">
+                    <i class="bi bi-star-fill me-1"></i>
+                    <i class="bi bi-star-fill me-1"></i>
+                    <i class="bi bi-star-fill me-1"></i>
+                    <i class="bi bi-star-fill me-1"></i>
+                    <i class="bi bi-star-fill"></i>
+                  </div>
+                  <span class="badge-pill-pastel badge-mint py-1 px-2" style="font-size: 0.72rem;">
+                    <i class="bi bi-patch-check-fill text-success"></i> Verified Patient
+                  </span>
                 </div>
                 <p class="testimonial-quote">
                   "Dr. Sarah Jenkins and the cardiology team at MediCare performed my valve procedure with such precision and empathy. The nursing staff kept my daughter updated every hour. Truly exceptional!"
@@ -650,12 +666,17 @@
           <div class="col-lg-4">
             <div class="testimonial-card">
               <div>
-                <div class="d-flex text-warning mb-3">
-                  <i class="bi bi-star-fill me-1"></i>
-                  <i class="bi bi-star-fill me-1"></i>
-                  <i class="bi bi-star-fill me-1"></i>
-                  <i class="bi bi-star-fill me-1"></i>
-                  <i class="bi bi-star-fill"></i>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <div class="d-flex text-warning">
+                    <i class="bi bi-star-fill me-1"></i>
+                    <i class="bi bi-star-fill me-1"></i>
+                    <i class="bi bi-star-fill me-1"></i>
+                    <i class="bi bi-star-fill me-1"></i>
+                    <i class="bi bi-star-fill"></i>
+                  </div>
+                  <span class="badge-pill-pastel badge-mint py-1 px-2" style="font-size: 0.72rem;">
+                    <i class="bi bi-patch-check-fill text-success"></i> Verified Patient
+                  </span>
                 </div>
                 <p class="testimonial-quote">
                   "After my skiing accident, Dr. Vance operated on my knee using robotic arthroscopy. I was walking without crutches in three weeks! The rehab team was attentive and motivating."
@@ -674,12 +695,17 @@
           <div class="col-lg-4">
             <div class="testimonial-card">
               <div>
-                <div class="d-flex text-warning mb-3">
-                  <i class="bi bi-star-fill me-1"></i>
-                  <i class="bi bi-star-fill me-1"></i>
-                  <i class="bi bi-star-fill me-1"></i>
-                  <i class="bi bi-star-fill me-1"></i>
-                  <i class="bi bi-star-fill"></i>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <div class="d-flex text-warning">
+                    <i class="bi bi-star-fill me-1"></i>
+                    <i class="bi bi-star-fill me-1"></i>
+                    <i class="bi bi-star-fill me-1"></i>
+                    <i class="bi bi-star-fill me-1"></i>
+                    <i class="bi bi-star-fill"></i>
+                  </div>
+                  <span class="badge-pill-pastel badge-mint py-1 px-2" style="font-size: 0.72rem;">
+                    <i class="bi bi-patch-check-fill text-success"></i> Verified Patient
+                  </span>
                 </div>
                 <p class="testimonial-quote">
                   "Dr. Elena Rostova treated our little boy when he had severe bronchitis. She explained every medication clearly and made him laugh despite being in a hospital. We cannot thank MediCare enough."
@@ -946,10 +972,15 @@
 
       <div class="sidebar-footer">
         <div class="user-mini-profile mb-3">
-          <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=120&q=80" alt="Dr. Robert Vance" class="user-avatar-circle">
+          <div class="position-relative">
+            <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=120&q=80" alt="Dr. Robert Vance" class="user-avatar-circle">
+            <span class="position-absolute bottom-0 end-0 p-1 bg-success border border-2 border-white rounded-circle"></span>
+          </div>
           <div class="overflow-hidden">
             <div class="fw-bold text-dark text-truncate" style="font-size: 0.9rem;">Dr. Robert Vance</div>
-            <div class="text-muted text-truncate" style="font-size: 0.75rem;">Chief Medical Officer</div>
+            <div class="text-muted text-truncate d-flex align-items-center gap-1" style="font-size: 0.75rem;">
+              <span class="pulse-dot-live pulse-dot-success" style="width: 6px; height: 6px;"></span> Chief Medical Officer
+            </div>
           </div>
         </div>
         <button class="btn btn-sm btn-outline-secondary w-100" onclick="switchMainView('public')">
@@ -1027,7 +1058,14 @@
           <div class="card-custom p-4 mb-4" style="background: linear-gradient(135deg, #FAF9F7 0%, #EDE7F6 100%);">
             <div class="row align-items-center g-3">
               <div class="col-md-8">
-                <span class="badge-pill-pastel badge-blue mb-2">Hospital Command Center</span>
+                <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+                  <span class="badge-pill-pastel badge-blue">
+                    <span class="pulse-dot-live pulse-dot-success me-1"></span> Hospital Command Center
+                  </span>
+                  <span class="badge bg-white text-success border border-success border-opacity-25 rounded-pill small fw-semibold px-2 py-1">
+                    <i class="bi bi-activity me-1"></i> All Systems Operational
+                  </span>
+                </div>
                 <h3 class="fw-bold mb-1">Good Day, Dr. Robert Vance</h3>
                 <p class="text-secondary mb-0">Here is your clinical snapshot for today: <strong>Thursday, November 12, 2026</strong>. All ICU wings and surgical suites operate normally.</p>
               </div>
@@ -1043,6 +1081,7 @@
           <div class="row g-4 mb-4">
             <div class="col-xl-3 col-sm-6">
               <div class="stat-card stat-mint">
+                <i class="bi bi-people-fill stat-watermark-icon text-success"></i>
                 <div class="d-flex justify-content-between align-items-center">
                   <span class="stat-label">Total Patients</span>
                   <div class="stat-icon-pill">
@@ -1058,6 +1097,7 @@
 
             <div class="col-xl-3 col-sm-6">
               <div class="stat-card stat-lavender">
+                <i class="bi bi-person-badge-fill stat-watermark-icon text-primary"></i>
                 <div class="d-flex justify-content-between align-items-center">
                   <span class="stat-label">Total Doctors</span>
                   <div class="stat-icon-pill">
@@ -1073,6 +1113,7 @@
 
             <div class="col-xl-3 col-sm-6">
               <div class="stat-card stat-blue">
+                <i class="bi bi-calendar-check-fill stat-watermark-icon text-info"></i>
                 <div class="d-flex justify-content-between align-items-center">
                   <span class="stat-label">Today's Appointments</span>
                   <div class="stat-icon-pill">
@@ -1088,6 +1129,7 @@
 
             <div class="col-xl-3 col-sm-6">
               <div class="stat-card stat-cream">
+                <i class="bi bi-currency-dollar stat-watermark-icon text-warning"></i>
                 <div class="d-flex justify-content-between align-items-center">
                   <span class="stat-label">Total Revenue</span>
                   <div class="stat-icon-pill">
@@ -2080,6 +2122,11 @@
       </div>
     </div>
   </div>
+
+  <!-- Floating Back-to-Top Button -->
+  <button id="btnBackToTop" class="btn-back-to-top" onclick="window.scrollTo({top:0, behavior:'smooth'})" title="Back to top">
+    <i class="bi bi-arrow-up-short"></i>
+  </button>
 
   <!-- Bootstrap 5 JS Bundle CDN -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
