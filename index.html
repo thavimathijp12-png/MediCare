@@ -82,7 +82,7 @@
         </a>
 
         <!-- Mobile Toggle Button -->
-        <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#publicNavContent">
+        <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#publicNavContent" aria-controls="publicNavContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
 
@@ -189,7 +189,7 @@
 
               <!-- Main Hero Image -->
               <div class="hero-main-img-card">
-                <img src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1000&q=80" alt="MediCare Hospital Doctors and Facilities">
+                <img src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1000&q=80" alt="MediCare Modern Clinical Reception and Healthcare Facilities">
               </div>
 
               <!-- Floating Badge Bottom -->
@@ -268,7 +268,7 @@
         <div class="row align-items-center g-5">
           <div class="col-lg-6">
             <div class="position-relative">
-              <img src="https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=800&q=80" alt="Hospital Operating Theater" class="img-fluid rounded-4 shadow-sm" style="border: 4px solid #FFFFFF;">
+              <img src="https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=800&q=80" alt="State-of-the-art sterile surgical operating theater at MediCare" class="img-fluid rounded-4 shadow-sm" style="border: 4px solid #FFFFFF;">
               <div class="p-3 bg-white rounded-3 shadow-md position-absolute bottom-0 start-0 m-4 border" style="max-width: 260px;">
                 <div class="d-flex align-items-center gap-2">
                   <i class="bi bi-award-fill text-warning fs-3"></i>
@@ -673,7 +673,7 @@
                 </p>
               </div>
               <div class="testimonial-user">
-                <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80" alt="Patient Claire Mitchell" class="testimonial-avatar">
+                <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80" alt="Portrait of patient Claire Mitchell" class="testimonial-avatar">
                 <div>
                   <div class="fw-bold text-dark">Claire Mitchell</div>
                   <div class="small text-muted">Cardiology Patient &bull; 6-Month Review</div>
@@ -702,7 +702,7 @@
                 </p>
               </div>
               <div class="testimonial-user">
-                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80" alt="Patient David Harrison" class="testimonial-avatar">
+                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80" alt="Portrait of patient David Harrison" class="testimonial-avatar">
                 <div>
                   <div class="fw-bold text-dark">David Harrison</div>
                   <div class="small text-muted">Orthopedic Patient &bull; Sports Injury</div>
@@ -731,7 +731,7 @@
                 </p>
               </div>
               <div class="testimonial-user">
-                <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=120&q=80" alt="Patient Maria Gonzalez" class="testimonial-avatar">
+                <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=120&q=80" alt="Portrait of patient Maria Gonzalez" class="testimonial-avatar">
                 <div>
                   <div class="fw-bold text-dark">Maria Gonzalez</div>
                   <div class="small text-muted">Parent &bull; Pediatric Care</div>
@@ -804,23 +804,23 @@
               <form onsubmit="handlePublicContactSubmit(event)" novalidate>
                 <div class="row g-3">
                   <div class="col-md-6">
-                    <label class="form-label small fw-semibold">Your Full Name</label>
-                    <input type="text" class="form-control form-control-custom" placeholder="e.g. John Doe" required>
+                    <label for="contactNameInput" class="form-label small fw-semibold">Your Full Name</label>
+                    <input type="text" id="contactNameInput" class="form-control form-control-custom" placeholder="e.g. John Doe" required>
                     <div class="invalid-feedback">Please enter your name.</div>
                   </div>
                   <div class="col-md-6">
-                    <label class="form-label small fw-semibold">Phone Number</label>
-                    <input type="tel" class="form-control form-control-custom" placeholder="+1 (555) 000-0000" required>
+                    <label for="contactPhoneInput" class="form-label small fw-semibold">Phone Number</label>
+                    <input type="tel" id="contactPhoneInput" class="form-control form-control-custom" placeholder="+1 (555) 000-0000" required>
                     <div class="invalid-feedback">Please provide a valid phone number.</div>
                   </div>
                   <div class="col-md-6">
-                    <label class="form-label small fw-semibold">Email Address</label>
-                    <input type="email" class="form-control form-control-custom" placeholder="name@example.com" required>
+                    <label for="contactEmailInput" class="form-label small fw-semibold">Email Address</label>
+                    <input type="email" id="contactEmailInput" class="form-control form-control-custom" placeholder="name@example.com" required>
                     <div class="invalid-feedback">Please enter a valid email.</div>
                   </div>
                   <div class="col-md-6">
-                    <label class="form-label small fw-semibold">Department of Interest</label>
-                    <select class="form-select form-select-custom" required>
+                    <label for="contactDeptInput" class="form-label small fw-semibold">Department of Interest</label>
+                    <select id="contactDeptInput" class="form-select form-select-custom" required>
                       <option value="">Select Department</option>
                       <option>Cardiology</option>
                       <option>Neurology</option>
@@ -831,8 +831,8 @@
                     </select>
                   </div>
                   <div class="col-12">
-                    <label class="form-label small fw-semibold">Message / Medical Concern</label>
-                    <textarea class="form-control form-control-custom" rows="3" placeholder="Briefly describe your health question or symptom..." required></textarea>
+                    <label for="contactMessageInput" class="form-label small fw-semibold">Message / Medical Concern</label>
+                    <textarea id="contactMessageInput" class="form-control form-control-custom" rows="3" placeholder="Briefly describe your health question or symptom..." required></textarea>
                     <div class="invalid-feedback">Please write your message.</div>
                   </div>
                   <div class="col-12 mt-4">
@@ -992,7 +992,7 @@
       <div class="sidebar-footer">
         <div class="user-mini-profile mb-3">
           <div class="position-relative">
-            <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=120&q=80" alt="Dr. Robert Vance" class="user-avatar-circle">
+            <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=120&q=80" alt="Profile picture of Chief Medical Officer Dr. Robert Vance" class="user-avatar-circle">
             <span class="position-absolute bottom-0 end-0 p-1 bg-success border border-2 border-white rounded-circle"></span>
           </div>
           <div class="overflow-hidden">
@@ -1014,20 +1014,20 @@
       <!-- Topbar -->
       <header class="admin-topbar">
         <div class="d-flex align-items-center gap-3">
-          <button class="btn btn-sm btn-light d-lg-none" onclick="toggleMobileSidebar()">
+          <button class="btn btn-sm btn-light d-lg-none" onclick="toggleMobileSidebar()" aria-label="Toggle admin sidebar navigation">
             <i class="bi bi-list fs-5"></i>
           </button>
 
           <!-- Global Dynamic Search -->
           <div class="topbar-search-box">
             <i class="bi bi-search"></i>
-            <input type="text" id="globalSearchInput" class="topbar-search-input" placeholder="Search patient, doctor, or record (Press Enter)...">
+            <input type="text" id="globalSearchInput" class="topbar-search-input" placeholder="Search patient, doctor, or record (Press Enter)..." aria-label="Global search across patients, doctors, and records">
           </div>
         </div>
 
         <div class="topbar-actions">
           <!-- Reset Demo Data -->
-          <button class="btn btn-sm btn-medicare-outline d-none d-sm-inline-flex" title="Restore initial sample dataset" onclick="DB.reset()">
+          <button class="btn btn-sm btn-medicare-outline d-none d-sm-inline-flex" title="Restore initial sample dataset" onclick="DB.reset()" aria-label="Restore demo dataset">
             <i class="bi bi-arrow-clockwise"></i> Reset Data
           </button>
 
@@ -1038,7 +1038,7 @@
 
           <!-- Notification Bell -->
           <div class="dropdown">
-            <button class="topbar-icon-btn" type="button" data-bs-toggle="dropdown" title="Notifications">
+            <button class="topbar-icon-btn" type="button" data-bs-toggle="dropdown" title="Notifications" aria-label="View notifications">
               <i class="bi bi-bell"></i>
               <span class="icon-badge-dot"></span>
             </button>
@@ -1256,18 +1256,18 @@
               <div class="col-md-5">
                 <div class="input-group">
                   <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
-                  <input type="text" id="patientSearchInput" class="form-control form-control-custom border-start-0" placeholder="Search by name, ID, diagnosis..." oninput="renderPatientsTable()">
+                  <input type="text" id="patientSearchInput" class="form-control form-control-custom border-start-0" placeholder="Search by name, ID, diagnosis..." oninput="renderPatientsTable()" aria-label="Search patients by name, ID, or diagnosis">
                 </div>
               </div>
               <div class="col-md-3">
-                <select id="patientFilterGender" class="form-select form-select-custom" onchange="renderPatientsTable()">
+                <select id="patientFilterGender" class="form-select form-select-custom" onchange="renderPatientsTable()" aria-label="Filter patients by gender">
                   <option value="">All Genders</option>
                   <option value="Male">Male</option>
                   <option value="Female">Female</option>
                 </select>
               </div>
               <div class="col-md-4">
-                <select id="patientFilterStatus" class="form-select form-select-custom" onchange="renderPatientsTable()">
+                <select id="patientFilterStatus" class="form-select form-select-custom" onchange="renderPatientsTable()" aria-label="Filter patients by admission status">
                   <option value="">All Admission Statuses</option>
                   <option value="Admitted">Admitted</option>
                   <option value="Outpatient">Outpatient</option>
@@ -1319,11 +1319,11 @@
               <div class="col-md-6">
                 <div class="input-group">
                   <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
-                  <input type="text" id="doctorSearchInput" class="form-control form-control-custom border-start-0" placeholder="Search doctor by name or specialty..." oninput="renderDoctorsGrid()">
+                  <input type="text" id="doctorSearchInput" class="form-control form-control-custom border-start-0" placeholder="Search doctor by name or specialty..." oninput="renderDoctorsGrid()" aria-label="Search doctors by name or specialty">
                 </div>
               </div>
               <div class="col-md-6">
-                <select id="doctorFilterDept" class="form-select form-select-custom" onchange="renderDoctorsGrid()">
+                <select id="doctorFilterDept" class="form-select form-select-custom" onchange="renderDoctorsGrid()" aria-label="Filter doctors by department">
                   <option value="">All Departments</option>
                   <option value="Cardiology">Cardiology</option>
                   <option value="Neurology">Neurology</option>
@@ -1363,11 +1363,11 @@
               <div class="col-md-5">
                 <div class="input-group">
                   <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
-                  <input type="text" id="appointmentSearchInput" class="form-control form-control-custom border-start-0" placeholder="Search by patient, ID, or doctor..." oninput="renderAppointmentsTable()">
+                  <input type="text" id="appointmentSearchInput" class="form-control form-control-custom border-start-0" placeholder="Search by patient, ID, or doctor..." oninput="renderAppointmentsTable()" aria-label="Search appointments by patient, ID, or doctor">
                 </div>
               </div>
               <div class="col-md-3">
-                <select id="appointmentFilterStatus" class="form-select form-select-custom" onchange="renderAppointmentsTable()">
+                <select id="appointmentFilterStatus" class="form-select form-select-custom" onchange="renderAppointmentsTable()" aria-label="Filter appointments by status">
                   <option value="">All Statuses</option>
                   <option value="Confirmed">Confirmed</option>
                   <option value="Pending">Pending</option>
@@ -1376,7 +1376,7 @@
                 </select>
               </div>
               <div class="col-md-4">
-                <select id="appointmentFilterDept" class="form-select form-select-custom" onchange="renderAppointmentsTable()">
+                <select id="appointmentFilterDept" class="form-select form-select-custom" onchange="renderAppointmentsTable()" aria-label="Filter appointments by department">
                   <option value="">All Departments</option>
                   <option value="Cardiology">Cardiology</option>
                   <option value="Neurology">Neurology</option>
@@ -1652,11 +1652,11 @@
               <div class="col-md-6">
                 <div class="input-group">
                   <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
-                  <input type="text" id="billingSearchInput" class="form-control form-control-custom border-start-0" placeholder="Search by Invoice ID or patient name..." oninput="renderBillingTable()">
+                  <input type="text" id="billingSearchInput" class="form-control form-control-custom border-start-0" placeholder="Search by Invoice ID or patient name..." oninput="renderBillingTable()" aria-label="Search billing statements by invoice ID or patient name">
                 </div>
               </div>
               <div class="col-md-6">
-                <select id="billingFilterStatus" class="form-select form-select-custom" onchange="renderBillingTable()">
+                <select id="billingFilterStatus" class="form-select form-select-custom" onchange="renderBillingTable()" aria-label="Filter billing statements by payment status">
                   <option value="">All Payment Statuses</option>
                   <option value="Paid">Paid</option>
                   <option value="Pending">Pending</option>
@@ -1823,12 +1823,12 @@
        ========================================================================= -->
 
   <!-- Add/Edit Patient Modal -->
-  <div class="modal fade" id="patientModal" tabindex="-1" aria-hidden="true">
+  <div class="modal fade" id="patientModal" tabindex="-1" aria-labelledby="patientModalTitle" aria-hidden="true" role="dialog" aria-modal="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content border-0 shadow-lg rounded-4">
         <div class="modal-header border-bottom px-4 pt-4 pb-3">
           <h5 class="modal-title fw-bold" id="patientModalTitle">Add Patient</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <form id="patientForm" onsubmit="savePatientForm(event)" novalidate>
           <div class="modal-body p-4">
@@ -1836,19 +1836,19 @@
 
             <div class="row g-3">
               <div class="col-md-6">
-                <label class="form-label small fw-semibold">Full Patient Name *</label>
+                <label for="patNameInput" class="form-label small fw-semibold">Full Patient Name *</label>
                 <input type="text" id="patNameInput" class="form-control form-control-custom" placeholder="e.g. Michael Thorne" required>
                 <div class="invalid-feedback">Patient name is required.</div>
               </div>
 
               <div class="col-md-3">
-                <label class="form-label small fw-semibold">Age *</label>
+                <label for="patAgeInput" class="form-label small fw-semibold">Age *</label>
                 <input type="number" id="patAgeInput" class="form-control form-control-custom" min="1" max="120" placeholder="42" required>
                 <div class="invalid-feedback">Valid age required.</div>
               </div>
 
               <div class="col-md-3">
-                <label class="form-label small fw-semibold">Gender *</label>
+                <label for="patGenderInput" class="form-label small fw-semibold">Gender *</label>
                 <select id="patGenderInput" class="form-select form-select-custom" required>
                   <option value="Male">Male</option>
                   <option value="Female">Female</option>
@@ -1857,7 +1857,7 @@
               </div>
 
               <div class="col-md-4">
-                <label class="form-label small fw-semibold">Blood Group</label>
+                <label for="patBloodInput" class="form-label small fw-semibold">Blood Group</label>
                 <select id="patBloodInput" class="form-select form-select-custom">
                   <option value="O+">O+</option>
                   <option value="O-">O-</option>
@@ -1871,30 +1871,30 @@
               </div>
 
               <div class="col-md-4">
-                <label class="form-label small fw-semibold">Phone Contact *</label>
+                <label for="patPhoneInput" class="form-label small fw-semibold">Phone Contact *</label>
                 <input type="tel" id="patPhoneInput" class="form-control form-control-custom" placeholder="+1 (555) 000-0000" required>
                 <div class="invalid-feedback">Phone is required.</div>
               </div>
 
               <div class="col-md-4">
-                <label class="form-label small fw-semibold">Email Address</label>
+                <label for="patEmailInput" class="form-label small fw-semibold">Email Address</label>
                 <input type="email" id="patEmailInput" class="form-control form-control-custom" placeholder="patient@example.com">
               </div>
 
               <div class="col-md-6">
-                <label class="form-label small fw-semibold">Primary Diagnosis / Condition</label>
+                <label for="patConditionInput" class="form-label small fw-semibold">Primary Diagnosis / Condition</label>
                 <input type="text" id="patConditionInput" class="form-control form-control-custom" placeholder="e.g. Hypertension, Knee Arthritis">
               </div>
 
               <div class="col-md-6">
-                <label class="form-label small fw-semibold">Assigned Physician</label>
+                <label for="patDoctorInput" class="form-label small fw-semibold">Assigned Physician</label>
                 <select id="patDoctorInput" class="form-select form-select-custom">
                   <!-- Dynamically populated -->
                 </select>
               </div>
 
               <div class="col-md-6">
-                <label class="form-label small fw-semibold">Admission Status *</label>
+                <label for="patStatusInput" class="form-label small fw-semibold">Admission Status *</label>
                 <select id="patStatusInput" class="form-select form-select-custom" required>
                   <option value="Admitted">Admitted</option>
                   <option value="Outpatient" selected>Outpatient</option>
@@ -1903,7 +1903,7 @@
               </div>
 
               <div class="col-md-6">
-                <label class="form-label small fw-semibold">Residential Address</label>
+                <label for="patAddressInput" class="form-label small fw-semibold">Residential Address</label>
                 <input type="text" id="patAddressInput" class="form-control form-control-custom" placeholder="e.g. 120 Boston Post Rd">
               </div>
             </div>
@@ -1918,12 +1918,12 @@
   </div>
 
   <!-- View Patient Profile Modal -->
-  <div class="modal fade" id="patientViewModal" tabindex="-1" aria-hidden="true">
+  <div class="modal fade" id="patientViewModal" tabindex="-1" aria-labelledby="patientViewModalTitle" aria-hidden="true" role="dialog" aria-modal="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content border-0 shadow-lg rounded-4">
         <div class="modal-header border-bottom px-4 pt-4 pb-3">
-          <h5 class="modal-title fw-bold">Patient Health Chart</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          <h5 class="modal-title fw-bold" id="patientViewModalTitle">Patient Health Chart</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body p-4" id="patientViewModalContent">
           <!-- Rendered by script.js -->
@@ -1936,12 +1936,12 @@
   </div>
 
   <!-- Add/Edit Doctor Modal -->
-  <div class="modal fade" id="doctorModal" tabindex="-1" aria-hidden="true">
+  <div class="modal fade" id="doctorModal" tabindex="-1" aria-labelledby="doctorModalTitle" aria-hidden="true" role="dialog" aria-modal="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content border-0 shadow-lg rounded-4">
         <div class="modal-header border-bottom px-4 pt-4 pb-3">
           <h5 class="modal-title fw-bold" id="doctorModalTitle">Add Specialist</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <form id="doctorForm" onsubmit="saveDoctorForm(event)" novalidate>
           <div class="modal-body p-4">
@@ -1949,13 +1949,13 @@
 
             <div class="row g-3">
               <div class="col-md-6">
-                <label class="form-label small fw-semibold">Doctor Name *</label>
+                <label for="docNameInput" class="form-label small fw-semibold">Doctor Name *</label>
                 <input type="text" id="docNameInput" class="form-control form-control-custom" placeholder="e.g. Dr. Julian Vance" required>
                 <div class="invalid-feedback">Doctor name is required.</div>
               </div>
 
               <div class="col-md-6">
-                <label class="form-label small fw-semibold">Department *</label>
+                <label for="docDeptInput" class="form-label small fw-semibold">Department *</label>
                 <select id="docDeptInput" class="form-select form-select-custom" required>
                   <option value="Cardiology">Cardiology</option>
                   <option value="Neurology">Neurology</option>
@@ -1967,33 +1967,33 @@
               </div>
 
               <div class="col-md-6">
-                <label class="form-label small fw-semibold">Degree / Credentials *</label>
+                <label for="docDegreeInput" class="form-label small fw-semibold">Degree / Credentials *</label>
                 <input type="text" id="docDegreeInput" class="form-control form-control-custom" placeholder="e.g. MD, FACC - Harvard Medical" required>
                 <div class="invalid-feedback">Degree is required.</div>
               </div>
 
               <div class="col-md-3">
-                <label class="form-label small fw-semibold">Experience</label>
+                <label for="docExpInput" class="form-label small fw-semibold">Experience</label>
                 <input type="text" id="docExpInput" class="form-control form-control-custom" placeholder="e.g. 12 Years" value="10 Years">
               </div>
 
               <div class="col-md-3">
-                <label class="form-label small fw-semibold">Consult Fee ($) *</label>
+                <label for="docFeeInput" class="form-label small fw-semibold">Consult Fee ($) *</label>
                 <input type="number" id="docFeeInput" class="form-control form-control-custom" min="10" placeholder="150" value="150" required>
               </div>
 
               <div class="col-md-6">
-                <label class="form-label small fw-semibold">Contact Phone</label>
+                <label for="docPhoneInput" class="form-label small fw-semibold">Contact Phone</label>
                 <input type="tel" id="docPhoneInput" class="form-control form-control-custom" placeholder="+1 (555) 000-0000" value="+1 (555) 300-8819">
               </div>
 
               <div class="col-md-6">
-                <label class="form-label small fw-semibold">Email Address</label>
+                <label for="docEmailInput" class="form-label small fw-semibold">Email Address</label>
                 <input type="email" id="docEmailInput" class="form-control form-control-custom" placeholder="doctor@medicare.health" value="doctor@medicare.health">
               </div>
 
               <div class="col-md-6">
-                <label class="form-label small fw-semibold">Availability Status *</label>
+                <label for="docStatusInput" class="form-label small fw-semibold">Availability Status *</label>
                 <select id="docStatusInput" class="form-select form-select-custom" required>
                   <option value="Available">Available</option>
                   <option value="In Surgery">In Surgery</option>
@@ -2002,12 +2002,12 @@
               </div>
 
               <div class="col-md-6">
-                <label class="form-label small fw-semibold">Profile Photo URL</label>
+                <label for="docImageInput" class="form-label small fw-semibold">Profile Photo URL</label>
                 <input type="url" id="docImageInput" class="form-control form-control-custom" placeholder="https://images.unsplash.com/...">
               </div>
 
               <div class="col-12">
-                <label class="form-label small fw-semibold">Professional Biography</label>
+                <label for="docAboutInput" class="form-label small fw-semibold">Professional Biography</label>
                 <textarea id="docAboutInput" class="form-control form-control-custom" rows="2" placeholder="Brief clinical background and areas of expertise..."></textarea>
               </div>
             </div>
@@ -2022,12 +2022,12 @@
   </div>
 
   <!-- Book / Edit Appointment Modal -->
-  <div class="modal fade" id="appointmentModal" tabindex="-1" aria-hidden="true">
+  <div class="modal fade" id="appointmentModal" tabindex="-1" aria-labelledby="appointmentModalTitle" aria-hidden="true" role="dialog" aria-modal="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content border-0 shadow-lg rounded-4">
         <div class="modal-header border-bottom px-4 pt-4 pb-3">
           <h5 class="modal-title fw-bold" id="appointmentModalTitle">Book Appointment</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <form id="appointmentForm" onsubmit="saveAppointmentForm(event)" novalidate>
           <div class="modal-body p-4">
@@ -2035,26 +2035,26 @@
 
             <div class="row g-3">
               <div class="col-12">
-                <label class="form-label small fw-semibold text-muted">Quick Pick: Existing Patient</label>
+                <label for="aptPatientSelect" class="form-label small fw-semibold text-muted">Quick Pick: Existing Patient</label>
                 <select id="aptPatientSelect" class="form-select form-select-custom" onchange="onAptPatientSelected(this)">
                   <!-- Dynamically populated -->
                 </select>
               </div>
 
               <div class="col-md-6">
-                <label class="form-label small fw-semibold">Patient Name *</label>
+                <label for="aptPatientNameInput" class="form-label small fw-semibold">Patient Name *</label>
                 <input type="text" id="aptPatientNameInput" class="form-control form-control-custom" placeholder="e.g. Eleanor Vance" required>
                 <div class="invalid-feedback">Patient name is required.</div>
               </div>
 
               <div class="col-md-6">
-                <label class="form-label small fw-semibold">Patient Phone Contact *</label>
+                <label for="aptPatientPhoneInput" class="form-label small fw-semibold">Patient Phone Contact *</label>
                 <input type="tel" id="aptPatientPhoneInput" class="form-control form-control-custom" placeholder="+1 (555) 000-0000" required>
                 <div class="invalid-feedback">Phone is required.</div>
               </div>
 
               <div class="col-md-6">
-                <label class="form-label small fw-semibold">Assigned Specialist *</label>
+                <label for="aptDoctorInput" class="form-label small fw-semibold">Assigned Specialist *</label>
                 <select id="aptDoctorInput" class="form-select form-select-custom" onchange="onAptDoctorSelected(this)" required>
                   <!-- Dynamically populated -->
                 </select>
@@ -2062,7 +2062,7 @@
               </div>
 
               <div class="col-md-6">
-                <label class="form-label small fw-semibold">Department *</label>
+                <label for="aptDeptInput" class="form-label small fw-semibold">Department *</label>
                 <select id="aptDeptInput" class="form-select form-select-custom" required>
                   <option value="Cardiology">Cardiology</option>
                   <option value="Neurology">Neurology</option>
@@ -2074,13 +2074,13 @@
               </div>
 
               <div class="col-md-4">
-                <label class="form-label small fw-semibold">Appointment Date *</label>
+                <label for="aptDateInput" class="form-label small fw-semibold">Appointment Date *</label>
                 <input type="date" id="aptDateInput" class="form-control form-control-custom" required>
                 <div class="invalid-feedback">Please choose a date.</div>
               </div>
 
               <div class="col-md-4">
-                <label class="form-label small fw-semibold">Time Slot *</label>
+                <label for="aptTimeInput" class="form-label small fw-semibold">Time Slot *</label>
                 <select id="aptTimeInput" class="form-select form-select-custom" required>
                   <option>09:00 AM</option>
                   <option>09:30 AM</option>
@@ -2095,7 +2095,7 @@
               </div>
 
               <div class="col-md-4">
-                <label class="form-label small fw-semibold">Consultation Mode</label>
+                <label for="aptTypeInput" class="form-label small fw-semibold">Consultation Mode</label>
                 <select id="aptTypeInput" class="form-select form-select-custom">
                   <option value="In-Person" selected>In-Person Visit</option>
                   <option value="Telehealth">Virtual Telehealth</option>
@@ -2103,7 +2103,7 @@
               </div>
 
               <div class="col-md-6">
-                <label class="form-label small fw-semibold">Booking Status</label>
+                <label for="aptStatusInput" class="form-label small fw-semibold">Booking Status</label>
                 <select id="aptStatusInput" class="form-select form-select-custom">
                   <option value="Confirmed" selected>Confirmed</option>
                   <option value="Pending">Pending</option>
@@ -2113,7 +2113,7 @@
               </div>
 
               <div class="col-md-6">
-                <label class="form-label small fw-semibold">Symptoms / Medical Reason</label>
+                <label for="aptReasonInput" class="form-label small fw-semibold">Symptoms / Medical Reason</label>
                 <input type="text" id="aptReasonInput" class="form-control form-control-custom" placeholder="e.g. Chest discomfort, post-op review">
               </div>
             </div>
@@ -2128,12 +2128,12 @@
   </div>
 
   <!-- View Invoice / Printable Receipt Modal -->
-  <div class="modal fade" id="invoiceModal" tabindex="-1" aria-hidden="true">
+  <div class="modal fade" id="invoiceModal" tabindex="-1" aria-labelledby="invoiceModalTitle" aria-hidden="true" role="dialog" aria-modal="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content border-0 shadow-lg rounded-4">
         <div class="modal-header border-bottom px-4 pt-4 pb-3">
-          <h5 class="modal-title fw-bold">Official Billing Statement</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          <h5 class="modal-title fw-bold" id="invoiceModalTitle">Official Billing Statement</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body p-4" id="invoiceModalContent">
           <!-- Rendered by script.js -->
@@ -2143,7 +2143,7 @@
   </div>
 
   <!-- Floating Back-to-Top Button -->
-  <button id="btnBackToTop" class="btn-back-to-top" onclick="window.scrollTo({top:0, behavior:'smooth'})" title="Back to top">
+  <button id="btnBackToTop" class="btn-back-to-top" onclick="window.scrollTo({top:0, behavior:'smooth'})" title="Back to top" aria-label="Back to top">
     <i class="bi bi-arrow-up-short"></i>
   </button>
 

@@ -1348,7 +1348,7 @@ function renderDoctorsGrid() {
     col.innerHTML = `
       <div class="doctor-card">
         <div class="doctor-img-wrap">
-          <img src="${doc.image}" alt="${doc.name}" loading="lazy">
+          <img src="${doc.image}" alt="Portrait of ${doc.name}, Specialist in ${doc.department}" loading="lazy">
           <span class="doctor-dept-pill">${doc.department}</span>
           <span class="doctor-availability-pill" style="${statusBg}">
             <i class="bi bi-circle-fill me-1" style="font-size: 0.5rem;"></i>${doc.status}
@@ -2050,7 +2050,7 @@ function renderPublicFeaturedDoctors() {
     col.innerHTML = `
       <div class="doctor-card">
         <div class="doctor-img-wrap">
-          <img src="${doc.image}" alt="${doc.name}" loading="lazy">
+          <img src="${doc.image}" alt="Portrait of ${doc.name}, Specialist in ${doc.department}" loading="lazy">
           <span class="doctor-dept-pill">${doc.department}</span>
         </div>
         <div class="doctor-body">

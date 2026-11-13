@@ -421,12 +421,13 @@ a:hover {
 .brand-logo-wrap {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   font-weight: 800;
-  font-size: 1.48rem;
+  font-size: 1.42rem;
   color: var(--text-primary);
   text-decoration: none;
   transition: transform var(--transition-fast);
+  flex-shrink: 0;
 }
 
 .brand-logo-wrap:hover {
@@ -434,18 +435,19 @@ a:hover {
 }
 
 .brand-icon-box {
-  width: 44px;
-  height: 44px;
+  width: 42px;
+  height: 42px;
   border-radius: var(--radius-md);
   background: linear-gradient(135deg, #1C5D99 0%, #2563EB 100%);
   color: #FFFFFF;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.38rem;
+  font-size: 1.35rem;
   box-shadow: 0 4px 14px rgba(28, 93, 153, 0.28);
   position: relative;
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .brand-icon-box::after {
@@ -459,6 +461,7 @@ a:hover {
 .brand-name {
   letter-spacing: -0.035em;
   font-weight: 800;
+  white-space: nowrap;
 }
 
 .brand-name span {
@@ -468,16 +471,18 @@ a:hover {
 .nav-link-custom {
   color: var(--text-secondary);
   font-weight: 600;
-  font-size: 0.92rem;
-  padding: 8px 12px !important;
+  font-size: 0.88rem;
+  padding: 6px 11px !important;
   border-radius: var(--radius-pill);
   white-space: nowrap;
   transition: color var(--transition-fast), background-color var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
 }
 
 .nav-link-custom:hover {
   color: var(--brand-primary);
-  background-color: rgba(28, 93, 153, 0.05);
+  background-color: rgba(28, 93, 153, 0.06);
 }
 
 .nav-link-custom.active {
@@ -489,31 +494,31 @@ a:hover {
 .nav-right-ctas {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   flex-shrink: 0;
 }
 
 @media (max-width: 1320px) and (min-width: 992px) {
   .nav-link-custom {
-    padding: 6px 8px !important;
-    font-size: 0.85rem;
+    padding: 5px 7px !important;
+    font-size: 0.82rem;
   }
   .brand-logo-wrap {
-    font-size: 1.3rem;
-    gap: 8px;
+    font-size: 1.25rem;
+    gap: 7px;
   }
   .brand-icon-box {
-    width: 38px;
-    height: 38px;
-    font-size: 1.15rem;
+    width: 36px;
+    height: 36px;
+    font-size: 1.1rem;
   }
   .btn-medicare-primary {
-    padding: 9px 16px;
-    font-size: 0.88rem;
+    padding: 8px 14px;
+    font-size: 0.84rem;
   }
   .btn-medicare-secondary {
-    padding: 9px 14px;
-    font-size: 0.88rem;
+    padding: 8px 12px;
+    font-size: 0.84rem;
   }
 }
 
@@ -521,9 +526,9 @@ a:hover {
 .top-notice-bar {
   background: #F1F6FB;
   color: var(--brand-primary-dark);
-  font-size: 0.85rem;
+  font-size: 0.84rem;
   font-weight: 600;
-  padding: 7px 0;
+  padding: 8px 0;
   border-bottom: 1px solid rgba(28, 93, 153, 0.09);
 }
 
@@ -531,7 +536,7 @@ a:hover {
    Public Hero Section
    ========================================================================== */
 .hero-section {
-  padding: 75px 0 95px;
+  padding: 50px 0 75px;
   position: relative;
   overflow: hidden;
   background: radial-gradient(circle at 85% 20%, rgba(227, 240, 250, 0.65) 0%, rgba(250, 249, 247, 0) 55%),
@@ -563,90 +568,115 @@ a:hover {
   left: -90px;
 }
 
+.hero-trust-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: #FFFFFF;
+  padding: 6px 16px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-xs);
+  font-size: 0.82rem;
+}
+
+.hero-trust-badge .badge-divider-v {
+  width: 1px;
+  height: 12px;
+  background-color: var(--border-subtle);
+  display: inline-block;
+}
+
 .hero-title {
-  font-size: 3.5rem;
+  font-size: clamp(2.4rem, 4.2vw, 3.25rem);
   font-weight: 800;
-  line-height: 1.15;
+  line-height: 1.18;
   color: var(--text-primary);
   letter-spacing: -0.035em;
-  margin-bottom: 22px;
+  margin-bottom: 16px;
 }
 
 .hero-title .highlight {
   color: var(--brand-primary);
   position: relative;
   display: inline-block;
+  z-index: 1;
 }
 
 .hero-title .highlight::after {
   content: '';
   position: absolute;
-  left: 0;
-  bottom: 8px;
-  width: 100%;
+  left: -2px;
+  right: -2px;
+  bottom: 4px;
   height: 12px;
   background-color: var(--pastel-mint);
   z-index: -1;
   border-radius: 4px;
+  opacity: 0.85;
 }
 
 .hero-subtitle {
-  font-size: 1.15rem;
-  line-height: 1.75;
+  font-size: 1.05rem;
+  line-height: 1.7;
   color: var(--text-secondary);
-  max-width: 540px;
-  margin-bottom: 34px;
+  max-width: 530px;
+  margin-bottom: 26px;
 }
 
 .hero-image-container {
   position: relative;
   z-index: 2;
+  padding: 16px 14px;
+  max-width: 540px;
+  margin: 0 auto;
 }
 
 .hero-main-img-card {
   position: relative;
   border-radius: var(--radius-xl);
   overflow: hidden;
-  box-shadow: 0 24px 60px -12px rgba(15, 23, 42, 0.18), 0 8px 24px -4px rgba(28, 93, 153, 0.12);
-  border: 6px solid #FFFFFF;
+  box-shadow: 0 20px 50px -12px rgba(15, 23, 42, 0.16), 0 8px 20px -4px rgba(28, 93, 153, 0.1);
+  border: 5px solid #FFFFFF;
   transition: transform var(--transition-slow);
 }
 
 .hero-main-img-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-3px);
 }
 
 .hero-main-img-card img {
   width: 100%;
-  height: 480px;
+  height: clamp(340px, 32vw, 420px);
   object-fit: cover;
   display: block;
 }
 
 .hero-floating-badge {
   position: absolute;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(14px) saturate(180%);
-  -webkit-backdrop-filter: blur(14px) saturate(180%);
-  padding: 14px 20px;
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  padding: 11px 16px;
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
-  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: var(--shadow-md);
+  border: 1px solid rgba(255, 255, 255, 0.9);
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   z-index: 3;
+  max-width: 280px;
   animation: floatSlow 6s ease-in-out infinite;
 }
 
 .hero-badge-top {
-  top: 25px;
-  left: -28px;
+  top: 0px;
+  left: -4px;
 }
 
 .hero-badge-bottom {
-  bottom: 22px;
-  right: -20px;
+  bottom: 0px;
+  right: -4px;
   animation-delay: -3s;
 }
 
@@ -674,12 +704,13 @@ a:hover {
 .quick-feature-box {
   background: #FFFFFF;
   border-radius: var(--radius-lg);
-  padding: 24px 26px;
+  padding: 22px 24px;
   border: 1px solid var(--border-subtle);
   box-shadow: var(--shadow-sm);
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 16px;
+  height: 100%;
   transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
 }
 
@@ -806,6 +837,7 @@ a:hover {
 }
 
 .service-card a {
+  margin-top: auto;
   transition: gap var(--transition-fast), color var(--transition-fast);
 }
 
