@@ -554,26 +554,61 @@ function updateDashboardStats() {
   const appointments = DB.get("appointments", []);
   const invoices = DB.get("invoices", []);
 
+  // Dynamic welcome date matching current system date
+  const now = new Date();
+  const welcomeDateEl = document.getElementById("dashboard-welcome-date");
+  if (welcomeDateEl) {
+    const dateOptions = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
+    welcomeDateEl.textContent = now.toLocaleDateString("en-US", dateOptions);
+  }
+
   // Total patients
   const patientStat = document.getElementById("stat-total-patients");
   if (patientStat) patientStat.textContent = patients.length;
+
+  const patientSub = document.getElementById("stat-patients-sub");
+  if (patientSub) {
+    const admitted = patients.filter(p => p.status === "Admitted").length;
+    patientSub.innerHTML = `<i class="bi bi-hospital me-1"></i>${admitted} currently admitted`;
+  }
 
   // Total doctors
   const doctorStat = document.getElementById("stat-total-doctors");
   if (doctorStat) doctorStat.textContent = doctors.length;
 
-  // Today's appointments (filter today or show pending/confirmed count)
-  const todayDate = "2026-11-12";
+  const doctorSub = document.getElementById("stat-doctors-sub");
+  if (doctorSub) {
+    const availableDocs = doctors.filter(d => d.status === "Available").length;
+    doctorSub.innerHTML = `<i class="bi bi-check-circle-fill me-1"></i>${availableDocs} of ${doctors.length} on duty`;
+  }
+
+  // Today's appointments (filter strictly by current local system date, no total fallback)
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, "0");
+  const dd = String(now.getDate()).padStart(2, "0");
+  const todayDate = `${yyyy}-${mm}-${dd}`;
+
   const todayApts = appointments.filter(a => a.date === todayDate);
   const aptStat = document.getElementById("stat-today-appointments");
-  if (aptStat) aptStat.textContent = todayApts.length > 0 ? todayApts.length : appointments.length;
+  if (aptStat) aptStat.textContent = todayApts.length;
 
-  // Total Revenue
-  const totalRev = invoices
-    .filter(inv => inv.status === "Paid")
-    .reduce((sum, inv) => sum + Number(inv.amount), 0);
+  const aptSub = document.getElementById("stat-appointments-sub");
+  if (aptSub) {
+    const count = todayApts.length;
+    const label = count === 1 ? "1 appointment today" : `${count} appointments today`;
+    aptSub.innerHTML = `<i class="bi bi-clock-history me-1"></i>${label}`;
+  }
+
+  // Total Revenue (strictly Paid invoices only)
+  const paidInvoices = invoices.filter(inv => inv.status === "Paid");
+  const totalRev = paidInvoices.reduce((sum, inv) => sum + (Number(inv.amount) || 0), 0);
   const revStat = document.getElementById("stat-total-revenue");
   if (revStat) revStat.textContent = `$${totalRev.toLocaleString()}`;
+
+  const revSub = document.getElementById("stat-revenue-sub");
+  if (revSub) {
+    revSub.innerHTML = `<i class="bi bi-receipt me-1"></i>From ${paidInvoices.length} paid invoices`;
+  }
 }
 
 function renderRecentAppointmentsTable() {
@@ -1534,7 +1569,11 @@ function openAppointmentModal(appointmentId = null) {
   } else {
     if (titleEl) titleEl.textContent = "Book New Appointment";
     idInput.value = "";
-    document.getElementById("aptDateInput").value = new Date().toISOString().split("T")[0];
+    const todayObj = new Date();
+    const curYear = todayObj.getFullYear();
+    const curMonth = String(todayObj.getMonth() + 1).padStart(2, "0");
+    const curDay = String(todayObj.getDate()).padStart(2, "0");
+    document.getElementById("aptDateInput").value = `${curYear}-${curMonth}-${curDay}`;
     document.getElementById("aptTimeInput").value = "10:00 AM";
   }
 
@@ -1982,5 +2021,19 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   });
+
+  // Back to top button visibility toggle on scroll
+  const backToTopBtn = document.getElementById("btnBackToTop");
+  if (backToTopBtn) {
+    window.addEventListener("scroll", () => {
+      if (window.scrollY > 350) {
+        backToTopBtn.style.opacity = "0.95";
+        backToTopBtn.style.pointerEvents = "auto";
+      } else {
+        backToTopBtn.style.opacity = "0";
+        backToTopBtn.style.pointerEvents = "none";
+      }
+    });
+  }
 });
 
