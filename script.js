@@ -545,6 +545,21 @@ function showToast(message, type = "success") {
   }, 4000);
 }
 
+// --------------------------------------------------------------------------
+// Form Validation Helpers
+// --------------------------------------------------------------------------
+function isValidEmail(email) {
+  if (!email || typeof email !== "string") return false;
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  return re.test(email.trim());
+}
+
+function isValidPhone(phone) {
+  if (!phone || typeof phone !== "string") return false;
+  const digits = phone.replace(/\D/g, "");
+  return digits.length >= 7 && digits.length <= 15;
+}
+
 // ==========================================================================
 // 5. Dashboard Stats & Calculations
 // ==========================================================================
@@ -1100,66 +1115,114 @@ function openPatientModal(patientId = null) {
 
 function savePatientForm(e) {
   e.preventDefault();
-  const form = document.getElementById("patientForm");
-  if (!form.checkValidity()) {
-    form.classList.add("was-validated");
-    return;
+  try {
+    const form = document.getElementById("patientForm");
+    if (!form) return;
+
+    const id = (document.getElementById("patientIdHidden")?.value || "").trim();
+    const name = (document.getElementById("patNameInput")?.value || "").trim();
+    const ageRaw = document.getElementById("patAgeInput")?.value;
+    const age = Number(ageRaw);
+    const gender = document.getElementById("patGenderInput")?.value;
+    const bloodGroup = document.getElementById("patBloodInput")?.value;
+    const phone = (document.getElementById("patPhoneInput")?.value || "").trim();
+    const email = (document.getElementById("patEmailInput")?.value || "").trim();
+    const condition = (document.getElementById("patConditionInput")?.value || "").trim();
+    const doctor = document.getElementById("patDoctorInput")?.value;
+    const status = document.getElementById("patStatusInput")?.value;
+    const address = (document.getElementById("patAddressInput")?.value || "").trim();
+
+    if (!name) {
+      showToast("Please enter the patient's full name.", "warning");
+      form.classList.add("was-validated");
+      document.getElementById("patNameInput")?.focus();
+      return;
+    }
+
+    if (isNaN(age) || age < 0 || age > 130 || ageRaw === "") {
+      showToast("Please enter a valid patient age between 0 and 130.", "warning");
+      form.classList.add("was-validated");
+      document.getElementById("patAgeInput")?.focus();
+      return;
+    }
+
+    if (!gender) {
+      showToast("Please select the patient's gender.", "warning");
+      form.classList.add("was-validated");
+      return;
+    }
+
+    if (!phone || !isValidPhone(phone)) {
+      showToast("Please provide a valid contact phone number (at least 7 digits).", "warning");
+      form.classList.add("was-validated");
+      document.getElementById("patPhoneInput")?.focus();
+      return;
+    }
+
+    if (email && !isValidEmail(email)) {
+      showToast("Please enter a valid email address.", "warning");
+      form.classList.add("was-validated");
+      document.getElementById("patEmailInput")?.focus();
+      return;
+    }
+
+    if (!doctor) {
+      showToast("Please assign a primary attending physician.", "warning");
+      form.classList.add("was-validated");
+      document.getElementById("patDoctorInput")?.focus();
+      return;
+    }
+
+    let patients = DB.get("patients", []);
+
+    if (id) {
+      // Update existing
+      patients = patients.map(p => {
+        if (p.id === id) {
+          return { ...p, name, age, gender, bloodGroup, phone, email, condition, doctor, status, address };
+        }
+        return p;
+      });
+      showToast(`Patient record for ${name} updated successfully.`);
+      logActivity("bi-pencil-square", "badge-blue", "Patient Updated", `${name}'s medical chart was updated.`);
+    } else {
+      // Create new
+      const newId = `PAT-${String(patients.length + 1).padStart(3, "0")}`;
+      const now = new Date();
+      const curYear = now.getFullYear();
+      const curMonth = String(now.getMonth() + 1).padStart(2, "0");
+      const curDay = String(now.getDate()).padStart(2, "0");
+      const newPatient = {
+        id: newId,
+        name,
+        age,
+        gender,
+        bloodGroup,
+        phone,
+        email,
+        condition,
+        doctor,
+        status,
+        address,
+        admissionDate: `${curYear}-${curMonth}-${curDay}`
+      };
+      patients.unshift(newPatient);
+      showToast(`New patient ${name} registered with ID ${newId}.`);
+      logActivity("bi-person-plus", "badge-mint", "New Patient Registered", `${name} was admitted to records.`);
+    }
+
+    DB.set("patients", patients);
+
+    const modalEl = document.getElementById("patientModal");
+    const modal = bootstrap.Modal.getInstance(modalEl);
+    if (modal) modal.hide();
+
+    renderPatientsTable();
+    updateDashboardStats();
+  } catch (err) {
+    console.error("Error saving patient:", err);
+    showToast("An unexpected error occurred while saving the patient record.", "error");
   }
-
-  const id = document.getElementById("patientIdHidden").value;
-  const name = document.getElementById("patNameInput").value.trim();
-  const age = Number(document.getElementById("patAgeInput").value);
-  const gender = document.getElementById("patGenderInput").value;
-  const bloodGroup = document.getElementById("patBloodInput").value;
-  const phone = document.getElementById("patPhoneInput").value.trim();
-  const email = document.getElementById("patEmailInput").value.trim();
-  const condition = document.getElementById("patConditionInput").value.trim();
-  const doctor = document.getElementById("patDoctorInput").value;
-  const status = document.getElementById("patStatusInput").value;
-  const address = document.getElementById("patAddressInput").value.trim();
-
-  let patients = DB.get("patients", []);
-
-  if (id) {
-    // Update existing
-    patients = patients.map(p => {
-      if (p.id === id) {
-        return { ...p, name, age, gender, bloodGroup, phone, email, condition, doctor, status, address };
-      }
-      return p;
-    });
-    showToast(`Patient record for ${name} updated successfully.`);
-    logActivity("bi-pencil-square", "badge-blue", "Patient Updated", `${name}'s medical chart was updated.`);
-  } else {
-    // Create new
-    const newId = `PAT-${String(patients.length + 1).padStart(3, "0")}`;
-    const newPatient = {
-      id: newId,
-      name,
-      age,
-      gender,
-      bloodGroup,
-      phone,
-      email,
-      condition,
-      doctor,
-      status,
-      address,
-      admissionDate: new Date().toISOString().split("T")[0]
-    };
-    patients.unshift(newPatient);
-    showToast(`New patient ${name} registered with ID ${newId}.`);
-    logActivity("bi-person-plus", "badge-mint", "New Patient Registered", `${name} was admitted to records.`);
-  }
-
-  DB.set("patients", patients);
-
-  const modalEl = document.getElementById("patientModal");
-  const modal = bootstrap.Modal.getInstance(modalEl);
-  if (modal) modal.hide();
-
-  renderPatientsTable();
-  updateDashboardStats();
 }
 
 function viewPatientDetails(patientId) {
@@ -1285,7 +1348,7 @@ function renderDoctorsGrid() {
     col.innerHTML = `
       <div class="doctor-card">
         <div class="doctor-img-wrap">
-          <img src="${doc.image}" alt="${doc.name}" loading="lazy">
+          <img src="${doc.image}" alt="Portrait of ${doc.name}, Specialist in ${doc.department}" loading="lazy">
           <span class="doctor-dept-pill">${doc.department}</span>
           <span class="doctor-availability-pill" style="${statusBg}">
             <i class="bi bi-circle-fill me-1" style="font-size: 0.5rem;"></i>${doc.status}
@@ -1364,64 +1427,116 @@ function openDoctorModal(doctorId = null) {
 
 function saveDoctorForm(e) {
   e.preventDefault();
-  const form = document.getElementById("doctorForm");
-  if (!form.checkValidity()) {
-    form.classList.add("was-validated");
-    return;
+  try {
+    const form = document.getElementById("doctorForm");
+    if (!form) return;
+
+    const id = (document.getElementById("doctorIdHidden")?.value || "").trim();
+    const name = (document.getElementById("docNameInput")?.value || "").trim();
+    const department = document.getElementById("docDeptInput")?.value;
+    const degree = (document.getElementById("docDegreeInput")?.value || "").trim();
+    const experience = (document.getElementById("docExpInput")?.value || "").trim();
+    const feeRaw = document.getElementById("docFeeInput")?.value;
+    const fee = Number(feeRaw);
+    const phone = (document.getElementById("docPhoneInput")?.value || "").trim();
+    const email = (document.getElementById("docEmailInput")?.value || "").trim();
+    const status = document.getElementById("docStatusInput")?.value;
+    const image = (document.getElementById("docImageInput")?.value || "").trim() || "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=600&q=80";
+    const about = (document.getElementById("docAboutInput")?.value || "").trim();
+
+    if (!name) {
+      showToast("Doctor full name is required.", "warning");
+      form.classList.add("was-validated");
+      document.getElementById("docNameInput")?.focus();
+      return;
+    }
+
+    if (!department) {
+      showToast("Please select a medical department.", "warning");
+      form.classList.add("was-validated");
+      document.getElementById("docDeptInput")?.focus();
+      return;
+    }
+
+    if (!degree) {
+      showToast("Please enter medical degree or credentials.", "warning");
+      form.classList.add("was-validated");
+      document.getElementById("docDegreeInput")?.focus();
+      return;
+    }
+
+    if (!experience) {
+      showToast("Please specify years of medical experience.", "warning");
+      form.classList.add("was-validated");
+      document.getElementById("docExpInput")?.focus();
+      return;
+    }
+
+    if (isNaN(fee) || fee < 0 || feeRaw === "") {
+      showToast("Please enter a valid consultation fee.", "warning");
+      form.classList.add("was-validated");
+      document.getElementById("docFeeInput")?.focus();
+      return;
+    }
+
+    if (!phone || !isValidPhone(phone)) {
+      showToast("Please provide a valid doctor phone number (at least 7 digits).", "warning");
+      form.classList.add("was-validated");
+      document.getElementById("docPhoneInput")?.focus();
+      return;
+    }
+
+    if (!email || !isValidEmail(email)) {
+      showToast("Please provide a valid doctor email address.", "warning");
+      form.classList.add("was-validated");
+      document.getElementById("docEmailInput")?.focus();
+      return;
+    }
+
+    let doctors = DB.get("doctors", []);
+
+    if (id) {
+      doctors = doctors.map(d => {
+        if (d.id === id) {
+          return { ...d, name, department, degree, experience, fee, phone, email, status, image, about };
+        }
+        return d;
+      });
+      showToast(`Doctor profile for ${name} updated.`);
+    } else {
+      const newId = `DOC-${100 + doctors.length + 1}`;
+      doctors.unshift({
+        id: newId,
+        name,
+        department,
+        degree,
+        experience,
+        fee,
+        phone,
+        email,
+        status,
+        image,
+        about,
+        rating: 5.0,
+        reviews: 1
+      });
+      showToast(`Specialist ${name} successfully onboarded.`);
+      logActivity("bi-person-badge", "badge-lavender", "Doctor Onboarded", `${name} joined ${department}.`);
+    }
+
+    DB.set("doctors", doctors);
+
+    const modalEl = document.getElementById("doctorModal");
+    const modal = bootstrap.Modal.getInstance(modalEl);
+    if (modal) modal.hide();
+
+    renderDoctorsGrid();
+    renderPublicFeaturedDoctors();
+    updateDashboardStats();
+  } catch (err) {
+    console.error("Error saving doctor:", err);
+    showToast("An unexpected error occurred while saving the doctor profile.", "error");
   }
-
-  const id = document.getElementById("doctorIdHidden").value;
-  const name = document.getElementById("docNameInput").value.trim();
-  const department = document.getElementById("docDeptInput").value;
-  const degree = document.getElementById("docDegreeInput").value.trim();
-  const experience = document.getElementById("docExpInput").value.trim();
-  const fee = Number(document.getElementById("docFeeInput").value);
-  const phone = document.getElementById("docPhoneInput").value.trim();
-  const email = document.getElementById("docEmailInput").value.trim();
-  const status = document.getElementById("docStatusInput").value;
-  const image = document.getElementById("docImageInput").value.trim() || "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=600&q=80";
-  const about = document.getElementById("docAboutInput").value.trim();
-
-  let doctors = DB.get("doctors", []);
-
-  if (id) {
-    doctors = doctors.map(d => {
-      if (d.id === id) {
-        return { ...d, name, department, degree, experience, fee, phone, email, status, image, about };
-      }
-      return d;
-    });
-    showToast(`Doctor profile for ${name} updated.`);
-  } else {
-    const newId = `DOC-${100 + doctors.length + 1}`;
-    doctors.unshift({
-      id: newId,
-      name,
-      department,
-      degree,
-      experience,
-      fee,
-      phone,
-      email,
-      status,
-      image,
-      about,
-      rating: 5.0,
-      reviews: 1
-    });
-    showToast(`Specialist ${name} successfully onboarded.`);
-    logActivity("bi-person-badge", "badge-lavender", "Doctor Onboarded", `${name} joined ${department}.`);
-  }
-
-  DB.set("doctors", doctors);
-
-  const modalEl = document.getElementById("doctorModal");
-  const modal = bootstrap.Modal.getInstance(modalEl);
-  if (modal) modal.hide();
-
-  renderDoctorsGrid();
-  renderPublicFeaturedDoctors();
-  updateDashboardStats();
 }
 
 function deleteDoctorRecord(doctorId) {
@@ -1610,60 +1725,104 @@ function onAptDoctorSelected(selectEl) {
 
 function saveAppointmentForm(e) {
   e.preventDefault();
-  const form = document.getElementById("appointmentForm");
-  if (!form.checkValidity()) {
-    form.classList.add("was-validated");
-    return;
+  try {
+    const form = document.getElementById("appointmentForm");
+    if (!form) return;
+
+    const id = (document.getElementById("appointmentIdHidden")?.value || "").trim();
+    const patientName = (document.getElementById("aptPatientNameInput")?.value || "").trim();
+    const patientPhone = (document.getElementById("aptPatientPhoneInput")?.value || "").trim();
+    const doctorName = document.getElementById("aptDoctorInput")?.value;
+    const department = document.getElementById("aptDeptInput")?.value;
+    const date = document.getElementById("aptDateInput")?.value;
+    const time = document.getElementById("aptTimeInput")?.value;
+    const type = document.getElementById("aptTypeInput")?.value || "In-Person";
+    const status = document.getElementById("aptStatusInput")?.value || "Pending";
+    const reason = (document.getElementById("aptReasonInput")?.value || "").trim();
+
+    if (!patientName) {
+      showToast("Patient name is required for booking.", "warning");
+      form.classList.add("was-validated");
+      document.getElementById("aptPatientNameInput")?.focus();
+      return;
+    }
+
+    if (!patientPhone || !isValidPhone(patientPhone)) {
+      showToast("Please provide a valid patient contact phone number.", "warning");
+      form.classList.add("was-validated");
+      document.getElementById("aptPatientPhoneInput")?.focus();
+      return;
+    }
+
+    if (!doctorName) {
+      showToast("Please assign a consulting specialist doctor.", "warning");
+      form.classList.add("was-validated");
+      document.getElementById("aptDoctorInput")?.focus();
+      return;
+    }
+
+    if (!department) {
+      showToast("Please specify the clinical department.", "warning");
+      form.classList.add("was-validated");
+      document.getElementById("aptDeptInput")?.focus();
+      return;
+    }
+
+    if (!date) {
+      showToast("Please select an appointment date.", "warning");
+      form.classList.add("was-validated");
+      document.getElementById("aptDateInput")?.focus();
+      return;
+    }
+
+    if (!time) {
+      showToast("Please select a consultation time slot.", "warning");
+      form.classList.add("was-validated");
+      document.getElementById("aptTimeInput")?.focus();
+      return;
+    }
+
+    let appointments = DB.get("appointments", []);
+
+    if (id) {
+      appointments = appointments.map(a => {
+        if (a.id === id) {
+          return { ...a, patientName, patientPhone, doctorName, department, date, time, type, status, reason };
+        }
+        return a;
+      });
+      showToast(`Appointment ${id} details updated.`);
+    } else {
+      const newId = `APT-2026-${String(appointments.length + 1).padStart(2, "0")}`;
+      appointments.unshift({
+        id: newId,
+        patientName,
+        patientPhone,
+        doctorName,
+        department,
+        date,
+        time,
+        type,
+        status,
+        reason
+      });
+      showToast(`Appointment confirmed for ${patientName} on ${date} at ${time}.`);
+      logActivity("bi-calendar2-plus", "badge-blue", "Appointment Booked", `${patientName} with ${doctorName}.`);
+    }
+
+    DB.set("appointments", appointments);
+
+    const modalEl = document.getElementById("appointmentModal");
+    const modal = bootstrap.Modal.getInstance(modalEl);
+    if (modal) modal.hide();
+
+    renderAppointmentsTable();
+    renderRecentAppointmentsTable();
+    updateDashboardStats();
+  } catch (err) {
+    console.error("Error saving appointment:", err);
+    showToast("An unexpected error occurred while saving the appointment.", "error");
   }
-
-  const id = document.getElementById("appointmentIdHidden").value;
-  const patientName = document.getElementById("aptPatientNameInput").value.trim();
-  const patientPhone = document.getElementById("aptPatientPhoneInput").value.trim();
-  const doctorName = document.getElementById("aptDoctorInput").value;
-  const department = document.getElementById("aptDeptInput").value;
-  const date = document.getElementById("aptDateInput").value;
-  const time = document.getElementById("aptTimeInput").value;
-  const type = document.getElementById("aptTypeInput").value;
-  const status = document.getElementById("aptStatusInput").value;
-  const reason = document.getElementById("aptReasonInput").value.trim();
-
-  let appointments = DB.get("appointments", []);
-
-  if (id) {
-    appointments = appointments.map(a => {
-      if (a.id === id) {
-        return { ...a, patientName, patientPhone, doctorName, department, date, time, type, status, reason };
-      }
-      return a;
-    });
-    showToast(`Appointment ${id} details updated.`);
-  } else {
-    const newId = `APT-2026-${String(appointments.length + 1).padStart(2, "0")}`;
-    appointments.unshift({
-      id: newId,
-      patientName,
-      patientPhone,
-      doctorName,
-      department,
-      date,
-      time,
-      type,
-      status,
-      reason
-    });
-    showToast(`Appointment confirmed for ${patientName} on ${date} at ${time}.`);
-    logActivity("bi-calendar2-plus", "badge-blue", "Appointment Booked", `${patientName} with ${doctorName}.`);
-  }
-
-  DB.set("appointments", appointments);
-
-  const modalEl = document.getElementById("appointmentModal");
-  const modal = bootstrap.Modal.getInstance(modalEl);
-  if (modal) modal.hide();
-
-  renderAppointmentsTable();
-  renderRecentAppointmentsTable();
-  updateDashboardStats();
 }
 
 function quickUpdateAppointmentStatus(aptId, newStatus) {
@@ -1891,7 +2050,7 @@ function renderPublicFeaturedDoctors() {
     col.innerHTML = `
       <div class="doctor-card">
         <div class="doctor-img-wrap">
-          <img src="${doc.image}" alt="${doc.name}" loading="lazy">
+          <img src="${doc.image}" alt="Portrait of ${doc.name}, Specialist in ${doc.department}" loading="lazy">
           <span class="doctor-dept-pill">${doc.department}</span>
         </div>
         <div class="doctor-body">
@@ -1916,19 +2075,68 @@ function renderPublicFeaturedDoctors() {
 
 function handlePublicContactSubmit(e) {
   e.preventDefault();
-  const form = e.target;
-  if (!form.checkValidity()) {
-    form.classList.add("was-validated");
-    return;
+  try {
+    const form = e.target;
+    if (!form) return;
+
+    const name = (form.querySelector('input[type="text"]')?.value || "").trim();
+    const phone = (form.querySelector('input[type="tel"]')?.value || "").trim();
+    const email = (form.querySelector('input[type="email"]')?.value || "").trim();
+    const dept = form.querySelector("select")?.value;
+    const message = (form.querySelector("textarea")?.value || "").trim();
+
+    if (!name) {
+      showToast("Please enter your full name.", "warning");
+      form.classList.add("was-validated");
+      form.querySelector('input[type="text"]')?.focus();
+      return;
+    }
+
+    if (!phone || !isValidPhone(phone)) {
+      showToast("Please provide a valid contact phone number (at least 7 digits).", "warning");
+      form.classList.add("was-validated");
+      form.querySelector('input[type="tel"]')?.focus();
+      return;
+    }
+
+    if (!email || !isValidEmail(email)) {
+      showToast("Please enter a valid email address.", "warning");
+      form.classList.add("was-validated");
+      form.querySelector('input[type="email"]')?.focus();
+      return;
+    }
+
+    if (!dept) {
+      showToast("Please select a medical department of interest.", "warning");
+      form.classList.add("was-validated");
+      form.querySelector("select")?.focus();
+      return;
+    }
+
+    if (!message) {
+      showToast("Please write a brief description of your inquiry.", "warning");
+      form.classList.add("was-validated");
+      form.querySelector("textarea")?.focus();
+      return;
+    }
+
+    showToast("Thank you! Your inquiry has been sent to our patient support team.");
+    form.reset();
+    form.classList.remove("was-validated");
+  } catch (err) {
+    console.error("Error handling contact submission:", err);
+    showToast("An unexpected error occurred while sending your inquiry. Please try again.", "error");
   }
-  showToast("Thank you! Your inquiry has been sent to our patient support team.");
-  form.reset();
-  form.classList.remove("was-validated");
 }
 
 function handleSaveSettings(e) {
   e.preventDefault();
-  showToast("Hospital configurations and profile settings updated successfully!");
+  try {
+    showToast("Hospital configurations and profile settings updated successfully!");
+  } catch (err) {
+    console.error("Error saving settings:", err);
+    showToast("Failed to save settings.", "error");
+  }
 }
 
 // ==========================================================================
