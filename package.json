@@ -1,0 +1,12 @@
+{
+  "name": "medicare-frontend-tests",
+  "private": true,
+  "scripts": {
+    "dev": "node serve.js",
+    "start": "node serve.js",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.58.2"
+  }
+}

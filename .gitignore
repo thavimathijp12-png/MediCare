@@ -1,0 +1,11 @@
+node_modules/
+backend/target/
+backend/data/
+data/
+*.mv.db
+*.trace.db
+*.log
+
+
+# Local development secrets
+backend/src/main/resources/application-dev.properties

@@ -1,3 +1,9 @@
 {
-    "liveServer.settings.port": 5501
+    "liveServer.settings.port": 5501,
+    "java.compile.nullAnalysis.mode": "automatic",
+    "terminal.integrated.env.windows": {
+        "JAVA_HOME": "C:\\Program Files\\Eclipse Adoptium\\jdk-17.0.20.101-hotspot",
+        "Path": "C:\\Program Files\\Eclipse Adoptium\\jdk-17.0.20.101-hotspot\\bin;${env:Path}"
+    },
+    "java.configuration.updateBuildConfiguration": "interactive"
 }

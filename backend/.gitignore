@@ -1,0 +1,13 @@
+target/
+*.log
+.classpath
+.project
+.settings/
+.idea/
+*.iml
+
+# Persistent H2 database storage
+data/
+*.mv.db
+*.trace.db
+
