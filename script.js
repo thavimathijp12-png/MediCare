@@ -31,11 +31,11 @@ function getApiBaseUrl() {
   if (configured) {
     const url = new URL(configured, window.location.origin);
     if (!["http:", "https:"].includes(url.protocol)
-        || url.username
-        || url.password
-        || (url.pathname !== "/" && url.pathname !== "")
-        || url.search
-        || url.hash) {
+      || url.username
+      || url.password
+      || (url.pathname !== "/" && url.pathname !== "")
+      || url.search
+      || url.hash) {
       throw new Error("The MediCare API base URL must be an HTTP(S) origin without credentials or a path.");
     }
     return url.origin;
@@ -56,6 +56,8 @@ const patientState = { token: null, dashboard: null };
 let activeClinicalPatientId = null;
 let activeClinicalData = null;
 const appData = {
+  active_view: "public",
+  active_tab: "dashboard",
   doctors: [],
   departments: [],
   patients: [],
@@ -125,9 +127,7 @@ const DB = {
     return Object.prototype.hasOwnProperty.call(appData, key) ? appData[key] : defaultValue;
   },
   set(key, value) {
-    if (Object.prototype.hasOwnProperty.call(appData, key)) {
-      appData[key] = value;
-    }
+    appData[key] = value;
   }
 };
 
@@ -153,155 +153,104 @@ const SubmissionLock = {
   }
 };
 
-// Staff Portal Authentication & Access Gatekeeper
-function isStaffAuthenticated() {
-  return sessionStorage.getItem("medicare_staff_session") === "true";
-}
-
-function openStaffAuthModal(targetTab = "dashboard") {
-  window._pendingAdminTab = targetTab;
-  const alertEl = document.getElementById("staffAuthAlert");
-  if (alertEl) alertEl.classList.add("d-none");
-  const form = document.getElementById("staffAuthForm");
-  if (form) form.reset();
-  const roleSelect = document.getElementById("staffRoleSelect");
-  if (roleSelect) roleSelect.value = "staff";
-  const passGroup = document.getElementById("staffPasscodeGroup");
-  if (passGroup) passGroup.classList.remove("d-none");
-  const passInput = document.getElementById("staffPasscodeInput");
-  if (passInput) passInput.value = "1234";
-
-  const modalEl = document.getElementById("staffAuthModal");
-  if (modalEl) {
-    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-    modal.show();
-  }
-}
-
-function onStaffRoleChange(selectedRole) {
-  const alertEl = document.getElementById("staffAuthAlert");
-  const alertMsg = document.getElementById("staffAuthAlertMsg");
-  const passGroup = document.getElementById("staffPasscodeGroup");
-
-  if (selectedRole === "visitor") {
-    if (passGroup) passGroup.classList.add("d-none");
-    if (alertEl) alertEl.classList.remove("d-none");
-    if (alertMsg) {
-      alertMsg.textContent = "Notice: The Admin Portal is restricted to authorized Hospital Staff only, not for patients and visitors. Please use the public site for appointment booking and clinical inquiries.";
-    }
-  } else {
-    if (passGroup) passGroup.classList.remove("d-none");
-    if (alertEl) alertEl.classList.add("d-none");
-  }
-}
-
-function handleStaffAuthSubmit(e) {
-  e.preventDefault();
-  const role = document.getElementById("staffRoleSelect")?.value;
-  const passcode = (document.getElementById("staffPasscodeInput")?.value || "").trim();
-  const alertEl = document.getElementById("staffAuthAlert");
-  const alertMsg = document.getElementById("staffAuthAlertMsg");
-
-  // If patient/visitor tries to log in
-  if (role === "visitor") {
-    const message = "Access Restricted: This portal is strictly for authorized Hospital Staff only, not for patients and visitors! Please use the 'Book Appointment' or 'Contact' sections for clinical care.";
-    if (alertEl) {
-      alertEl.classList.remove("d-none");
-      if (alertMsg) alertMsg.textContent = message;
-    }
-    showToast(message, "danger");
-    return;
-  }
-
-  // Validate staff passcode
-  const validCodes = ["1234", "admin", "staff", "medicare", "doctor"];
-  if (!validCodes.includes(passcode.toLowerCase())) {
-    const message = "Invalid staff passcode. Access denied. Hospital Staff portal is restricted to authorized personnel only.";
-    if (alertEl) {
-      alertEl.classList.remove("d-none");
-      if (alertMsg) alertMsg.textContent = message;
-    }
-    showToast(message, "danger");
-    return;
-  }
-
-  // Authorized staff
-  sessionStorage.setItem("medicare_staff_session", "true");
-  const modalEl = document.getElementById("staffAuthModal");
-  if (modalEl) {
-    const modal = bootstrap.Modal.getInstance(modalEl);
-    if (modal) modal.hide();
-  }
-
-  showToast("Staff access verified. Welcome to MediCare Clinical Portal.", "success");
-  proceedToAdmin(window._pendingAdminTab || "dashboard");
-}
-
-function logoutStaff() {
-  sessionStorage.removeItem("medicare_staff_session");
-  DB.set("active_view", "public");
-  switchMainView("public");
-  showToast("You have been signed out from the Hospital Staff Portal.", "info");
-}
-
 // ==========================================================================
 // 3. Navigation & View Controller
 // ==========================================================================
 let currentPortalTab = "dashboard";
 
 function switchMainView(targetView) {
-  if (targetView === "admin") {
-    if (!isStaffAuthenticated()) {
-      openStaffAuthModal("dashboard");
-      return;
-    }
-    proceedToAdmin();
-  } else {
-    proceedToPublic();
-  }
-}
-
-function proceedToAdmin(targetTab = null) {
   const publicView = document.getElementById("public-view");
   const adminView = document.getElementById("admin-view");
   const publicNavbar = document.querySelector(".public-navbar");
+  const patientPortal = document.getElementById("patient-portal");
+  const loginPanel = document.getElementById("staff-login-panel");
+  const dashboard = document.getElementById("staff-dashboard");
+
+  DB.set("active_view", targetView);
 
   if (targetView === "patient") {
-    publicView.classList.add("d-none");
+    if (publicView) publicView.classList.add("d-none");
     if (publicNavbar) publicNavbar.classList.add("d-none");
-    adminView.classList.remove("d-none");
-    document.getElementById("staff-login-panel")?.classList.add("d-none");
-    document.getElementById("staff-dashboard")?.classList.add("d-none");
-    document.getElementById("patient-portal")?.classList.remove("d-none");
+    if (adminView) adminView.classList.remove("d-none");
+    if (loginPanel) loginPanel.classList.add("d-none");
+    if (dashboard) dashboard.classList.add("d-none");
+    if (patientPortal) patientPortal.classList.remove("d-none");
     window.scrollTo({ top: 0, behavior: "smooth" });
-    if (patientState.token) loadPatientDashboard();
+
+    if (patientState.token) {
+      document.getElementById("patientPortalAuth")?.classList.add("d-none");
+      document.getElementById("patientPortalDashboard")?.classList.remove("d-none");
+      loadPatientDashboard();
+    } else {
+      document.getElementById("patientPortalAuth")?.classList.remove("d-none");
+      document.getElementById("patientPortalDashboard")?.classList.add("d-none");
+      showPatientPortalForm("login");
+    }
     return;
   }
 
   if (targetView === "admin") {
-    document.getElementById("patient-portal")?.classList.add("d-none");
-    publicView.classList.add("d-none");
+    if (patientPortal) patientPortal.classList.add("d-none");
+    if (publicView) publicView.classList.add("d-none");
     if (publicNavbar) publicNavbar.classList.add("d-none");
-    adminView.classList.remove("d-none");
+    if (adminView) adminView.classList.remove("d-none");
     window.scrollTo({ top: 0, behavior: "smooth" });
-    const loginPanel = document.getElementById("staff-login-panel");
-    const dashboard = document.getElementById("staff-dashboard");
+
     if (!authState.token || !authState.user) {
       if (loginPanel) loginPanel.classList.remove("d-none");
       if (dashboard) dashboard.classList.add("d-none");
       document.getElementById("staffUsernameInput")?.focus();
       return;
     }
+
     if (loginPanel) loginPanel.classList.add("d-none");
     if (dashboard) dashboard.classList.remove("d-none");
     applyRolePermissions();
-    switchAdminTab(firstAllowedTab());
-  } else {
-    adminView.classList.add("d-none");
-    publicView.classList.remove("d-none");
-    if (publicNavbar) publicNavbar.classList.remove("d-none");
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    switchAdminTab(currentPortalTab || firstAllowedTab());
+    return;
   }
+
+  // Default: Public View
+  if (adminView) adminView.classList.add("d-none");
+  if (publicView) publicView.classList.remove("d-none");
+  if (publicNavbar) publicNavbar.classList.remove("d-none");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+
+function proceedToAdmin(targetTab = null) {
+  if (targetTab) {
+    currentPortalTab = targetTab;
+  }
+
+  switchMainView("admin");
+
+  if (authState.token && authState.user) {
+    switchAdminTab(currentPortalTab || "dashboard");
+  }
+}
+
+
+function proceedToPublic() {
+  switchMainView("public");
+}
+
+// Backwards-compatible staff auth modal helpers
+function isStaffAuthenticated() {
+  return Boolean(authState.token && authState.user);
+}
+
+function openStaffAuthModal(targetTab = "dashboard") {
+  currentPortalTab = targetTab;
+  switchMainView("admin");
+}
+
+function onStaffRoleChange() { }
+function handleStaffAuthSubmit(e) {
+  if (e) e.preventDefault();
+  const modalEl = document.getElementById("staffAuthModal");
+  if (modalEl) bootstrap.Modal.getInstance(modalEl)?.hide();
+  switchMainView("admin");
 }
 
 function switchAdminTab(tabName) {
@@ -517,6 +466,7 @@ async function establishPatientSession(login) {
     throw new Error("This sign-in is only for patient accounts. Use Staff Login for hospital staff.");
   }
   patientState.token = login.token;
+  sessionStorage.setItem("medicare_patient_token", login.token);
   document.getElementById("patientPortalAuth").classList.add("d-none");
   document.getElementById("patientPortalDashboard").classList.remove("d-none");
   await loadPatientDashboard();
@@ -611,27 +561,27 @@ async function loadPatientDashboard() {
       <section class="mb-4">
         <h2 class="h5 fw-bold">${escapeHtml(title)}</h2>
         ${items.length ? `<div class="list-group">${items.map(item => `<div class="list-group-item">${render(item)}</div>`).join("")}</div>`
-          : `<p class="text-secondary small">${escapeHtml(emptyText)}</p>`}
+        : `<p class="text-secondary small">${escapeHtml(emptyText)}</p>`}
       </section>`;
     content.innerHTML = `
       ${section("Appointments", dashboard.appointments, item =>
-        `<strong>${escapeHtml(item.date)} ${escapeHtml(item.time)}</strong> · ${escapeHtml(item.doctorName)} · ${escapeHtml(item.status)}`,
+      `<strong>${escapeHtml(item.date)} ${escapeHtml(item.time)}</strong> · ${escapeHtml(item.doctorName)} · ${escapeHtml(item.status)}`,
       "No appointments are currently linked to your account.")}
       ${section("Invoices", dashboard.invoices, item =>
         `<strong>${escapeHtml(item.id)}</strong> · ${escapeHtml(item.department)} · ${escapeHtml(item.status)} · ${escapeHtml(item.amount)}`
         + (["pending", "overdue"].includes(item.status?.toLowerCase()) && item.patientId
           ? ` <button type="button" class="btn btn-sm btn-outline-primary ms-2" data-pay-invoice="${escapeHtml(item.id)}">Pay securely</button>`
           : ""),
-      "No invoices are currently linked to your account.")}
+        "No invoices are currently linked to your account.")}
       ${section("Clinical records", dashboard.clinicalRecords, item =>
-        `<strong>${escapeHtml(item.diagnosis || "Clinical record")}</strong><div>${escapeHtml(item.clinicalNote || "")}</div>`,
-      "No clinical records are available.")}
+          `<strong>${escapeHtml(item.diagnosis || "Clinical record")}</strong><div>${escapeHtml(item.clinicalNote || "")}</div>`,
+          "No clinical records are available.")}
       ${section("Prescriptions", dashboard.prescriptions, item =>
-        `<strong>${escapeHtml(item.medication || "Prescription")}</strong> · ${escapeHtml(item.dose || "")} · ${escapeHtml(item.status || "")}`,
-      "No prescriptions are available.")}
+            `<strong>${escapeHtml(item.medication || "Prescription")}</strong> · ${escapeHtml(item.dose || "")} · ${escapeHtml(item.status || "")}`,
+            "No prescriptions are available.")}
       ${section("Vitals", dashboard.vitals, item =>
-        `<strong>${escapeHtml(item.type || "Vital")}</strong> · ${escapeHtml(item.value)} ${escapeHtml(item.unit || "")}`,
-      "No vitals are available.")}`;
+              `<strong>${escapeHtml(item.type || "Vital")}</strong> · ${escapeHtml(item.value)} ${escapeHtml(item.unit || "")}`,
+              "No vitals are available.")}`;
     content.querySelectorAll("[data-pay-invoice]").forEach(button => {
       button.addEventListener("click", () => startInvoiceCheckout(button.dataset.payInvoice));
     });
@@ -712,6 +662,7 @@ async function logoutPatient() {
   }
   patientState.token = null;
   patientState.dashboard = null;
+  sessionStorage.removeItem("medicare_patient_token");
   document.getElementById("patientPortalDashboard").classList.add("d-none");
   document.getElementById("patientPortalAuth").classList.remove("d-none");
   document.getElementById("patientDashboardContent").replaceChildren();
@@ -729,6 +680,8 @@ function clearStaffSession(loginMessage = "") {
   authState.user = null;
   activeClinicalPatientId = null;
   activeClinicalData = null;
+  sessionStorage.removeItem("medicare_auth_token");
+  sessionStorage.removeItem("medicare_auth_user");
   const patientProfile = document.getElementById("patientViewModalContent");
   if (patientProfile) patientProfile.replaceChildren();
   DB.set("patients", []);
@@ -1079,6 +1032,9 @@ async function handleStaffLogin(event) {
       throw new Error("This account is not permitted to access the staff portal.");
     }
 
+    sessionStorage.setItem("medicare_auth_token", login.token);
+    sessionStorage.setItem("medicare_auth_user", JSON.stringify(authState.user));
+
     await loadStaffData();
     document.getElementById("staff-login-panel").classList.add("d-none");
     document.getElementById("staff-dashboard").classList.remove("d-none");
@@ -1279,15 +1235,16 @@ function updateDashboardStats() {
   }
 
   // Sum of invoices whose status is Paid; this does not confirm payment processing.
-  const totalRev = stats ? Number(stats.totalRevenue || 0) : invoices
-    .filter(inv => inv.status === "Paid")
+  const paidInvoices = invoices.filter(inv => inv.status === "Paid");
+  const totalRev = stats ? Number(stats.totalRevenue || 0) : paidInvoices
     .reduce((sum, inv) => sum + Number(inv.amount), 0);
   const revStat = document.getElementById("stat-total-revenue");
   if (revStat) revStat.textContent = `$${totalRev.toLocaleString()}`;
 
   const revSub = document.getElementById("stat-revenue-sub");
   if (revSub) {
-    revSub.innerHTML = `<i class="bi bi-receipt me-1"></i>From ${paidInvoices.length} paid invoices`;
+    const paidCount = stats?.paidInvoicesCount !== undefined ? stats.paidInvoicesCount : paidInvoices.length;
+    revSub.innerHTML = `<i class="bi bi-receipt me-1"></i>From ${paidCount} paid invoices`;
   }
 }
 
@@ -1550,102 +1507,102 @@ function renderReportsCharts() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-  const rect = canvas.getBoundingClientRect();
-  const dpr = window.devicePixelRatio || 1;
-  canvas.width = rect.width * dpr;
-  canvas.height = 280 * dpr;
-  ctx.scale(dpr, dpr);
+    const rect = canvas.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = rect.width * dpr;
+    canvas.height = 280 * dpr;
+    ctx.scale(dpr, dpr);
 
-  const w = rect.width;
-  const h = 280;
-  ctx.clearRect(0, 0, w, h);
+    const w = rect.width;
+    const h = 280;
+    ctx.clearRect(0, 0, w, h);
 
-  const monthlyRevenue = new Map();
-  DB.get("invoices", []).forEach(invoice => {
-    if (invoice.status !== "Paid" || !invoice.date) return;
-    const month = invoice.date.slice(0, 7);
-    monthlyRevenue.set(month, (monthlyRevenue.get(month) || 0) + Number(invoice.amount || 0));
-  });
-  const months = Array.from({ length: 6 }, (_, index) => {
-    const date = new Date();
-    date.setDate(1);
-    date.setMonth(date.getMonth() - (5 - index));
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
-  });
-  const revenue = months.map(month => monthlyRevenue.get(month) || 0);
-  const max = Math.max(1, ...revenue);
-  const monthLabels = months.map(month =>
-    new Date(`${month}-01T00:00:00`).toLocaleDateString(undefined, { month: "short" }));
+    const monthlyRevenue = new Map();
+    DB.get("invoices", []).forEach(invoice => {
+      if (invoice.status !== "Paid" || !invoice.date) return;
+      const month = invoice.date.slice(0, 7);
+      monthlyRevenue.set(month, (monthlyRevenue.get(month) || 0) + Number(invoice.amount || 0));
+    });
+    const months = Array.from({ length: 6 }, (_, index) => {
+      const date = new Date();
+      date.setDate(1);
+      date.setMonth(date.getMonth() - (5 - index));
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+    });
+    const revenue = months.map(month => monthlyRevenue.get(month) || 0);
+    const max = Math.max(1, ...revenue);
+    const monthLabels = months.map(month =>
+      new Date(`${month}-01T00:00:00`).toLocaleDateString(undefined, { month: "short" }));
 
-  const padLeft = 60;
-  const padBottom = 35;
-  const chartW = w - padLeft - 20;
-  const chartH = h - padBottom - 20;
+    const padLeft = 60;
+    const padBottom = 35;
+    const chartW = w - padLeft - 20;
+    const chartH = h - padBottom - 20;
 
-  // Grid
-  ctx.strokeStyle = "#E8ECEF";
-  ctx.lineWidth = 1;
-  for (let i = 0; i <= 4; i++) {
-    const y = 20 + (chartH / 4) * i;
+    // Grid
+    ctx.strokeStyle = "#E8ECEF";
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 4; i++) {
+      const y = 20 + (chartH / 4) * i;
+      ctx.beginPath();
+      ctx.moveTo(padLeft, y);
+      ctx.lineTo(w - 20, y);
+      ctx.stroke();
+
+      ctx.fillStyle = "#8F9CAE";
+      ctx.font = "11px 'Plus Jakarta Sans', sans-serif";
+      ctx.textAlign = "right";
+      ctx.fillText(`$${Math.round((max * (4 - i) / 4) / 1000)}k`, padLeft - 10, y + 4);
+    }
+
+    // Draw smooth gradient curve
+    const points = months.map((m, i) => ({
+      x: padLeft + (chartW / (months.length - 1)) * i,
+      y: 20 + chartH - (revenue[i] / max) * chartH
+    }));
+
+    // Create gradient area
+    const gradient = ctx.createLinearGradient(0, 20, 0, 20 + chartH);
+    gradient.addColorStop(0, "rgba(28, 93, 153, 0.28)");
+    gradient.addColorStop(1, "rgba(28, 93, 153, 0.0)");
+
     ctx.beginPath();
-    ctx.moveTo(padLeft, y);
-    ctx.lineTo(w - 20, y);
-    ctx.stroke();
-
-    ctx.fillStyle = "#8F9CAE";
-    ctx.font = "11px 'Plus Jakarta Sans', sans-serif";
-    ctx.textAlign = "right";
-    ctx.fillText(`$${Math.round((max * (4 - i) / 4) / 1000)}k`, padLeft - 10, y + 4);
-  }
-
-  // Draw smooth gradient curve
-  const points = months.map((m, i) => ({
-    x: padLeft + (chartW / (months.length - 1)) * i,
-    y: 20 + chartH - (revenue[i] / max) * chartH
-  }));
-
-  // Create gradient area
-  const gradient = ctx.createLinearGradient(0, 20, 0, 20 + chartH);
-  gradient.addColorStop(0, "rgba(28, 93, 153, 0.28)");
-  gradient.addColorStop(1, "rgba(28, 93, 153, 0.0)");
-
-  ctx.beginPath();
-  ctx.moveTo(points[0].x, 20 + chartH);
-  ctx.lineTo(points[0].x, points[0].y);
-  for (let i = 1; i < points.length; i++) {
-    ctx.lineTo(points[i].x, points[i].y);
-  }
-  ctx.lineTo(points[points.length - 1].x, 20 + chartH);
-  ctx.closePath();
-  ctx.fillStyle = gradient;
-  ctx.fill();
-
-  // Draw stroke line
-  ctx.beginPath();
-  ctx.moveTo(points[0].x, points[0].y);
-  for (let i = 1; i < points.length; i++) {
-    ctx.lineTo(points[i].x, points[i].y);
-  }
-  ctx.strokeStyle = "#1C5D99";
-  ctx.lineWidth = 3;
-  ctx.stroke();
-
-  // Draw point circles
-  points.forEach((p, idx) => {
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
-    ctx.fillStyle = "#FFFFFF";
+    ctx.moveTo(points[0].x, 20 + chartH);
+    ctx.lineTo(points[0].x, points[0].y);
+    for (let i = 1; i < points.length; i++) {
+      ctx.lineTo(points[i].x, points[i].y);
+    }
+    ctx.lineTo(points[points.length - 1].x, 20 + chartH);
+    ctx.closePath();
+    ctx.fillStyle = gradient;
     ctx.fill();
-    ctx.lineWidth = 3;
+
+    // Draw stroke line
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, points[0].y);
+    for (let i = 1; i < points.length; i++) {
+      ctx.lineTo(points[i].x, points[i].y);
+    }
     ctx.strokeStyle = "#1C5D99";
+    ctx.lineWidth = 3;
     ctx.stroke();
 
-    // Month label
-    ctx.fillStyle = "#5C6B7E";
-    ctx.font = "600 12px 'Plus Jakarta Sans', sans-serif";
-    ctx.textAlign = "center";
-    ctx.fillText(monthLabels[idx], p.x, h - 10);
-  });
+    // Draw point circles
+    points.forEach((p, idx) => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
+      ctx.fillStyle = "#FFFFFF";
+      ctx.fill();
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = "#1C5D99";
+      ctx.stroke();
+
+      // Month label
+      ctx.fillStyle = "#5C6B7E";
+      ctx.font = "600 12px 'Plus Jakarta Sans', sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(monthLabels[idx], p.x, h - 10);
+    });
   } catch (err) {
     ErrorLogger.log(err, "RenderReportsCharts");
   }
@@ -2194,11 +2151,11 @@ function renderPatientCareTasks(patientId, tasks, role, canUpdate) {
       <div class="fw-semibold">${escapeHtml(task.description)}</div>
       <div class="small text-muted mb-2">Added by ${escapeHtml(task.createdBy)} · ${formatClinicalDateTime(task.createdAt)}</div>
       ${canUpdate
-        ? `<select class="form-select form-select-sm" aria-label="Care task status" onchange="saveCareTaskStatus(event, ${escapeHtml(JSON.stringify(patientId))}, ${escapeHtml(JSON.stringify(task.id))})">
+      ? `<select class="form-select form-select-sm" aria-label="Care task status" onchange="saveCareTaskStatus(event, ${escapeHtml(JSON.stringify(patientId))}, ${escapeHtml(JSON.stringify(task.id))})">
              ${[["PENDING", "Pending"], ["IN_PROGRESS", "In Progress"], ["COMPLETED", "Completed"]]
-               .map(([value, label]) => `<option value="${value}" ${task.status === value ? "selected" : ""}>${label}</option>`).join("")}
+        .map(([value, label]) => `<option value="${value}" ${task.status === value ? "selected" : ""}>${label}</option>`).join("")}
            </select>`
-        : `<span class="badge text-bg-secondary">${escapeHtml(task.status.replaceAll("_", " "))}</span>`}
+      : `<span class="badge text-bg-secondary">${escapeHtml(task.status.replaceAll("_", " "))}</span>`}
     </div>`).join("") : `<div class="small text-muted py-2">No care tasks yet.</div>`;
   return `
     <section class="border-top pt-3 mt-3">
@@ -2809,7 +2766,7 @@ async function saveAppointmentForm(e) {
       return;
     }
 
-        if (!date) {
+    if (!date) {
       showToast("Please select an appointment date.", "warning");
       form.classList.add("was-validated");
       document.getElementById("aptDateInput")?.focus();
@@ -2873,6 +2830,7 @@ async function saveAppointmentForm(e) {
     const submitBtn = form.querySelector("button[type=submit]");
     if (!SubmissionLock.acquire("appointmentForm", submitBtn, "Booking...")) return;
 
+    const patientId = document.getElementById("aptPatientSelect")?.value || null;
     const canManage = ["ADMIN", "RECEPTIONIST"].includes(authState.user?.role);
     const appointment = {
       patientId: patientId || null,
@@ -3199,6 +3157,7 @@ function renderPublicFeaturedDoctors() {
     return;
   }
 
+  const fragment = document.createDocumentFragment();
   featured.forEach(doc => {
     const safeName = escapeHtml(doc.name);
     const safeDept = escapeHtml(doc.department);
@@ -3418,6 +3377,26 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   loadLocalSettings();
+
+  // Restore persisted auth sessions if available
+  const savedStaffToken = sessionStorage.getItem("medicare_auth_token");
+  const savedStaffUser = sessionStorage.getItem("medicare_auth_user");
+  if (savedStaffToken && savedStaffUser) {
+    try {
+      authState.token = savedStaffToken;
+      authState.user = JSON.parse(savedStaffUser);
+      loadStaffData().catch(e => console.warn("Staff session refresh failed:", e));
+    } catch {
+      sessionStorage.removeItem("medicare_auth_token");
+      sessionStorage.removeItem("medicare_auth_user");
+    }
+  }
+
+  const savedPatientToken = sessionStorage.getItem("medicare_patient_token");
+  if (savedPatientToken) {
+    patientState.token = savedPatientToken;
+  }
+
   // Initial renders
   refreshAllViews();
   loadPublicCatalog().catch(error => {
@@ -3439,6 +3418,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (savedTab && savedTab !== "dashboard") {
       switchAdminTab(savedTab);
     }
+  } else if (savedView === "patient") {
+    switchMainView("patient");
   }
 
   // Optimized debounced resize listener for crisp chart rendering

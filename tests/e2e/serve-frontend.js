@@ -3,7 +3,7 @@ const http = require("node:http");
 const path = require("node:path");
 
 const root = path.resolve(__dirname, "../..");
-const apiOrigin = process.env.MEDICARE_E2E_API_ORIGIN || "http://127.0.0.1:18080";
+const apiOrigin = process.env.MEDICARE_E2E_API_ORIGIN || "http://127.0.0.1:8080";
 const contentTypes = {
   ".css": "text/css; charset=utf-8",
   ".html": "text/html; charset=utf-8",

@@ -1,7 +1,7 @@
 const crypto = require("node:crypto");
 const { expect } = require("@playwright/test");
 
-const apiOrigin = process.env.MEDICARE_E2E_API_ORIGIN || "http://127.0.0.1:18080";
+const apiOrigin = process.env.MEDICARE_E2E_API_ORIGIN || "http://127.0.0.1:8080";
 
 function newPatient() {
   const suffix = crypto.randomUUID();
