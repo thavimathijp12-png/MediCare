@@ -372,20 +372,26 @@ const INITIAL_ACTIVITIES = [
 // 2. LocalStorage Persistence Manager
 // ==========================================================================
 const DB = {
+  _mem: {},
   get(key, defaultValue) {
     try {
       const data = localStorage.getItem(`medicare_${key}`);
-      return data ? JSON.parse(data) : defaultValue;
+      if (data !== null) {
+        return JSON.parse(data);
+      }
+      return this._mem[key] !== undefined ? this._mem[key] : defaultValue;
     } catch (e) {
-      console.error("Storage error:", e);
-      return defaultValue;
+      console.warn("Storage read error, using memory store:", e);
+      return this._mem[key] !== undefined ? this._mem[key] : defaultValue;
     }
   },
   set(key, value) {
     try {
+      this._mem[key] = value;
       localStorage.setItem(`medicare_${key}`, JSON.stringify(value));
     } catch (e) {
-      console.error("Storage save error:", e);
+      console.warn("Storage save error, retained in memory store:", e);
+      this._mem[key] = value;
     }
   },
   init() {
@@ -416,8 +422,175 @@ const DB = {
   }
 };
 
+// Form Draft Auto-Save Manager to prevent accidental data loss on refresh
+const FormDraftManager = {
+  saveDraft(formId) {
+    try {
+      const form = document.getElementById(formId);
+      if (!form) return;
+      const data = {};
+      const inputs = form.querySelectorAll("input:not([type=hidden]):not([type=password]), select, textarea");
+      inputs.forEach(input => {
+        if (input.id && input.value) {
+          data[input.id] = input.value;
+        }
+      });
+      sessionStorage.setItem(`medicare_draft_${formId}`, JSON.stringify(data));
+    } catch (e) {
+      console.warn("Could not save form draft:", e);
+    }
+  },
+  restoreDraft(formId) {
+    try {
+      const form = document.getElementById(formId);
+      if (!form) return false;
+      const raw = sessionStorage.getItem(`medicare_draft_${formId}`);
+      if (!raw) return false;
+      const data = JSON.parse(raw);
+      let count = 0;
+      Object.keys(data).forEach(id => {
+        const el = document.getElementById(id);
+        if (el && data[id]) {
+          el.value = data[id];
+          count++;
+        }
+      });
+      return count > 0;
+    } catch (e) {
+      console.warn("Could not restore form draft:", e);
+      return false;
+    }
+  },
+  clearDraft(formId) {
+    try {
+      sessionStorage.removeItem(`medicare_draft_${formId}`);
+    } catch (e) {
+      // ignore
+    }
+  },
+  initAutoSave(formId) {
+    const form = document.getElementById(formId);
+    if (!form) return;
+    form.addEventListener("input", () => this.saveDraft(formId));
+    form.addEventListener("change", () => this.saveDraft(formId));
+  }
+};
+
 // Initialize DB immediately
 DB.init();
+
+// Submission Lock & Debounce to prevent duplicate form submissions
+const SubmissionLock = {
+  _active: new Set(),
+  acquire(key, buttonEl = null, loadingText = "Processing...") {
+    if (this._active.has(key)) return false;
+    this._active.add(key);
+    if (buttonEl) {
+      buttonEl.disabled = true;
+      buttonEl.dataset.origHtml = buttonEl.innerHTML;
+      buttonEl.innerHTML = `<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> ${loadingText}`;
+    }
+    return true;
+  },
+  release(key, buttonEl = null) {
+    this._active.delete(key);
+    if (buttonEl && buttonEl.dataset.origHtml) {
+      buttonEl.innerHTML = buttonEl.dataset.origHtml;
+      buttonEl.disabled = false;
+    }
+  }
+};
+
+// Staff Portal Authentication & Access Gatekeeper
+function isStaffAuthenticated() {
+  return sessionStorage.getItem("medicare_staff_session") === "true";
+}
+
+function openStaffAuthModal(targetTab = "dashboard") {
+  window._pendingAdminTab = targetTab;
+  const alertEl = document.getElementById("staffAuthAlert");
+  if (alertEl) alertEl.classList.add("d-none");
+  const form = document.getElementById("staffAuthForm");
+  if (form) form.reset();
+  const roleSelect = document.getElementById("staffRoleSelect");
+  if (roleSelect) roleSelect.value = "staff";
+  const passGroup = document.getElementById("staffPasscodeGroup");
+  if (passGroup) passGroup.classList.remove("d-none");
+  const passInput = document.getElementById("staffPasscodeInput");
+  if (passInput) passInput.value = "1234";
+
+  const modalEl = document.getElementById("staffAuthModal");
+  if (modalEl) {
+    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+    modal.show();
+  }
+}
+
+function onStaffRoleChange(selectedRole) {
+  const alertEl = document.getElementById("staffAuthAlert");
+  const alertMsg = document.getElementById("staffAuthAlertMsg");
+  const passGroup = document.getElementById("staffPasscodeGroup");
+
+  if (selectedRole === "visitor") {
+    if (passGroup) passGroup.classList.add("d-none");
+    if (alertEl) alertEl.classList.remove("d-none");
+    if (alertMsg) {
+      alertMsg.textContent = "Notice: The Admin Portal is restricted to authorized Hospital Staff only, not for patients and visitors. Please use the public site for appointment booking and clinical inquiries.";
+    }
+  } else {
+    if (passGroup) passGroup.classList.remove("d-none");
+    if (alertEl) alertEl.classList.add("d-none");
+  }
+}
+
+function handleStaffAuthSubmit(e) {
+  e.preventDefault();
+  const role = document.getElementById("staffRoleSelect")?.value;
+  const passcode = (document.getElementById("staffPasscodeInput")?.value || "").trim();
+  const alertEl = document.getElementById("staffAuthAlert");
+  const alertMsg = document.getElementById("staffAuthAlertMsg");
+
+  // If patient/visitor tries to log in
+  if (role === "visitor") {
+    const message = "Access Restricted: This portal is strictly for authorized Hospital Staff only, not for patients and visitors! Please use the 'Book Appointment' or 'Contact' sections for clinical care.";
+    if (alertEl) {
+      alertEl.classList.remove("d-none");
+      if (alertMsg) alertMsg.textContent = message;
+    }
+    showToast(message, "danger");
+    return;
+  }
+
+  // Validate staff passcode
+  const validCodes = ["1234", "admin", "staff", "medicare", "doctor"];
+  if (!validCodes.includes(passcode.toLowerCase())) {
+    const message = "Invalid staff passcode. Access denied. Hospital Staff portal is restricted to authorized personnel only.";
+    if (alertEl) {
+      alertEl.classList.remove("d-none");
+      if (alertMsg) alertMsg.textContent = message;
+    }
+    showToast(message, "danger");
+    return;
+  }
+
+  // Authorized staff
+  sessionStorage.setItem("medicare_staff_session", "true");
+  const modalEl = document.getElementById("staffAuthModal");
+  if (modalEl) {
+    const modal = bootstrap.Modal.getInstance(modalEl);
+    if (modal) modal.hide();
+  }
+
+  showToast("Staff access verified. Welcome to MediCare Clinical Portal.", "success");
+  proceedToAdmin(window._pendingAdminTab || "dashboard");
+}
+
+function logoutStaff() {
+  sessionStorage.removeItem("medicare_staff_session");
+  DB.set("active_view", "public");
+  switchMainView("public");
+  showToast("You have been signed out from the Hospital Staff Portal.", "info");
+}
 
 // ==========================================================================
 // 3. Navigation & View Controller
@@ -425,27 +598,48 @@ DB.init();
 let currentPortalTab = "dashboard";
 
 function switchMainView(targetView) {
+  if (targetView === "admin") {
+    if (!isStaffAuthenticated()) {
+      openStaffAuthModal("dashboard");
+      return;
+    }
+    proceedToAdmin();
+  } else {
+    proceedToPublic();
+  }
+}
+
+function proceedToAdmin(targetTab = null) {
   const publicView = document.getElementById("public-view");
   const adminView = document.getElementById("admin-view");
   const publicNavbar = document.querySelector(".public-navbar");
 
-  if (targetView === "admin") {
-    publicView.classList.add("d-none");
-    if (publicNavbar) publicNavbar.classList.add("d-none");
-    adminView.classList.remove("d-none");
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    switchAdminTab("dashboard");
-    renderDashboardCharts();
-  } else {
-    adminView.classList.add("d-none");
-    publicView.classList.remove("d-none");
-    if (publicNavbar) publicNavbar.classList.remove("d-none");
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
+  DB.set("active_view", "admin");
+  publicView.classList.add("d-none");
+  if (publicNavbar) publicNavbar.classList.add("d-none");
+  adminView.classList.remove("d-none");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+
+  const tab = targetTab || DB.get("active_tab", "dashboard") || "dashboard";
+  switchAdminTab(tab);
+  renderDashboardCharts();
+}
+
+function proceedToPublic() {
+  const publicView = document.getElementById("public-view");
+  const adminView = document.getElementById("admin-view");
+  const publicNavbar = document.querySelector(".public-navbar");
+
+  DB.set("active_view", "public");
+  adminView.classList.add("d-none");
+  publicView.classList.remove("d-none");
+  if (publicNavbar) publicNavbar.classList.remove("d-none");
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function switchAdminTab(tabName) {
   currentPortalTab = tabName;
+  DB.set("active_tab", tabName);
 
   // Update sidebar active state
   document.querySelectorAll(".sidebar-nav-link").forEach(link => {
@@ -545,9 +739,87 @@ function showToast(message, type = "success") {
   }, 4000);
 }
 
+// ==========================================================================
+// Centralized Error Handling & Diagnostics Logger
+// ==========================================================================
+const ErrorLogger = {
+  _logs: [],
+  maxLogs: 100,
+
+  log(error, context = "General", userMessage = null) {
+    const timestamp = new Date().toISOString();
+    const entry = {
+      timestamp,
+      context,
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : null
+    };
+
+    this._logs.unshift(entry);
+    if (this._logs.length > this.maxLogs) {
+      this._logs.pop();
+    }
+
+    console.error(`[MediCare Diagnostic Log] [${context}]`, {
+      time: timestamp,
+      context,
+      details: entry.message,
+      stack: entry.stack,
+      rawError: error
+    });
+
+    if (userMessage) {
+      showToast(userMessage, "error");
+    }
+
+    return entry;
+  },
+
+  warn(message, context = "General") {
+    console.warn(`[MediCare Diagnostic Warning] [${context}]`, message);
+  },
+
+  getHistory() {
+    return [...this._logs];
+  },
+
+  clearHistory() {
+    this._logs = [];
+  }
+};
+
+// Global uncaught errors and unhandled promise rejections
+window.addEventListener("error", (event) => {
+  ErrorLogger.log(event.error || event.message, "WindowUncaughtError", "An unexpected interface error occurred. Please refresh or retry.");
+});
+
+window.addEventListener("unhandledrejection", (event) => {
+  ErrorLogger.log(event.reason, "PromiseUnhandledRejection");
+});
+
 // --------------------------------------------------------------------------
-// Form Validation Helpers
+// Form Validation & Secure Input Helpers (XSS Prevention)
 // --------------------------------------------------------------------------
+function escapeHtml(str) {
+  if (str === null || str === undefined) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function sanitizeInput(str) {
+  if (typeof str !== "string") return str;
+  return str
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
+    .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, "")
+    .replace(/javascript:/gi, "")
+    .replace(/on\w+\s*=/gi, "")
+    .trim();
+}
+
 function isValidEmail(email) {
   if (!email || typeof email !== "string") return false;
   const re = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -558,6 +830,15 @@ function isValidPhone(phone) {
   if (!phone || typeof phone !== "string") return false;
   const digits = phone.replace(/\D/g, "");
   return digits.length >= 7 && digits.length <= 15;
+}
+
+// High-performance debounce utility for rapid input events & window resizing
+function debounce(fn, delay = 150) {
+  let timer = null;
+  return function (...args) {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn.apply(this, args), delay);
+  };
 }
 
 // ==========================================================================
@@ -639,39 +920,49 @@ function renderRecentAppointmentsTable() {
     return;
   }
 
+  const fragment = document.createDocumentFragment();
   recent.forEach(apt => {
+    const safePatient = escapeHtml(apt.patientName);
+    const safePhone = escapeHtml(apt.patientPhone || 'N/A');
+    const safeDoctor = escapeHtml(apt.doctorName);
+    const safeDept = escapeHtml(apt.department);
+    const safeDate = escapeHtml(apt.date);
+    const safeTime = escapeHtml(apt.time);
+    const safeId = escapeHtml(apt.id);
     const statusClass = getStatusClass(apt.status);
+
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td><span class="fw-bold">${apt.id}</span></td>
+      <td><span class="fw-bold">${safeId}</span></td>
       <td>
-        <div class="fw-semibold">${apt.patientName}</div>
-        <div class="small text-muted">${apt.patientPhone || 'N/A'}</div>
+        <div class="fw-semibold">${safePatient}</div>
+        <div class="small text-muted">${safePhone}</div>
       </td>
       <td>
-        <div>${apt.doctorName}</div>
-        <span class="badge-pill-pastel badge-blue" style="font-size: 0.72rem; padding: 2px 8px;">${apt.department}</span>
+        <div>${safeDoctor}</div>
+        <span class="badge-pill-pastel badge-blue" style="font-size: 0.72rem; padding: 2px 8px;">${safeDept}</span>
       </td>
       <td>
-        <div>${apt.date}</div>
-        <div class="small text-muted">${apt.time}</div>
+        <div>${safeDate}</div>
+        <div class="small text-muted">${safeTime}</div>
       </td>
       <td>
-        <span class="status-badge ${statusClass}">${apt.status}</span>
+        <span class="status-badge ${statusClass}">${escapeHtml(apt.status)}</span>
       </td>
       <td>
         <div class="d-flex gap-1">
-          <button class="btn-table-action" title="Mark Completed" onclick="quickUpdateAppointmentStatus('${apt.id}', 'Completed')">
+          <button class="btn-table-action" title="Mark Completed" onclick="quickUpdateAppointmentStatus('${safeId}', 'Completed')">
             <i class="bi bi-check2"></i>
           </button>
-          <button class="btn-table-action btn-delete" title="Cancel Appointment" onclick="quickUpdateAppointmentStatus('${apt.id}', 'Cancelled')">
+          <button class="btn-table-action btn-delete" title="Cancel Appointment" onclick="quickUpdateAppointmentStatus('${safeId}', 'Cancelled')">
             <i class="bi bi-x"></i>
           </button>
         </div>
       </td>
     `;
-    tbody.appendChild(tr);
+    fragment.appendChild(tr);
   });
+  tbody.appendChild(fragment);
 }
 
 function renderActivityFeed() {
@@ -680,21 +971,23 @@ function renderActivityFeed() {
   if (!container) return;
 
   container.innerHTML = "";
+  const fragment = document.createDocumentFragment();
   activities.forEach(act => {
     const div = document.createElement("div");
     div.className = "activity-item";
     div.innerHTML = `
-      <div class="activity-dot-circle ${act.color}">
-        <i class="bi ${act.icon}"></i>
+      <div class="activity-dot-circle ${escapeHtml(act.color)}">
+        <i class="bi ${escapeHtml(act.icon)}"></i>
       </div>
       <div>
-        <div class="fw-semibold" style="font-size: 0.92rem;">${act.title}</div>
-        <div class="text-secondary" style="font-size: 0.85rem;">${act.detail}</div>
-        <div class="text-muted" style="font-size: 0.75rem; margin-top: 2px;">${act.time}</div>
+        <div class="fw-semibold" style="font-size: 0.92rem;">${escapeHtml(act.title)}</div>
+        <div class="text-secondary" style="font-size: 0.85rem;">${escapeHtml(act.detail)}</div>
+        <div class="text-muted" style="font-size: 0.75rem; margin-top: 2px;">${escapeHtml(act.time)}</div>
       </div>
     `;
-    container.appendChild(div);
+    fragment.appendChild(div);
   });
+  container.appendChild(fragment);
 }
 
 function logActivity(icon, color, title, detail) {
@@ -741,8 +1034,12 @@ function getStatusClass(status) {
 // 6. Pure HTML5 Canvas Interactive Charts (No external libraries!)
 // ==========================================================================
 function renderDashboardCharts() {
-  renderWeeklyChart();
-  renderDepartmentDonut();
+  try {
+    renderWeeklyChart();
+    renderDepartmentDonut();
+  } catch (err) {
+    ErrorLogger.log(err, "RenderDashboardCharts");
+  }
 }
 
 function renderWeeklyChart() {
@@ -876,10 +1173,11 @@ function renderDepartmentDonut() {
 }
 
 function renderReportsCharts() {
-  const canvas = document.getElementById("revenueTrendChart");
-  if (!canvas) return;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return;
+  try {
+    const canvas = document.getElementById("revenueTrendChart");
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
 
   const rect = canvas.getBoundingClientRect();
   const dpr = window.devicePixelRatio || 1;
@@ -964,6 +1262,9 @@ function renderReportsCharts() {
     ctx.textAlign = "center";
     ctx.fillText(months[idx], p.x, h - 10);
   });
+  } catch (err) {
+    ErrorLogger.log(err, "RenderReportsCharts");
+  }
 }
 
 function roundRect(ctx, x, y, width, height, radius) {
@@ -1023,51 +1324,61 @@ function renderPatientsTable() {
     return;
   }
 
+  const fragment = document.createDocumentFragment();
   filtered.forEach(pat => {
+    const safeName = escapeHtml(pat.name);
+    const safeEmail = escapeHtml(pat.email || 'No email registered');
+    const safePhone = escapeHtml(pat.phone);
+    const safeCondition = escapeHtml(pat.condition || 'General Routine');
+    const safeDoctor = escapeHtml(pat.doctor || 'Unassigned');
+    const safeBlood = escapeHtml(pat.bloodGroup || 'N/A');
+    const safeId = escapeHtml(pat.id);
+
     const initials = pat.name.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase();
     const avatarColor = pat.gender === "Female" ? "background-color: var(--pastel-pink); color: var(--pastel-pink-dark);" : "background-color: var(--pastel-blue); color: var(--pastel-blue-dark);";
     const statusClass = getStatusClass(pat.status);
 
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td><span class="fw-bold">${pat.id}</span></td>
+      <td><span class="fw-bold">${safeId}</span></td>
       <td>
         <div class="d-flex align-items-center gap-3">
           <div class="patient-avatar-box" style="${avatarColor}">${initials}</div>
           <div>
-            <div class="fw-bold text-dark">${pat.name}</div>
-            <div class="small text-muted">${pat.email || 'No email registered'}</div>
+            <div class="fw-bold text-dark">${safeName}</div>
+            <div class="small text-muted">${safeEmail}</div>
           </div>
         </div>
       </td>
-      <td>${pat.age} yrs / ${pat.gender}</td>
+      <td>${Number(pat.age)} yrs / ${escapeHtml(pat.gender)}</td>
       <td>
-        <div>${pat.phone}</div>
-        <span class="badge-pill-pastel badge-cream py-0 px-2" style="font-size: 0.7rem;">Blood: ${pat.bloodGroup || 'N/A'}</span>
+        <div>${safePhone}</div>
+        <span class="badge-pill-pastel badge-cream py-0 px-2" style="font-size: 0.7rem;">Blood: ${safeBlood}</span>
       </td>
       <td>
-        <div class="fw-semibold text-truncate" style="max-width: 180px;">${pat.condition || 'General Routine'}</div>
-        <div class="small text-muted">${pat.doctor || 'Unassigned'}</div>
+        <div class="fw-semibold text-truncate" style="max-width: 180px;">${safeCondition}</div>
+        <div class="small text-muted">${safeDoctor}</div>
       </td>
       <td>
-        <span class="status-badge ${statusClass}">${pat.status}</span>
+        <span class="status-badge ${statusClass}">${escapeHtml(pat.status)}</span>
       </td>
       <td>
         <div class="d-flex gap-1">
-          <button class="btn-table-action" title="View Patient Profile" onclick="viewPatientDetails('${pat.id}')">
+          <button class="btn-table-action" title="View Patient Profile" onclick="viewPatientDetails('${safeId}')">
             <i class="bi bi-eye"></i>
           </button>
-          <button class="btn-table-action" title="Edit Patient" onclick="openPatientModal('${pat.id}')">
+          <button class="btn-table-action" title="Edit Patient" onclick="openPatientModal('${safeId}')">
             <i class="bi bi-pencil"></i>
           </button>
-          <button class="btn-table-action btn-delete" title="Delete Patient" onclick="deletePatientRecord('${pat.id}')">
+          <button class="btn-table-action btn-delete" title="Delete Patient" onclick="deletePatientRecord('${safeId}')">
             <i class="bi bi-trash3"></i>
           </button>
         </div>
       </td>
     `;
-    tbody.appendChild(tr);
+    fragment.appendChild(tr);
   });
+  tbody.appendChild(fragment);
 }
 
 function openPatientModal(patientId = null) {
@@ -1106,6 +1417,9 @@ function openPatientModal(patientId = null) {
   } else {
     if (titleEl) titleEl.textContent = "Add New Patient Record";
     idInput.value = "";
+    if (FormDraftManager.restoreDraft("patientForm")) {
+      showToast("Restored your unsaved patient form draft.", "info");
+    }
   }
 
   const modalEl = document.getElementById("patientModal");
@@ -1120,17 +1434,17 @@ function savePatientForm(e) {
     if (!form) return;
 
     const id = (document.getElementById("patientIdHidden")?.value || "").trim();
-    const name = (document.getElementById("patNameInput")?.value || "").trim();
+    const name = sanitizeInput((document.getElementById("patNameInput")?.value || "").trim());
     const ageRaw = document.getElementById("patAgeInput")?.value;
     const age = Number(ageRaw);
-    const gender = document.getElementById("patGenderInput")?.value;
-    const bloodGroup = document.getElementById("patBloodInput")?.value;
-    const phone = (document.getElementById("patPhoneInput")?.value || "").trim();
-    const email = (document.getElementById("patEmailInput")?.value || "").trim();
-    const condition = (document.getElementById("patConditionInput")?.value || "").trim();
-    const doctor = document.getElementById("patDoctorInput")?.value;
-    const status = document.getElementById("patStatusInput")?.value;
-    const address = (document.getElementById("patAddressInput")?.value || "").trim();
+    const gender = sanitizeInput(document.getElementById("patGenderInput")?.value);
+    const bloodGroup = sanitizeInput(document.getElementById("patBloodInput")?.value);
+    const phone = sanitizeInput((document.getElementById("patPhoneInput")?.value || "").trim());
+    const email = sanitizeInput((document.getElementById("patEmailInput")?.value || "").trim());
+    const condition = sanitizeInput((document.getElementById("patConditionInput")?.value || "").trim());
+    const doctor = sanitizeInput(document.getElementById("patDoctorInput")?.value);
+    const status = sanitizeInput(document.getElementById("patStatusInput")?.value);
+    const address = sanitizeInput((document.getElementById("patAddressInput")?.value || "").trim());
 
     if (!name) {
       showToast("Please enter the patient's full name.", "warning");
@@ -1173,11 +1487,31 @@ function savePatientForm(e) {
       return;
     }
 
-    let patients = DB.get("patients", []);
+    // Duplicate validation: check if another patient has identical phone or email
+    const patients = DB.get("patients", []);
+    const dupPhone = patients.find(p => p.id !== id && phone && p.phone === phone);
+    if (dupPhone) {
+      showToast(`A patient record with phone "${phone}" already exists (${dupPhone.name}, ID: ${dupPhone.id}).`, "warning");
+      form.classList.add("was-validated");
+      document.getElementById("patPhoneInput")?.focus();
+      return;
+    }
+    const dupEmail = patients.find(p => p.id !== id && email && p.email && p.email.toLowerCase() === email.toLowerCase());
+    if (dupEmail) {
+      showToast(`A patient record with email "${email}" already exists (${dupEmail.name}, ID: ${dupEmail.id}).`, "warning");
+      form.classList.add("was-validated");
+      document.getElementById("patEmailInput")?.focus();
+      return;
+    }
+
+    const submitBtn = form.querySelector("button[type=submit]");
+    if (!SubmissionLock.acquire("patientForm", submitBtn, "Saving...")) return;
+
+    let updatedPatients = [...patients];
 
     if (id) {
       // Update existing
-      patients = patients.map(p => {
+      updatedPatients = updatedPatients.map(p => {
         if (p.id === id) {
           return { ...p, name, age, gender, bloodGroup, phone, email, condition, doctor, status, address };
         }
@@ -1187,7 +1521,7 @@ function savePatientForm(e) {
       logActivity("bi-pencil-square", "badge-blue", "Patient Updated", `${name}'s medical chart was updated.`);
     } else {
       // Create new
-      const newId = `PAT-${String(patients.length + 1).padStart(3, "0")}`;
+      const newId = `PAT-${String(updatedPatients.length + 1).padStart(3, "0")}`;
       const now = new Date();
       const curYear = now.getFullYear();
       const curMonth = String(now.getMonth() + 1).padStart(2, "0");
@@ -1206,12 +1540,13 @@ function savePatientForm(e) {
         address,
         admissionDate: `${curYear}-${curMonth}-${curDay}`
       };
-      patients.unshift(newPatient);
+      updatedPatients.unshift(newPatient);
       showToast(`New patient ${name} registered with ID ${newId}.`);
       logActivity("bi-person-plus", "badge-mint", "New Patient Registered", `${name} was admitted to records.`);
     }
 
-    DB.set("patients", patients);
+    DB.set("patients", updatedPatients);
+    FormDraftManager.clearDraft("patientForm");
 
     const modalEl = document.getElementById("patientModal");
     const modal = bootstrap.Modal.getInstance(modalEl);
@@ -1219,9 +1554,9 @@ function savePatientForm(e) {
 
     renderPatientsTable();
     updateDashboardStats();
+    setTimeout(() => SubmissionLock.release("patientForm", submitBtn), 500);
   } catch (err) {
-    console.error("Error saving patient:", err);
-    showToast("An unexpected error occurred while saving the patient record.", "error");
+    ErrorLogger.log(err, "SavePatientForm", "An unexpected error occurred while saving the patient record. Please check details and try again.");
   }
 }
 
@@ -1234,47 +1569,49 @@ function viewPatientDetails(patientId) {
   if (!content) return;
 
   const statusClass = getStatusClass(pat.status);
+  const initials = pat.name.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase();
+
   content.innerHTML = `
     <div class="text-center pb-3 border-bottom">
       <div class="patient-avatar-box mx-auto mb-2" style="width: 64px; height: 64px; font-size: 1.5rem; background: var(--pastel-blue); color: var(--brand-primary);">
-        ${pat.name.split(" ").map(n => n[0]).join("")}
+        ${initials}
       </div>
-      <h4 class="fw-bold mb-1">${pat.name}</h4>
-      <div class="text-muted small">Record ID: ${pat.id}</div>
-      <span class="status-badge ${statusClass} mt-2">${pat.status}</span>
+      <h4 class="fw-bold mb-1">${escapeHtml(pat.name)}</h4>
+      <div class="text-muted small">Record ID: ${escapeHtml(pat.id)}</div>
+      <span class="status-badge ${statusClass} mt-2">${escapeHtml(pat.status)}</span>
     </div>
     <div class="row g-3 mt-2">
       <div class="col-6">
         <label class="small text-muted">Age / Gender</label>
-        <div class="fw-semibold">${pat.age} Years (${pat.gender})</div>
+        <div class="fw-semibold">${Number(pat.age)} Years (${escapeHtml(pat.gender)})</div>
       </div>
       <div class="col-6">
         <label class="small text-muted">Blood Group</label>
-        <div class="fw-semibold text-danger">${pat.bloodGroup || 'Not Recorded'}</div>
+        <div class="fw-semibold text-danger">${escapeHtml(pat.bloodGroup || 'Not Recorded')}</div>
       </div>
       <div class="col-6">
         <label class="small text-muted">Contact Phone</label>
-        <div class="fw-semibold">${pat.phone}</div>
+        <div class="fw-semibold">${escapeHtml(pat.phone)}</div>
       </div>
       <div class="col-6">
         <label class="small text-muted">Email Address</label>
-        <div class="fw-semibold text-truncate">${pat.email || 'N/A'}</div>
+        <div class="fw-semibold text-truncate">${escapeHtml(pat.email || 'N/A')}</div>
       </div>
       <div class="col-12">
         <label class="small text-muted">Primary Diagnosed Condition</label>
-        <div class="p-2 rounded bg-light border fw-semibold text-primary">${pat.condition || 'General Checkup'}</div>
+        <div class="p-2 rounded bg-light border fw-semibold text-primary">${escapeHtml(pat.condition || 'General Checkup')}</div>
       </div>
       <div class="col-6">
         <label class="small text-muted">Assigned Physician</label>
-        <div class="fw-semibold">${pat.doctor || 'Unassigned'}</div>
+        <div class="fw-semibold">${escapeHtml(pat.doctor || 'Unassigned')}</div>
       </div>
       <div class="col-6">
         <label class="small text-muted">Admission Date</label>
-        <div class="fw-semibold">${pat.admissionDate || '2026-11-12'}</div>
+        <div class="fw-semibold">${escapeHtml(pat.admissionDate || '2026-11-12')}</div>
       </div>
       <div class="col-12">
         <label class="small text-muted">Residential Address</label>
-        <div class="text-secondary small">${pat.address || 'Address on file'}</div>
+        <div class="text-secondary small">${escapeHtml(pat.address || 'Address on file')}</div>
       </div>
     </div>
   `;
@@ -1339,7 +1676,16 @@ function renderDoctorsGrid() {
     return;
   }
 
+  const fragment = document.createDocumentFragment();
   filtered.forEach(doc => {
+    const safeName = escapeHtml(doc.name);
+    const safeDept = escapeHtml(doc.department);
+    const safeDegree = escapeHtml(doc.degree);
+    const safeExp = escapeHtml(doc.experience);
+    const safeAbout = escapeHtml(doc.about || 'Dedicated clinical practitioner focused on high-standard patient care.');
+    const safeId = escapeHtml(doc.id);
+    const safeStatus = escapeHtml(doc.status);
+
     const isAvail = doc.status === "Available";
     const statusBg = isAvail ? "background: #DFF3EA; color: #0E9F6E;" : "background: #FFF4E5; color: #D97706;";
 
@@ -1348,45 +1694,46 @@ function renderDoctorsGrid() {
     col.innerHTML = `
       <div class="doctor-card">
         <div class="doctor-img-wrap">
-          <img src="${doc.image}" alt="Portrait of ${doc.name}, Specialist in ${doc.department}" loading="lazy">
-          <span class="doctor-dept-pill">${doc.department}</span>
+          <img src="${doc.image}" alt="Portrait of ${safeName}, Specialist in ${safeDept}" loading="lazy">
+          <span class="doctor-dept-pill">${safeDept}</span>
           <span class="doctor-availability-pill" style="${statusBg}">
-            <i class="bi bi-circle-fill me-1" style="font-size: 0.5rem;"></i>${doc.status}
+            <i class="bi bi-circle-fill me-1" style="font-size: 0.5rem;"></i>${safeStatus}
           </span>
         </div>
         <div class="doctor-body">
           <div>
             <div class="d-flex justify-content-between align-items-start mb-1">
-              <h5 class="doctor-name mb-0">${doc.name}</h5>
+              <h5 class="doctor-name mb-0">${safeName}</h5>
               <div class="doctor-rating">
-                <i class="bi bi-star-fill"></i> ${doc.rating}
+                <i class="bi bi-star-fill"></i> ${Number(doc.rating) || 5.0}
               </div>
             </div>
-            <div class="doctor-sub">${doc.degree}</div>
+            <div class="doctor-sub">${safeDegree}</div>
             <p class="small text-secondary mb-3" style="line-height: 1.5; height: 42px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
-              ${doc.about || 'Dedicated clinical practitioner focused on high-standard patient care.'}
+              ${safeAbout}
             </p>
             <div class="d-flex justify-content-between align-items-center py-2 px-3 rounded bg-light border mb-3 small">
-              <span class="text-muted"><i class="bi bi-briefcase me-1"></i> ${doc.experience}</span>
-              <span class="fw-bold text-primary"><i class="bi bi-cash me-1"></i> $${doc.fee}/Visit</span>
+              <span class="text-muted"><i class="bi bi-briefcase me-1"></i> ${safeExp}</span>
+              <span class="fw-bold text-primary"><i class="bi bi-cash me-1"></i> $${Number(doc.fee)}/Visit</span>
             </div>
           </div>
           <div class="d-flex gap-2">
-            <button class="btn btn-sm btn-outline-secondary flex-grow-1" onclick="openDoctorModal('${doc.id}')">
+            <button class="btn btn-sm btn-outline-secondary flex-grow-1" onclick="openDoctorModal('${safeId}')">
               <i class="bi bi-pencil me-1"></i> Edit
             </button>
-            <button class="btn btn-sm btn-medicare-primary flex-grow-1" onclick="openBookAppointmentForDoctor('${doc.name}', '${doc.department}')">
+            <button class="btn btn-sm btn-medicare-primary flex-grow-1" onclick="openBookAppointmentForDoctor('${safeName.replace(/'/g, "\\'")}', '${safeDept.replace(/'/g, "\\'")}')">
               <i class="bi bi-calendar-plus me-1"></i> Book
             </button>
-            <button class="btn btn-sm btn-outline-danger" title="Remove Doctor" onclick="deleteDoctorRecord('${doc.id}')">
+            <button class="btn btn-sm btn-outline-danger" title="Remove Doctor" onclick="deleteDoctorRecord('${safeId}')">
               <i class="bi bi-trash"></i>
             </button>
           </div>
         </div>
       </div>
     `;
-    container.appendChild(col);
+    fragment.appendChild(col);
   });
+  container.appendChild(fragment);
 }
 
 function openDoctorModal(doctorId = null) {
@@ -1418,6 +1765,9 @@ function openDoctorModal(doctorId = null) {
     if (titleEl) titleEl.textContent = "Add New Specialist";
     idInput.value = "";
     document.getElementById("docImageInput").value = "https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=600&q=80";
+    if (FormDraftManager.restoreDraft("doctorForm")) {
+      showToast("Restored your unsaved specialist form draft.", "info");
+    }
   }
 
   const modalEl = document.getElementById("doctorModal");
@@ -1432,17 +1782,17 @@ function saveDoctorForm(e) {
     if (!form) return;
 
     const id = (document.getElementById("doctorIdHidden")?.value || "").trim();
-    const name = (document.getElementById("docNameInput")?.value || "").trim();
-    const department = document.getElementById("docDeptInput")?.value;
-    const degree = (document.getElementById("docDegreeInput")?.value || "").trim();
-    const experience = (document.getElementById("docExpInput")?.value || "").trim();
+    const name = sanitizeInput((document.getElementById("docNameInput")?.value || "").trim());
+    const department = sanitizeInput(document.getElementById("docDeptInput")?.value);
+    const degree = sanitizeInput((document.getElementById("docDegreeInput")?.value || "").trim());
+    const experience = sanitizeInput((document.getElementById("docExpInput")?.value || "").trim());
     const feeRaw = document.getElementById("docFeeInput")?.value;
     const fee = Number(feeRaw);
-    const phone = (document.getElementById("docPhoneInput")?.value || "").trim();
-    const email = (document.getElementById("docEmailInput")?.value || "").trim();
-    const status = document.getElementById("docStatusInput")?.value;
-    const image = (document.getElementById("docImageInput")?.value || "").trim() || "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=600&q=80";
-    const about = (document.getElementById("docAboutInput")?.value || "").trim();
+    const phone = sanitizeInput((document.getElementById("docPhoneInput")?.value || "").trim());
+    const email = sanitizeInput((document.getElementById("docEmailInput")?.value || "").trim());
+    const status = sanitizeInput(document.getElementById("docStatusInput")?.value);
+    const image = sanitizeInput((document.getElementById("docImageInput")?.value || "").trim()) || "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=600&q=80";
+    const about = sanitizeInput((document.getElementById("docAboutInput")?.value || "").trim());
 
     if (!name) {
       showToast("Doctor full name is required.", "warning");
@@ -1493,10 +1843,31 @@ function saveDoctorForm(e) {
       return;
     }
 
-    let doctors = DB.get("doctors", []);
+    const doctors = DB.get("doctors", []);
+
+    // Duplicate validation: check if another specialist has identical phone or email
+    const dupPhone = doctors.find(d => d.id !== id && phone && d.phone === phone);
+    if (dupPhone) {
+      showToast(`A specialist with phone "${phone}" is already registered (${dupPhone.name}).`, "warning");
+      form.classList.add("was-validated");
+      document.getElementById("docPhoneInput")?.focus();
+      return;
+    }
+    const dupEmail = doctors.find(d => d.id !== id && email && d.email && d.email.toLowerCase() === email.toLowerCase());
+    if (dupEmail) {
+      showToast(`A specialist with email "${email}" is already registered (${dupEmail.name}).`, "warning");
+      form.classList.add("was-validated");
+      document.getElementById("docEmailInput")?.focus();
+      return;
+    }
+
+    const submitBtn = form.querySelector("button[type=submit]");
+    if (!SubmissionLock.acquire("doctorForm", submitBtn, "Saving...")) return;
+
+    let updatedDoctors = [...doctors];
 
     if (id) {
-      doctors = doctors.map(d => {
+      updatedDoctors = updatedDoctors.map(d => {
         if (d.id === id) {
           return { ...d, name, department, degree, experience, fee, phone, email, status, image, about };
         }
@@ -1504,8 +1875,8 @@ function saveDoctorForm(e) {
       });
       showToast(`Doctor profile for ${name} updated.`);
     } else {
-      const newId = `DOC-${100 + doctors.length + 1}`;
-      doctors.unshift({
+      const newId = `DOC-${100 + updatedDoctors.length + 1}`;
+      updatedDoctors.unshift({
         id: newId,
         name,
         department,
@@ -1524,7 +1895,8 @@ function saveDoctorForm(e) {
       logActivity("bi-person-badge", "badge-lavender", "Doctor Onboarded", `${name} joined ${department}.`);
     }
 
-    DB.set("doctors", doctors);
+    DB.set("doctors", updatedDoctors);
+    FormDraftManager.clearDraft("doctorForm");
 
     const modalEl = document.getElementById("doctorModal");
     const modal = bootstrap.Modal.getInstance(modalEl);
@@ -1533,9 +1905,9 @@ function saveDoctorForm(e) {
     renderDoctorsGrid();
     renderPublicFeaturedDoctors();
     updateDashboardStats();
+    setTimeout(() => SubmissionLock.release("doctorForm", submitBtn), 500);
   } catch (err) {
-    console.error("Error saving doctor:", err);
-    showToast("An unexpected error occurred while saving the doctor profile.", "error");
+    ErrorLogger.log(err, "SaveDoctorForm", "An unexpected error occurred while saving the doctor profile. Please verify details and try again.");
   }
 }
 
@@ -1598,29 +1970,41 @@ function renderAppointmentsTable() {
     return;
   }
 
+  const fragment = document.createDocumentFragment();
   filtered.forEach(apt => {
+    const safePatient = escapeHtml(apt.patientName);
+    const safePhone = escapeHtml(apt.patientPhone || 'No phone');
+    const safeDoctor = escapeHtml(apt.doctorName);
+    const safeDept = escapeHtml(apt.department);
+    const safeDate = escapeHtml(apt.date);
+    const safeTime = escapeHtml(apt.time);
+    const safeReason = escapeHtml(apt.reason || 'General Health Consultation');
+    const safeType = escapeHtml(apt.type || 'In-Person');
+    const safeId = escapeHtml(apt.id);
+    const safeStatus = escapeHtml(apt.status);
     const statusClass = getStatusClass(apt.status);
+
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td><span class="fw-bold">${apt.id}</span></td>
+      <td><span class="fw-bold">${safeId}</span></td>
       <td>
-        <div class="fw-bold">${apt.patientName}</div>
-        <div class="small text-muted">${apt.patientPhone || 'No phone'}</div>
+        <div class="fw-bold">${safePatient}</div>
+        <div class="small text-muted">${safePhone}</div>
       </td>
       <td>
-        <div class="fw-semibold">${apt.doctorName}</div>
-        <span class="badge-pill-pastel badge-blue" style="font-size: 0.72rem; padding: 2px 8px;">${apt.department}</span>
+        <div class="fw-semibold">${safeDoctor}</div>
+        <span class="badge-pill-pastel badge-blue" style="font-size: 0.72rem; padding: 2px 8px;">${safeDept}</span>
       </td>
       <td>
-        <div><i class="bi bi-calendar3 me-1 text-muted"></i> ${apt.date}</div>
-        <div class="small text-muted"><i class="bi bi-clock me-1"></i> ${apt.time}</div>
+        <div><i class="bi bi-calendar3 me-1 text-muted"></i> ${safeDate}</div>
+        <div class="small text-muted"><i class="bi bi-clock me-1"></i> ${safeTime}</div>
       </td>
       <td>
-        <div class="text-truncate" style="max-width: 180px;">${apt.reason || 'General Health Consultation'}</div>
-        <span class="badge bg-light text-secondary border" style="font-size: 0.7rem;">${apt.type || 'In-Person'}</span>
+        <div class="text-truncate" style="max-width: 180px;">${safeReason}</div>
+        <span class="badge bg-light text-secondary border" style="font-size: 0.7rem;">${safeType}</span>
       </td>
       <td>
-        <span class="status-badge ${statusClass}">${apt.status}</span>
+        <span class="status-badge ${statusClass}">${safeStatus}</span>
       </td>
       <td>
         <div class="dropdown">
@@ -1628,17 +2012,18 @@ function renderAppointmentsTable() {
             Action
           </button>
           <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-            <li><a class="dropdown-item" href="javascript:void(0)" onclick="quickUpdateAppointmentStatus('${apt.id}', 'Confirmed')"><i class="bi bi-check2-circle text-success me-2"></i> Confirm</a></li>
-            <li><a class="dropdown-item" href="javascript:void(0)" onclick="quickUpdateAppointmentStatus('${apt.id}', 'Completed')"><i class="bi bi-clipboard2-check text-primary me-2"></i> Mark Completed</a></li>
-            <li><a class="dropdown-item" href="javascript:void(0)" onclick="quickUpdateAppointmentStatus('${apt.id}', 'Cancelled')"><i class="bi bi-x-circle text-danger me-2"></i> Cancel</a></li>
+            <li><a class="dropdown-item" href="javascript:void(0)" onclick="quickUpdateAppointmentStatus('${safeId}', 'Confirmed')"><i class="bi bi-check2-circle text-success me-2"></i> Confirm</a></li>
+            <li><a class="dropdown-item" href="javascript:void(0)" onclick="quickUpdateAppointmentStatus('${safeId}', 'Completed')"><i class="bi bi-clipboard2-check text-primary me-2"></i> Mark Completed</a></li>
+            <li><a class="dropdown-item" href="javascript:void(0)" onclick="quickUpdateAppointmentStatus('${safeId}', 'Cancelled')"><i class="bi bi-x-circle text-danger me-2"></i> Cancel</a></li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="javascript:void(0)" onclick="openAppointmentModal('${apt.id}')"><i class="bi bi-pencil me-2"></i> Edit Details</a></li>
+            <li><a class="dropdown-item" href="javascript:void(0)" onclick="openAppointmentModal('${safeId}')"><i class="bi bi-pencil me-2"></i> Edit Details</a></li>
           </ul>
         </div>
       </td>
     `;
-    tbody.appendChild(tr);
+    fragment.appendChild(tr);
   });
+  tbody.appendChild(fragment);
 }
 
 function openAppointmentModal(appointmentId = null) {
@@ -1690,6 +2075,9 @@ function openAppointmentModal(appointmentId = null) {
     const curDay = String(todayObj.getDate()).padStart(2, "0");
     document.getElementById("aptDateInput").value = `${curYear}-${curMonth}-${curDay}`;
     document.getElementById("aptTimeInput").value = "10:00 AM";
+    if (FormDraftManager.restoreDraft("appointmentForm")) {
+      showToast("Restored your unsaved appointment draft.", "info");
+    }
   }
 
   const modalEl = document.getElementById("appointmentModal");
@@ -1730,15 +2118,15 @@ function saveAppointmentForm(e) {
     if (!form) return;
 
     const id = (document.getElementById("appointmentIdHidden")?.value || "").trim();
-    const patientName = (document.getElementById("aptPatientNameInput")?.value || "").trim();
-    const patientPhone = (document.getElementById("aptPatientPhoneInput")?.value || "").trim();
-    const doctorName = document.getElementById("aptDoctorInput")?.value;
-    const department = document.getElementById("aptDeptInput")?.value;
-    const date = document.getElementById("aptDateInput")?.value;
-    const time = document.getElementById("aptTimeInput")?.value;
-    const type = document.getElementById("aptTypeInput")?.value || "In-Person";
-    const status = document.getElementById("aptStatusInput")?.value || "Pending";
-    const reason = (document.getElementById("aptReasonInput")?.value || "").trim();
+    const patientName = sanitizeInput((document.getElementById("aptPatientNameInput")?.value || "").trim());
+    const patientPhone = sanitizeInput((document.getElementById("aptPatientPhoneInput")?.value || "").trim());
+    const doctorName = sanitizeInput(document.getElementById("aptDoctorInput")?.value);
+    const department = sanitizeInput(document.getElementById("aptDeptInput")?.value);
+    const date = sanitizeInput(document.getElementById("aptDateInput")?.value);
+    const time = sanitizeInput(document.getElementById("aptTimeInput")?.value);
+    const type = sanitizeInput(document.getElementById("aptTypeInput")?.value || "In-Person");
+    const status = sanitizeInput(document.getElementById("aptStatusInput")?.value || "Pending");
+    const reason = sanitizeInput((document.getElementById("aptReasonInput")?.value || "").trim());
 
     if (!patientName) {
       showToast("Patient name is required for booking.", "warning");
@@ -1768,13 +2156,27 @@ function saveAppointmentForm(e) {
       return;
     }
 
-    if (!date) {
+        if (!date) {
       showToast("Please select an appointment date.", "warning");
       form.classList.add("was-validated");
       document.getElementById("aptDateInput")?.focus();
       return;
     }
 
+    // Prevent booking appointments for past dates
+    const selectedDate = new Date(`${date}T00:00:00`);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (Number.isNaN(selectedDate.getTime()) || selectedDate < today) {
+      showToast(
+        "Appointment date cannot be in the past. Please select today or a future date.",
+        "warning"
+      );
+      form.classList.add("was-validated");
+      document.getElementById("aptDateInput")?.focus();
+      return;
+    }
     if (!time) {
       showToast("Please select a consultation time slot.", "warning");
       form.classList.add("was-validated");
@@ -1782,10 +2184,46 @@ function saveAppointmentForm(e) {
       return;
     }
 
-    let appointments = DB.get("appointments", []);
+    const appointments = DB.get("appointments", []);
+
+    // Prevent duplicate appointment bookings:
+    // 1. Same doctor at the same date and time (ignoring Cancelled appointments and current appointment)
+    const doctorConflict = appointments.find(a =>
+      a.id !== id &&
+      a.doctorName === doctorName &&
+      a.date === date &&
+      a.time === time &&
+      a.status !== "Cancelled"
+    );
+    if (doctorConflict) {
+      showToast(`Doctor ${doctorName} is already booked on ${date} at ${time}. Please select an alternate time slot or specialist.`, "warning");
+      form.classList.add("was-validated");
+      document.getElementById("aptTimeInput")?.focus();
+      return;
+    }
+
+    // 2. Same patient at the same date and time
+    const patientConflict = appointments.find(a =>
+      a.id !== id &&
+      a.patientName.toLowerCase() === patientName.toLowerCase() &&
+      a.date === date &&
+      a.time === time &&
+      a.status !== "Cancelled"
+    );
+    if (patientConflict) {
+      showToast(`Patient ${patientName} already has an active appointment scheduled on ${date} at ${time}.`, "warning");
+      form.classList.add("was-validated");
+      document.getElementById("aptDateInput")?.focus();
+      return;
+    }
+
+    const submitBtn = form.querySelector("button[type=submit]");
+    if (!SubmissionLock.acquire("appointmentForm", submitBtn, "Booking...")) return;
+
+    let updatedAppointments = [...appointments];
 
     if (id) {
-      appointments = appointments.map(a => {
+      updatedAppointments = updatedAppointments.map(a => {
         if (a.id === id) {
           return { ...a, patientName, patientPhone, doctorName, department, date, time, type, status, reason };
         }
@@ -1793,8 +2231,8 @@ function saveAppointmentForm(e) {
       });
       showToast(`Appointment ${id} details updated.`);
     } else {
-      const newId = `APT-2026-${String(appointments.length + 1).padStart(2, "0")}`;
-      appointments.unshift({
+      const newId = `APT-2026-${String(updatedAppointments.length + 1).padStart(2, "0")}`;
+      updatedAppointments.unshift({
         id: newId,
         patientName,
         patientPhone,
@@ -1810,7 +2248,8 @@ function saveAppointmentForm(e) {
       logActivity("bi-calendar2-plus", "badge-blue", "Appointment Booked", `${patientName} with ${doctorName}.`);
     }
 
-    DB.set("appointments", appointments);
+    DB.set("appointments", updatedAppointments);
+    FormDraftManager.clearDraft("appointmentForm");
 
     const modalEl = document.getElementById("appointmentModal");
     const modal = bootstrap.Modal.getInstance(modalEl);
@@ -1819,9 +2258,9 @@ function saveAppointmentForm(e) {
     renderAppointmentsTable();
     renderRecentAppointmentsTable();
     updateDashboardStats();
+    setTimeout(() => SubmissionLock.release("appointmentForm", submitBtn), 500);
   } catch (err) {
-    console.error("Error saving appointment:", err);
-    showToast("An unexpected error occurred while saving the appointment.", "error");
+    ErrorLogger.log(err, "SaveAppointmentForm", "An unexpected error occurred while confirming the appointment. Please try again.");
   }
 }
 
@@ -1889,38 +2328,47 @@ function renderBillingTable() {
     return;
   }
 
+  const fragment = document.createDocumentFragment();
   filtered.forEach(inv => {
+    const safePatient = escapeHtml(inv.patientName);
+    const safeDept = escapeHtml(inv.department);
+    const safeId = escapeHtml(inv.id);
+    const safeDate = escapeHtml(inv.date);
+    const safeMethod = escapeHtml(inv.method || 'Standard Pay');
+    const safeStatus = escapeHtml(inv.status);
     const statusClass = getStatusClass(inv.status);
+
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td><span class="fw-bold">${inv.id}</span></td>
+      <td><span class="fw-bold">${safeId}</span></td>
       <td>
-        <div class="fw-bold">${inv.patientName}</div>
-        <div class="small text-muted">${inv.department}</div>
+        <div class="fw-bold">${safePatient}</div>
+        <div class="small text-muted">${safeDept}</div>
       </td>
-      <td>${inv.date}</td>
+      <td>${safeDate}</td>
       <td class="fw-bold text-dark">$${Number(inv.amount).toLocaleString()}.00</td>
       <td>
-        <span class="small text-secondary"><i class="bi bi-credit-card me-1"></i> ${inv.method || 'Standard Pay'}</span>
+        <span class="small text-secondary"><i class="bi bi-credit-card me-1"></i> ${safeMethod}</span>
       </td>
       <td>
-        <span class="status-badge ${statusClass}">${inv.status}</span>
+        <span class="status-badge ${statusClass}">${safeStatus}</span>
       </td>
       <td>
         <div class="d-flex gap-1">
-          <button class="btn btn-sm btn-medicare-secondary py-1 px-3" onclick="viewInvoiceModal('${inv.id}')">
+          <button class="btn btn-sm btn-medicare-secondary py-1 px-3" onclick="viewInvoiceModal('${safeId}')">
             <i class="bi bi-file-earmark-text me-1"></i> View Receipt
           </button>
           ${inv.status !== 'Paid' ? `
-            <button class="btn btn-sm btn-outline-success py-1 px-2" title="Mark as Paid" onclick="markInvoicePaid('${inv.id}')">
+            <button class="btn btn-sm btn-outline-success py-1 px-2" title="Mark as Paid" onclick="markInvoicePaid('${safeId}')">
               <i class="bi bi-check-lg"></i>
             </button>
           ` : ''}
         </div>
       </td>
     `;
-    tbody.appendChild(tr);
+    fragment.appendChild(tr);
   });
+  tbody.appendChild(fragment);
 }
 
 function viewInvoiceModal(invoiceId) {
@@ -1935,12 +2383,18 @@ function viewInvoiceModal(invoiceId) {
     { desc: "General Medical Examination & Clinical Assessment", cost: inv.amount }
   ]).map(item => `
     <tr>
-      <td class="py-2">${item.desc}</td>
+      <td class="py-2">${escapeHtml(item.desc)}</td>
       <td class="text-end py-2">$${Number(item.cost).toFixed(2)}</td>
     </tr>
   `).join("");
 
   const statusClass = getStatusClass(inv.status);
+  const safePatient = escapeHtml(inv.patientName);
+  const safeDept = escapeHtml(inv.department);
+  const safeId = escapeHtml(inv.id);
+  const safeDate = escapeHtml(inv.date);
+  const safeMethod = escapeHtml(inv.method || 'Direct');
+  const safeStatus = escapeHtml(inv.status);
 
   content.innerHTML = `
     <div class="invoice-container">
@@ -1957,18 +2411,18 @@ function viewInvoiceModal(invoiceId) {
         </div>
         <div class="text-end">
           <h5 class="fw-bold text-primary mb-1">INVOICE</h5>
-          <div class="fw-bold">${inv.id}</div>
-          <div class="small text-muted">Date: ${inv.date}</div>
-          <span class="status-badge ${statusClass} mt-2">${inv.status}</span>
+          <div class="fw-bold">${safeId}</div>
+          <div class="small text-muted">Date: ${safeDate}</div>
+          <span class="status-badge ${statusClass} mt-2">${safeStatus}</span>
         </div>
       </div>
 
       <div class="row g-3 mb-4">
         <div class="col-6">
           <div class="small text-muted text-uppercase fw-bold">Billed To</div>
-          <div class="fw-bold fs-6">${inv.patientName}</div>
-          <div class="small text-muted">Department: ${inv.department}</div>
-          <div class="small text-muted">Payment: ${inv.method || 'Direct'}</div>
+          <div class="fw-bold fs-6">${safePatient}</div>
+          <div class="small text-muted">Department: ${safeDept}</div>
+          <div class="small text-muted">Payment: ${safeMethod}</div>
         </div>
         <div class="col-6 text-end">
           <div class="small text-muted text-uppercase fw-bold">Hospital Tax ID</div>
@@ -2045,32 +2499,37 @@ function renderPublicFeaturedDoctors() {
   const featured = doctors.slice(0, 4);
 
   featured.forEach(doc => {
+    const safeName = escapeHtml(doc.name);
+    const safeDept = escapeHtml(doc.department);
+    const safeDegree = escapeHtml(doc.degree);
+
     const col = document.createElement("div");
     col.className = "col-lg-3 col-md-6";
     col.innerHTML = `
       <div class="doctor-card">
         <div class="doctor-img-wrap">
-          <img src="${doc.image}" alt="Portrait of ${doc.name}, Specialist in ${doc.department}" loading="lazy">
-          <span class="doctor-dept-pill">${doc.department}</span>
+          <img src="${doc.image}" alt="Portrait of ${safeName}, Specialist in ${safeDept}" loading="lazy">
+          <span class="doctor-dept-pill">${safeDept}</span>
         </div>
         <div class="doctor-body">
           <div>
             <div class="d-flex justify-content-between align-items-start mb-1">
-              <h5 class="doctor-name mb-0">${doc.name}</h5>
+              <h5 class="doctor-name mb-0">${safeName}</h5>
             </div>
-            <div class="doctor-sub">${doc.degree}</div>
+            <div class="doctor-sub">${safeDegree}</div>
             <div class="doctor-rating mb-3">
-              <i class="bi bi-star-fill"></i> ${doc.rating} <span class="text-muted fw-normal">(${doc.reviews} reviews)</span>
+              <i class="bi bi-star-fill"></i> ${Number(doc.rating) || 5.0} <span class="text-muted fw-normal">(${Number(doc.reviews) || 0} reviews)</span>
             </div>
           </div>
-          <button class="btn btn-medicare-secondary w-100 btn-sm" onclick="openBookAppointmentForDoctor('${doc.name}', '${doc.department}')">
+          <button class="btn btn-medicare-secondary w-100 btn-sm" onclick="openBookAppointmentForDoctor('${safeName.replace(/'/g, "\\'")}', '${safeDept.replace(/'/g, "\\'")}')">
             <i class="bi bi-calendar-event me-1"></i> Consult Specialist
           </button>
         </div>
       </div>
     `;
-    container.appendChild(col);
+    fragment.appendChild(col);
   });
+  container.appendChild(fragment);
 }
 
 function handlePublicContactSubmit(e) {
@@ -2078,6 +2537,9 @@ function handlePublicContactSubmit(e) {
   try {
     const form = e.target;
     if (!form) return;
+
+    const submitBtn = form.querySelector('button[type="submit"]');
+    if (!SubmissionLock.acquire("publicContactForm", submitBtn, "Sending...")) return;
 
     const name = (form.querySelector('input[type="text"]')?.value || "").trim();
     const phone = (form.querySelector('input[type="tel"]')?.value || "").trim();
@@ -2089,6 +2551,7 @@ function handlePublicContactSubmit(e) {
       showToast("Please enter your full name.", "warning");
       form.classList.add("was-validated");
       form.querySelector('input[type="text"]')?.focus();
+      SubmissionLock.release("publicContactForm", submitBtn);
       return;
     }
 
@@ -2096,6 +2559,7 @@ function handlePublicContactSubmit(e) {
       showToast("Please provide a valid contact phone number (at least 7 digits).", "warning");
       form.classList.add("was-validated");
       form.querySelector('input[type="tel"]')?.focus();
+      SubmissionLock.release("publicContactForm", submitBtn);
       return;
     }
 
@@ -2103,6 +2567,7 @@ function handlePublicContactSubmit(e) {
       showToast("Please enter a valid email address.", "warning");
       form.classList.add("was-validated");
       form.querySelector('input[type="email"]')?.focus();
+      SubmissionLock.release("publicContactForm", submitBtn);
       return;
     }
 
@@ -2110,6 +2575,7 @@ function handlePublicContactSubmit(e) {
       showToast("Please select a medical department of interest.", "warning");
       form.classList.add("was-validated");
       form.querySelector("select")?.focus();
+      SubmissionLock.release("publicContactForm", submitBtn);
       return;
     }
 
@@ -2117,15 +2583,16 @@ function handlePublicContactSubmit(e) {
       showToast("Please write a brief description of your inquiry.", "warning");
       form.classList.add("was-validated");
       form.querySelector("textarea")?.focus();
+      SubmissionLock.release("publicContactForm", submitBtn);
       return;
     }
 
     showToast("Thank you! Your inquiry has been sent to our patient support team.");
     form.reset();
     form.classList.remove("was-validated");
+    setTimeout(() => SubmissionLock.release("publicContactForm", submitBtn), 1000);
   } catch (err) {
-    console.error("Error handling contact submission:", err);
-    showToast("An unexpected error occurred while sending your inquiry. Please try again.", "error");
+    ErrorLogger.log(err, "ContactSubmission", "An unexpected error occurred while sending your inquiry. Please try again.");
   }
 }
 
@@ -2134,8 +2601,7 @@ function handleSaveSettings(e) {
   try {
     showToast("Hospital configurations and profile settings updated successfully!");
   } catch (err) {
-    console.error("Error saving settings:", err);
-    showToast("Failed to save settings.", "error");
+    ErrorLogger.log(err, "SaveSettings", "Failed to update hospital settings.");
   }
 }
 
@@ -2194,17 +2660,46 @@ function refreshAllViews() {
 // 13. DOM Ready Initialization & Event Wiring
 // ==========================================================================
 document.addEventListener("DOMContentLoaded", () => {
+  // Form draft auto-save initialization
+  FormDraftManager.initAutoSave("patientForm");
+  FormDraftManager.initAutoSave("doctorForm");
+  FormDraftManager.initAutoSave("appointmentForm");
+
+  // Prevent accidental data loss on refresh when modal is dirty
+  window.addEventListener("beforeunload", (e) => {
+    const openModalForm = document.querySelector(".modal.show form");
+    if (openModalForm) {
+      const inputs = openModalForm.querySelectorAll("input:not([type=hidden]), select, textarea");
+      const hasInput = Array.from(inputs).some(inp => inp.value && inp.value.trim().length > 0);
+      if (hasInput) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    }
+  });
+
   // Initial renders
   refreshAllViews();
 
-  // Resize listener to re-draw canvas charts sharply
-  window.addEventListener("resize", () => {
+  // Restore active view and tab across page refresh
+  const savedView = DB.get("active_view", "public");
+  const savedTab = DB.get("active_tab", "dashboard");
+  if (savedView === "admin") {
+    switchMainView("admin");
+    if (savedTab && savedTab !== "dashboard") {
+      switchAdminTab(savedTab);
+    }
+  }
+
+  // Optimized debounced resize listener for crisp chart rendering
+  const handleOptimizedResize = debounce(() => {
     if (currentPortalTab === "dashboard") {
       renderDashboardCharts();
     } else if (currentPortalTab === "reports") {
       renderReportsCharts();
     }
-  });
+  }, 160);
+  window.addEventListener("resize", handleOptimizedResize, { passive: true });
 
   // Global search input enter listener
   const topSearch = document.getElementById("globalSearchInput");
@@ -2230,18 +2725,25 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Back to top button visibility toggle on scroll
+  // Optimized smooth scroll handler with requestAnimationFrame
   const backToTopBtn = document.getElementById("btnBackToTop");
   if (backToTopBtn) {
+    let scrollTicking = false;
     window.addEventListener("scroll", () => {
-      if (window.scrollY > 350) {
-        backToTopBtn.style.opacity = "0.95";
-        backToTopBtn.style.pointerEvents = "auto";
-      } else {
-        backToTopBtn.style.opacity = "0";
-        backToTopBtn.style.pointerEvents = "none";
+      if (!scrollTicking) {
+        window.requestAnimationFrame(() => {
+          if (window.scrollY > 350) {
+            backToTopBtn.style.opacity = "0.95";
+            backToTopBtn.style.pointerEvents = "auto";
+          } else {
+            backToTopBtn.style.opacity = "0";
+            backToTopBtn.style.pointerEvents = "none";
+          }
+          scrollTicking = false;
+        });
+        scrollTicking = true;
       }
-    });
+    }, { passive: true });
   }
 });
 
