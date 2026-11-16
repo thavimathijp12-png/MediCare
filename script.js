@@ -2156,13 +2156,27 @@ function saveAppointmentForm(e) {
       return;
     }
 
-    if (!date) {
+        if (!date) {
       showToast("Please select an appointment date.", "warning");
       form.classList.add("was-validated");
       document.getElementById("aptDateInput")?.focus();
       return;
     }
 
+    // Prevent booking appointments for past dates
+    const selectedDate = new Date(`${date}T00:00:00`);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (Number.isNaN(selectedDate.getTime()) || selectedDate < today) {
+      showToast(
+        "Appointment date cannot be in the past. Please select today or a future date.",
+        "warning"
+      );
+      form.classList.add("was-validated");
+      document.getElementById("aptDateInput")?.focus();
+      return;
+    }
     if (!time) {
       showToast("Please select a consultation time slot.", "warning");
       form.classList.add("was-validated");
