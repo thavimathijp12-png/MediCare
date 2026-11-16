@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MediCare - Premier Hospital & Healthcare Management System</title>
   <meta name="description" content="MediCare is a state-of-the-art hospital and clinical healthcare management platform offering world-class patient care, appointment scheduling, and clinical diagnostics.">
+  <meta name="medicare-api-base-url" content="">
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="assets/favicon.png">
@@ -21,7 +22,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
   <!-- Custom Stylesheet -->
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=2">
 </head>
 <body>
 
@@ -43,7 +44,7 @@
         </div>
         <div class="d-flex align-items-center gap-3">
           <button class="btn btn-sm btn-link text-decoration-none text-primary fw-bold p-0" onclick="switchMainView('admin')">
-            <i class="bi bi-shield-lock-fill me-1"></i> Staff / Admin Portal
+            <i class="bi bi-shield-lock-fill me-1"></i> Staff Login
           </button>
         </div>
       </div>
@@ -94,14 +95,20 @@
             <li class="nav-item">
               <a class="nav-link nav-link-custom" href="#section-contact">Contact</a>
             </li>
+            <li class="nav-item">
+              <button class="nav-link nav-link-custom border-0 bg-transparent" type="button" onclick="switchMainView('patient')">Patient Portal</button>
+            </li>
           </ul>
 
           <!-- Nav Right CTAs -->
           <div class="nav-right-ctas">
             <button class="btn btn-medicare-secondary d-none d-xl-inline-flex" onclick="switchMainView('admin')">
-              <i class="bi bi-grid-fill"></i> Portal Dashboard
+              <i class="bi bi-grid-fill"></i> Staff Login
             </button>
-            <button class="btn btn-medicare-primary" onclick="openAppointmentModal()">
+            <button class="btn btn-medicare-secondary d-xl-none" onclick="switchMainView('patient')">
+              <i class="bi bi-person-circle"></i> Patient Portal
+            </button>
+            <button class="btn btn-medicare-primary appointment-create-action" onclick="openAppointmentModal()">
               <i class="bi bi-calendar-check-fill"></i> Book Appointment
             </button>
           </div>
@@ -311,7 +318,7 @@
               </div>
             </div>
 
-            <button class="btn btn-medicare-primary" onclick="openAppointmentModal()">
+            <button class="btn btn-medicare-primary appointment-create-action" onclick="openAppointmentModal()">
               <i class="bi bi-chevron-right"></i> Meet Our Physicians
             </button>
           </div>
@@ -431,7 +438,7 @@
           <p class="section-desc">Our dedicated departments unite multidisciplinary specialists to diagnose and treat complex medical conditions with exceptional care.</p>
         </div>
 
-        <div class="row g-4">
+        <div class="row g-4" id="public-departments-grid">
           <!-- Cardiology -->
           <div class="col-lg-4 col-md-6">
             <div class="dept-card">
@@ -760,40 +767,40 @@
           <div class="col-lg-7">
             <div class="card-custom p-4 p-md-5">
               <h4 class="fw-bold mb-2">Send Us an Inquiry</h4>
-              <p class="small text-secondary mb-4">Our patient coordinator will contact you within 2 hours.</p>
+              <p class="small text-secondary mb-4">Your inquiry is sent to our support team by email. Do not include sensitive or urgent medical information.</p>
 
               <form onsubmit="handlePublicContactSubmit(event)" novalidate>
                 <div class="row g-3">
                   <div class="col-md-6">
-                    <label class="form-label small fw-semibold">Your Full Name</label>
-                    <input type="text" class="form-control form-control-custom" placeholder="e.g. John Doe" required>
+                    <label for="contactNameInput" class="form-label small fw-semibold">Your Full Name</label>
+                    <input id="contactNameInput" name="name" type="text" class="form-control form-control-custom" placeholder="e.g. John Doe" required maxlength="120">
                     <div class="invalid-feedback">Please enter your name.</div>
                   </div>
                   <div class="col-md-6">
-                    <label class="form-label small fw-semibold">Phone Number</label>
-                    <input type="tel" class="form-control form-control-custom" placeholder="+1 (555) 000-0000" required>
+                    <label for="contactPhoneInput" class="form-label small fw-semibold">Phone Number</label>
+                    <input id="contactPhoneInput" name="phone" type="tel" class="form-control form-control-custom" placeholder="+1 (555) 000-0000" pattern="[+()0-9 .-]{7,24}" required>
                     <div class="invalid-feedback">Please provide a valid phone number.</div>
                   </div>
                   <div class="col-md-6">
-                    <label class="form-label small fw-semibold">Email Address</label>
-                    <input type="email" class="form-control form-control-custom" placeholder="name@example.com" required>
+                    <label for="contactEmailInput" class="form-label small fw-semibold">Email Address</label>
+                    <input id="contactEmailInput" name="email" type="email" class="form-control form-control-custom" placeholder="name@example.com" required maxlength="254">
                     <div class="invalid-feedback">Please enter a valid email.</div>
                   </div>
                   <div class="col-md-6">
-                    <label class="form-label small fw-semibold">Department of Interest</label>
-                    <select class="form-select form-select-custom" required>
+                    <label for="contactDepartmentInput" class="form-label small fw-semibold">Department of Interest</label>
+                    <select id="contactDepartmentInput" name="department" class="form-select form-select-custom" required>
                       <option value="">Select Department</option>
-                      <option>Cardiology</option>
-                      <option>Neurology</option>
-                      <option>Orthopedics</option>
-                      <option>Pediatrics</option>
-                      <option>Dermatology</option>
-                      <option>General Medicine</option>
+                      <option value="Cardiology">Cardiology</option>
+                      <option value="Neurology">Neurology</option>
+                      <option value="Orthopedics">Orthopedics</option>
+                      <option value="Pediatrics">Pediatrics</option>
+                      <option value="Dermatology">Dermatology</option>
+                      <option value="General Medicine">General Medicine</option>
                     </select>
                   </div>
                   <div class="col-12">
-                    <label class="form-label small fw-semibold">Message / Medical Concern</label>
-                    <textarea class="form-control form-control-custom" rows="3" placeholder="Briefly describe your health question or symptom..." required></textarea>
+                    <label for="contactMessageInput" class="form-label small fw-semibold">General Question</label>
+                    <textarea id="contactMessageInput" name="message" class="form-control form-control-custom" rows="3" maxlength="2000" placeholder="Do not include sensitive or time-critical medical details." required></textarea>
                     <div class="invalid-feedback">Please write your message.</div>
                   </div>
                   <div class="col-12 mt-4">
@@ -824,10 +831,10 @@
               MediCare is an internationally accredited hospital and research institution committed to delivering exceptional patient-first clinical outcomes with dignity, integrity, and warmth.
             </p>
             <div class="d-flex gap-2">
-              <a href="javascript:void(0)" class="btn btn-sm btn-outline-light rounded-circle p-2" style="width: 36px; height: 36px;"><i class="bi bi-facebook"></i></a>
-              <a href="javascript:void(0)" class="btn btn-sm btn-outline-light rounded-circle p-2" style="width: 36px; height: 36px;"><i class="bi bi-twitter-x"></i></a>
-              <a href="javascript:void(0)" class="btn btn-sm btn-outline-light rounded-circle p-2" style="width: 36px; height: 36px;"><i class="bi bi-linkedin"></i></a>
-              <a href="javascript:void(0)" class="btn btn-sm btn-outline-light rounded-circle p-2" style="width: 36px; height: 36px;"><i class="bi bi-instagram"></i></a>
+              <span class="btn btn-sm btn-outline-light rounded-circle p-2" style="width: 36px; height: 36px;" aria-hidden="true"><i class="bi bi-facebook"></i></span>
+              <span class="btn btn-sm btn-outline-light rounded-circle p-2" style="width: 36px; height: 36px;" aria-hidden="true"><i class="bi bi-twitter-x"></i></span>
+              <span class="btn btn-sm btn-outline-light rounded-circle p-2" style="width: 36px; height: 36px;" aria-hidden="true"><i class="bi bi-linkedin"></i></span>
+              <span class="btn btn-sm btn-outline-light rounded-circle p-2" style="width: 36px; height: 36px;" aria-hidden="true"><i class="bi bi-instagram"></i></span>
             </div>
           </div>
 
@@ -873,9 +880,9 @@
         <div class="pt-4 border-top border-secondary border-opacity-25 d-flex flex-wrap justify-content-between align-items-center small text-muted">
           <div>&copy; 2026 MediCare Hospital & Healthcare Systems. All rights reserved.</div>
           <div class="d-flex gap-3">
-            <a href="javascript:void(0)" class="text-muted">Privacy Policy</a>
-            <a href="javascript:void(0)" class="text-muted">Terms of Medical Care</a>
-            <a href="javascript:void(0)" class="text-muted">Patient Rights</a>
+            <span class="text-muted">Privacy Policy</span>
+            <span class="text-muted">Terms of Medical Care</span>
+            <span class="text-muted">Patient Rights</span>
           </div>
         </div>
       </div>
@@ -888,6 +895,146 @@
        ========================================================================= -->
   <div id="admin-view" class="d-none">
 
+         <section id="patient-portal" class="staff-login-panel d-none" aria-labelledby="patientPortalTitle">
+           <div class="staff-login-card">
+             <a class="brand-logo-wrap justify-content-center mb-4" href="javascript:void(0)" onclick="switchMainView('public')">
+               <div class="brand-icon-box"><i class="bi bi-heart-pulse-fill"></i></div>
+               <div class="brand-name">Medi<span>Care</span></div>
+             </a>
+             <div id="patientPortalAuth">
+               <div class="text-center mb-4">
+                 <div class="staff-login-icon"><i class="bi bi-person-heart"></i></div>
+                 <h1 id="patientPortalTitle" class="h3 fw-bold mt-3 mb-2">Patient Portal</h1>
+                 <p class="text-secondary mb-0">Sign in to securely view your personal health information.</p>
+               </div>
+               <div class="btn-group w-100 mb-3" role="group" aria-label="Patient portal access">
+                 <button id="patientLoginTab" type="button" class="btn btn-medicare-primary" onclick="showPatientPortalForm('login')">Sign in</button>
+                 <button id="patientRegisterTab" type="button" class="btn btn-medicare-secondary" onclick="showPatientPortalForm('register')">Create account</button>
+               </div>
+               <form id="patientLoginForm" onsubmit="handlePatientLogin(event)" novalidate>
+                 <div class="mb-3">
+                   <label for="patientLoginEmail" class="form-label fw-semibold">Email</label>
+                   <input id="patientLoginEmail" type="email" class="form-control form-control-custom" autocomplete="username" required>
+                   <div class="invalid-feedback">Enter your email.</div>
+                 </div>
+                 <div class="mb-3">
+                   <label for="patientLoginPassword" class="form-label fw-semibold">Password</label>
+                   <input id="patientLoginPassword" type="password" class="form-control form-control-custom" autocomplete="current-password" required>
+                   <div class="invalid-feedback">Enter your password.</div>
+                 </div>
+                 <div id="patientLoginError" class="text-danger small mb-3" role="alert" aria-live="polite"></div>
+                 <button type="submit" class="btn btn-medicare-primary w-100 py-2">Sign in securely</button>
+               </form>
+               <form id="patientRegisterForm" class="d-none" onsubmit="handlePatientRegistration(event)" novalidate>
+                 <div class="mb-3">
+                   <label for="patientRegisterName" class="form-label fw-semibold">Full name</label>
+                   <input id="patientRegisterName" type="text" class="form-control form-control-custom" autocomplete="name" minlength="2" maxlength="120" required>
+                 </div>
+                 <div class="mb-3">
+                   <label for="patientRegisterEmail" class="form-label fw-semibold">Email</label>
+                   <input id="patientRegisterEmail" type="email" class="form-control form-control-custom" autocomplete="email" required>
+                 </div>
+                 <div class="mb-3">
+                   <label for="patientRegisterPassword" class="form-label fw-semibold">Password (at least 8 characters)</label>
+                   <input id="patientRegisterPassword" type="password" class="form-control form-control-custom" autocomplete="new-password" minlength="8" required>
+                 </div>
+                 <div class="row g-3">
+                   <div class="col-sm-6">
+                     <label for="patientRegisterAge" class="form-label fw-semibold">Age</label>
+                     <input id="patientRegisterAge" type="number" class="form-control form-control-custom" min="0" max="130" required>
+                   </div>
+                   <div class="col-sm-6">
+                     <label for="patientRegisterGender" class="form-label fw-semibold">Gender</label>
+                     <input id="patientRegisterGender" type="text" class="form-control form-control-custom" maxlength="24" required>
+                   </div>
+                 </div>
+                 <div class="mt-3 mb-3">
+                   <label for="patientRegisterPhone" class="form-label fw-semibold">Phone</label>
+                   <input id="patientRegisterPhone" type="tel" class="form-control form-control-custom" maxlength="40" autocomplete="tel" required>
+                 </div>
+                 <div class="mb-3">
+                   <label for="patientRegisterAddress" class="form-label fw-semibold">Address (optional)</label>
+                   <input id="patientRegisterAddress" type="text" class="form-control form-control-custom" maxlength="500" autocomplete="street-address">
+                 </div>
+                 <div id="patientRegisterError" class="text-danger small mb-3" role="alert" aria-live="polite"></div>
+                 <button type="submit" class="btn btn-medicare-primary w-100 py-2">Create patient account</button>
+               </form>
+             </div>
+             <div id="patientPortalDashboard" class="d-none">
+               <div class="d-flex justify-content-between align-items-start gap-3 mb-4">
+                 <div>
+                   <h1 class="h3 fw-bold mb-1">My health dashboard</h1>
+                   <p id="patientDashboardName" class="text-secondary mb-0"></p>
+                 </div>
+                 <button type="button" class="btn btn-outline-secondary btn-sm" onclick="logoutPatient()">Sign out</button>
+               </div>
+               <div id="patientDashboardContent" aria-live="polite"></div>
+               <form id="patientAppointmentForm" class="border rounded-3 p-3 mt-4" onsubmit="bookPatientAppointment(event)">
+                 <h2 class="h5 fw-bold">Request an appointment</h2>
+                 <p class="small text-secondary">Requests are pending until the care team confirms them.</p>
+                 <div class="mb-3">
+                   <label for="patientAppointmentDoctor" class="form-label fw-semibold">Doctor</label>
+                   <select id="patientAppointmentDoctor" class="form-select form-select-custom" required></select>
+                 </div>
+                 <div class="row g-3">
+                   <div class="col-sm-6">
+                     <label for="patientAppointmentDate" class="form-label fw-semibold">Date</label>
+                     <input id="patientAppointmentDate" type="date" class="form-control form-control-custom" required>
+                   </div>
+                   <div class="col-sm-6">
+                     <label for="patientAppointmentTime" class="form-label fw-semibold">Time</label>
+                     <input id="patientAppointmentTime" type="time" class="form-control form-control-custom" required>
+                   </div>
+                 </div>
+                 <div class="mt-3 mb-3">
+                   <label for="patientAppointmentReason" class="form-label fw-semibold">Reason (optional)</label>
+                   <input id="patientAppointmentReason" type="text" class="form-control form-control-custom" maxlength="1000">
+                 </div>
+                 <div id="patientAppointmentError" class="text-danger small mb-3" role="alert"></div>
+                 <button type="submit" class="btn btn-medicare-primary">Request appointment</button>
+               </form>
+               <div id="patientDashboardError" class="text-danger small mt-3" role="alert"></div>
+             </div>
+             <button type="button" class="btn btn-link w-100 mt-3 text-decoration-none" onclick="switchMainView('public')">
+               <i class="bi bi-arrow-left me-1"></i> Return to public website
+             </button>
+           </div>
+         </section>
+
+         <section id="staff-login-panel" class="staff-login-panel d-none" aria-labelledby="staffLoginTitle">
+           <div class="staff-login-card">
+             <a class="brand-logo-wrap justify-content-center mb-4" href="javascript:void(0)" onclick="switchMainView('public')">
+               <div class="brand-icon-box"><i class="bi bi-heart-pulse-fill"></i></div>
+               <div class="brand-name">Medi<span>Care</span></div>
+             </a>
+             <div class="text-center mb-4">
+               <div class="staff-login-icon"><i class="bi bi-shield-lock-fill"></i></div>
+               <h1 id="staffLoginTitle" class="h3 fw-bold mt-3 mb-2">Staff sign in</h1>
+               <p class="text-secondary mb-0">Use your hospital staff account to access internal records.</p>
+             </div>
+             <form id="staffLoginForm" onsubmit="handleStaffLogin(event)" novalidate>
+               <div class="mb-3">
+                 <label for="staffUsernameInput" class="form-label fw-semibold">Staff email</label>
+                 <input id="staffUsernameInput" type="email" class="form-control form-control-custom" autocomplete="username" required>
+                 <div class="invalid-feedback">Enter your staff email.</div>
+               </div>
+               <div class="mb-3">
+                 <label for="staffPasswordInput" class="form-label fw-semibold">Password</label>
+                 <input id="staffPasswordInput" type="password" class="form-control form-control-custom" autocomplete="current-password" required>
+                 <div class="invalid-feedback">Enter your password.</div>
+               </div>
+               <div id="staffLoginError" class="text-danger small mb-3" role="alert" aria-live="polite"></div>
+               <button type="submit" class="btn btn-medicare-primary w-100 py-2">
+                 <i class="bi bi-box-arrow-in-right me-1"></i> Sign in securely
+               </button>
+             </form>
+             <button type="button" class="btn btn-link w-100 mt-3 text-decoration-none" onclick="switchMainView('public')">
+               <i class="bi bi-arrow-left me-1"></i> Return to public website
+             </button>
+           </div>
+         </section>
+
+         <div id="staff-dashboard" class="staff-dashboard d-none">
     <!-- Admin Sidebar -->
     <aside class="admin-sidebar">
       <div class="sidebar-header">
@@ -948,18 +1095,23 @@
           <i class="bi bi-gear-fill"></i>
           <span>Settings</span>
         </a>
+
+        <a class="sidebar-nav-link" data-tab="staff" onclick="switchAdminTab('staff')">
+          <i class="bi bi-person-lock-fill"></i>
+          <span>Staff Accounts</span>
+        </a>
       </div>
 
       <div class="sidebar-footer">
         <div class="user-mini-profile mb-3">
-          <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=120&q=80" alt="Dr. Robert Vance" class="user-avatar-circle">
+          <div class="user-avatar-circle d-flex align-items-center justify-content-center"><i class="bi bi-person-fill"></i></div>
           <div class="overflow-hidden">
-            <div class="fw-bold text-dark text-truncate" style="font-size: 0.9rem;">Dr. Robert Vance</div>
-            <div class="text-muted text-truncate" style="font-size: 0.75rem;">Chief Medical Officer</div>
+            <div id="staffDisplayName" class="fw-bold text-dark text-truncate" style="font-size: 0.9rem;">Signed-in staff</div>
+            <div id="staffDisplayRole" class="text-muted text-truncate" style="font-size: 0.75rem;"></div>
           </div>
         </div>
-        <button class="btn btn-sm btn-outline-secondary w-100" onclick="switchMainView('public')">
-          <i class="bi bi-box-arrow-left me-1"></i> Public Website
+        <button class="btn btn-sm btn-outline-danger w-100" onclick="logoutStaff()">
+          <i class="bi bi-box-arrow-left me-1"></i> Sign out
         </button>
       </div>
     </aside>
@@ -982,13 +1134,12 @@
         </div>
 
         <div class="topbar-actions">
-          <!-- Reset Demo Data -->
-          <button class="btn btn-sm btn-medicare-outline d-none d-sm-inline-flex" title="Restore initial sample dataset" onclick="DB.reset()">
-            <i class="bi bi-arrow-clockwise"></i> Reset Data
+          <button class="btn btn-sm btn-medicare-outline d-none d-sm-inline-flex" title="Reload hospital data" onclick="refreshStaffData()">
+            <i class="bi bi-arrow-clockwise"></i> Refresh Data
           </button>
 
           <!-- Quick Action: Book Appointment -->
-          <button class="btn btn-sm btn-medicare-primary" onclick="openAppointmentModal()">
+          <button class="btn btn-sm btn-medicare-primary appointment-create-action" onclick="openAppointmentModal()">
             <i class="bi bi-calendar-plus"></i> <span class="d-none d-sm-inline">New Appointment</span>
           </button>
 
@@ -1001,25 +1152,17 @@
             <div class="dropdown-menu dropdown-menu-end shadow-md p-3" style="width: 300px;">
               <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
                 <span class="fw-bold text-dark">Notifications</span>
-                <span class="badge badge-mint" style="font-size: 0.7rem;">3 New</span>
+                <span class="badge badge-mint" style="font-size: 0.7rem;">Staff</span>
               </div>
-              <div class="small mb-2 pb-2 border-bottom">
-                <div class="fw-semibold">Emergency Case Arrived</div>
-                <div class="text-muted" style="font-size: 0.75rem;">Trauma Suite 1 assigned &bull; 10m ago</div>
-              </div>
-              <div class="small mb-2 pb-2 border-bottom">
-                <div class="fw-semibold">Lab Diagnostics Complete</div>
-                <div class="text-muted" style="font-size: 0.75rem;">Blood panel for Eleanor Vance &bull; 25m ago</div>
-              </div>
-              <div class="small text-center pt-1">
-                <a href="javascript:void(0)" class="text-primary fw-semibold" style="font-size: 0.8rem;">Mark all as read</a>
+              <div class="small text-muted text-center py-2">
+                Notifications are not configured for this application.
               </div>
             </div>
           </div>
 
           <!-- Switch to Public Site -->
           <button class="btn btn-sm btn-medicare-secondary d-none d-md-inline-flex" onclick="switchMainView('public')">
-            <i class="bi bi-house"></i> View Website
+            <i class="bi bi-house"></i> Public Website
           </button>
         </div>
       </header>
@@ -1034,11 +1177,11 @@
             <div class="row align-items-center g-3">
               <div class="col-md-8">
                 <span class="badge-pill-pastel badge-blue mb-2">Hospital Command Center</span>
-                <h3 class="fw-bold mb-1">Good Day, Dr. Robert Vance</h3>
-                <p class="text-secondary mb-0">Here is your clinical snapshot for today: <strong>Thursday, November 12, 2026</strong>. All ICU wings and surgical suites operate normally.</p>
+                <h3 class="fw-bold mb-1">Welcome, <span id="staffWelcomeName">staff member</span></h3>
+                <p class="text-secondary mb-0">Hospital overview from your authorized records. <span id="staffTodayDate"></span></p>
               </div>
               <div class="col-md-4 text-md-end">
-                <button class="btn btn-medicare-primary" onclick="openPatientModal()">
+                <button class="btn btn-medicare-primary patient-create-action" onclick="openPatientModal()">
                   <i class="bi bi-person-plus-fill"></i> Add Patient
                 </button>
               </div>
@@ -1057,7 +1200,7 @@
                 </div>
                 <div class="stat-number" id="stat-total-patients">0</div>
                 <div class="stat-growth text-success">
-                  <i class="bi bi-arrow-up-short"></i> +8.4% this month
+                  <i class="bi bi-database-check"></i> Current database total
                 </div>
               </div>
             </div>
@@ -1072,7 +1215,7 @@
                 </div>
                 <div class="stat-number" id="stat-total-doctors">0</div>
                 <div class="stat-growth text-primary">
-                  <i class="bi bi-check-circle-fill"></i> 100% active staff
+                  <i class="bi bi-person-check-fill"></i> Public directory profiles
                 </div>
               </div>
             </div>
@@ -1087,7 +1230,7 @@
                 </div>
                 <div class="stat-number" id="stat-today-appointments">0</div>
                 <div class="stat-growth text-info">
-                  <i class="bi bi-clock-history"></i> 4 upcoming slots
+                  <i class="bi bi-clock-history"></i> Scheduled for today
                 </div>
               </div>
             </div>
@@ -1095,14 +1238,14 @@
             <div class="col-xl-3 col-sm-6">
               <div class="stat-card stat-cream">
                 <div class="d-flex justify-content-between align-items-center">
-                  <span class="stat-label">Total Revenue</span>
+                  <span class="stat-label">Invoices Marked Paid</span>
                   <div class="stat-icon-pill">
                     <i class="bi bi-currency-dollar"></i>
                   </div>
                 </div>
                 <div class="stat-number" id="stat-total-revenue">$0</div>
                 <div class="stat-growth text-warning">
-                  <i class="bi bi-graph-up"></i> +14.2% collected
+                  <i class="bi bi-info-circle"></i> Status only; not payment confirmation
                 </div>
               </div>
             </div>
@@ -1191,7 +1334,7 @@
                 </div>
                 <p class="small text-secondary mb-0">Maintain patient medical charts, contact info, and admission status.</p>
               </div>
-              <button class="btn btn-medicare-primary" onclick="openPatientModal()">
+              <button class="btn btn-medicare-primary patient-create-action" onclick="openPatientModal()">
                 <i class="bi bi-person-plus-fill"></i> Add New Patient
               </button>
             </div>
@@ -1253,7 +1396,7 @@
               </div>
               <p class="small text-secondary mb-0">Manage hospital staff credentials, clinical availability, and consultation rates.</p>
             </div>
-            <button class="btn btn-medicare-primary" onclick="openDoctorModal()">
+            <button class="btn btn-medicare-primary admin-only" onclick="openDoctorModal()">
               <i class="bi bi-person-plus-fill"></i> Add Specialist
             </button>
           </div>
@@ -1298,7 +1441,7 @@
                 </div>
                 <p class="small text-secondary mb-0">Review patient reservations, confirm clinical slots, and update statuses.</p>
               </div>
-              <button class="btn btn-medicare-primary" onclick="openAppointmentModal()">
+              <button class="btn btn-medicare-primary appointment-create-action" onclick="openAppointmentModal()">
                 <i class="bi bi-calendar2-plus-fill"></i> Book Appointment
               </button>
             </div>
@@ -1357,12 +1500,17 @@
 
         <!-- TAB 5: DEPARTMENTS -->
         <div id="tab-departments" class="admin-tab-pane">
-          <div class="mb-4">
-            <h4 class="fw-bold mb-1">Clinical Departments</h4>
-            <p class="small text-secondary mb-0">Overview of clinical infrastructure, bed capacities, and lead department chairs.</p>
+          <div class="d-flex justify-content-between align-items-center gap-3 mb-4">
+            <div>
+              <h4 class="fw-bold mb-1">Clinical Departments</h4>
+              <p class="small text-secondary mb-0">Department information and capacity from hospital records.</p>
+            </div>
+            <button class="btn btn-medicare-primary admin-only" onclick="openDepartmentModal()">
+              <i class="bi bi-plus-lg me-1"></i> Add Department
+            </button>
           </div>
 
-          <div class="row g-4">
+          <div class="row g-4" id="departments-cards-grid">
             <!-- Cardiology -->
             <div class="col-lg-4 col-md-6">
               <div class="card-custom p-4 h-100">
@@ -1570,16 +1718,16 @@
             </div>
             <div class="col-md-4">
               <div class="stat-card stat-mint">
-                <span class="stat-label">Settled / Collected</span>
+                <span class="stat-label">Invoices Marked Paid</span>
                 <div class="stat-number" id="billing-total-paid">$0</div>
-                <span class="small text-success fw-bold">Settled payments</span>
+                <span class="small text-success fw-bold">Amount recorded as Paid (status only)</span>
               </div>
             </div>
             <div class="col-md-4">
               <div class="stat-card stat-cream">
                 <span class="stat-label">Pending / Outstanding</span>
                 <div class="stat-number" id="billing-total-outstanding">$0</div>
-                <span class="small text-warning fw-bold">Unsettled claims</span>
+                <span class="small text-warning fw-bold">Invoices not marked Paid</span>
               </div>
             </div>
           </div>
@@ -1590,6 +1738,9 @@
                 <h4 class="fw-bold mb-0">Invoices & Financial Records</h4>
                 <p class="small text-secondary mb-0">View billing receipts, payment statuses, and claim disbursements.</p>
               </div>
+              <button class="btn btn-medicare-primary invoice-create-action" onclick="openInvoiceModal()">
+                <i class="bi bi-receipt me-1"></i> Create Invoice
+              </button>
             </div>
 
             <!-- Filters -->
@@ -1636,7 +1787,7 @@
         <div id="tab-reports" class="admin-tab-pane">
           <div class="card-custom p-4 mb-4">
             <h4 class="fw-bold mb-1">Financial & Clinical Growth Analytics</h4>
-            <p class="small text-secondary mb-4">6-Month revenue performance and patient admission trajectory.</p>
+            <p class="small text-secondary mb-4">Invoice amounts marked Paid over the latest six months. This status does not confirm that MediCare processed a payment.</p>
 
             <div class="chart-canvas-wrap" style="height: 280px;">
               <canvas id="revenueTrendChart" class="chart-canvas"></canvas>
@@ -1647,30 +1798,30 @@
           <div class="row g-4">
             <div class="col-md-3 col-sm-6">
               <div class="card-custom p-4 text-center">
-                <div class="fs-1 fw-bold text-primary mb-1">84%</div>
-                <div class="fw-semibold text-dark">Bed Occupancy Rate</div>
-                <div class="small text-muted">126 of 150 beds in use</div>
+                <div class="fs-1 fw-bold text-primary mb-1" id="report-bed-occupancy">0%</div>
+                <div class="fw-semibold text-dark">Bed Occupancy</div>
+                <div class="small text-muted" id="report-bed-count">No bed capacity data</div>
               </div>
             </div>
             <div class="col-md-3 col-sm-6">
               <div class="card-custom p-4 text-center">
-                <div class="fs-1 fw-bold text-success mb-1">3.4 Days</div>
-                <div class="fw-semibold text-dark">Average Length of Stay</div>
-                <div class="small text-muted">-0.6d better than national avg</div>
+                <div class="fs-1 fw-bold text-success mb-1" id="report-invoice-count">0</div>
+                <div class="fw-semibold text-dark">Total Invoices</div>
+                <div class="small text-muted">Records in billing database</div>
               </div>
             </div>
             <div class="col-md-3 col-sm-6">
               <div class="card-custom p-4 text-center">
-                <div class="fs-1 fw-bold text-info mb-1">98.8%</div>
-                <div class="fw-semibold text-dark">Positive Patient Rating</div>
-                <div class="small text-muted">Based on 1,420 exit surveys</div>
+                <div class="fs-1 fw-bold text-info mb-1" id="report-outstanding-count">0</div>
+                <div class="fw-semibold text-dark">Unpaid Invoices</div>
+                <div class="small text-muted">Invoices not marked paid</div>
               </div>
             </div>
             <div class="col-md-3 col-sm-6">
               <div class="card-custom p-4 text-center">
-                <div class="fs-1 fw-bold text-warning mb-1">11 Mins</div>
-                <div class="fw-semibold text-dark">ER Triage Response</div>
-                <div class="small text-muted">Door-to-doctor average time</div>
+                <div class="fs-1 fw-bold text-warning mb-1" id="report-month-appointments">0</div>
+                <div class="fw-semibold text-dark">Appointments This Month</div>
+                <div class="small text-muted">Scheduled appointment records</div>
               </div>
             </div>
           </div>
@@ -1679,86 +1830,69 @@
         <!-- TAB 8: SETTINGS -->
         <div id="tab-settings" class="admin-tab-pane">
           <div class="card-custom p-4 p-md-5">
-            <h4 class="fw-bold mb-1">Hospital & Application Settings</h4>
-            <p class="small text-secondary mb-4">Configure hospital identity, notification policies, and medical portal preferences.</p>
-
-            <form onsubmit="handleSaveSettings(event)">
-              <div class="row g-4">
-                <div class="col-md-6">
-                  <label class="form-label fw-semibold small">Hospital Name</label>
-                  <input type="text" class="form-control form-control-custom" value="MediCare Hospital & Research Institute">
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label fw-semibold small">Hospital Registration Code</label>
-                  <input type="text" class="form-control form-control-custom" value="JCI-MED-NY-84920" readonly>
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label fw-semibold small">Emergency Dispatch Hotline</label>
-                  <input type="text" class="form-control form-control-custom" value="+1 (800) 555-CARE">
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label fw-semibold small">Hospital Contact Email</label>
-                  <input type="email" class="form-control form-control-custom" value="admin@medicare.health">
-                </div>
-                <div class="col-12">
-                  <label class="form-label fw-semibold small">Campus Physical Address</label>
-                  <input type="text" class="form-control form-control-custom" value="100 Healthcare Boulevard, Metro City, NY 10001">
-                </div>
-
-                <div class="col-12"><hr class="my-2"></div>
-
-                <div class="col-md-6">
-                  <h6 class="fw-bold mb-2">Automated Notifications</h6>
-                  <div class="form-check form-switch mb-2">
-                    <input class="form-check-input" type="checkbox" id="smsReminders" checked>
-                    <label class="form-check-label small" for="smsReminders">Send SMS appointment reminder to patients 24h prior</label>
-                  </div>
-                  <div class="form-check form-switch mb-2">
-                    <input class="form-check-input" type="checkbox" id="emailResults" checked>
-                    <label class="form-check-label small" for="emailResults">Auto-email lab diagnostic reports to patients upon sign-off</label>
-                  </div>
-                  <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" id="doctorAlerts" checked>
-                    <label class="form-check-label small" for="doctorAlerts">Alert on-call specialist when emergency admission logged</label>
-                  </div>
-                </div>
-
-                <div class="col-md-6">
-                  <h6 class="fw-bold mb-2">System Currency & Standards</h6>
-                  <div class="row g-2">
-                    <div class="col-6">
-                      <label class="form-label small text-muted">Currency</label>
-                      <select class="form-select form-select-custom">
-                        <option value="USD" selected>USD ($)</option>
-                        <option value="EUR">EUR (€)</option>
-                        <option value="GBP">GBP (£)</option>
-                      </select>
-                    </div>
-                    <div class="col-6">
-                      <label class="form-label small text-muted">Timezone</label>
-                      <select class="form-select form-select-custom">
-                        <option selected>Eastern Time (US & Canada)</option>
-                        <option>Central Time</option>
-                        <option>Pacific Time</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="col-12 pt-3">
-                  <button type="submit" class="btn btn-medicare-primary px-4">
-                    <i class="bi bi-floppy-fill me-1"></i> Save Preferences
-                  </button>
-                  <button type="button" class="btn btn-medicare-outline ms-2" onclick="DB.reset()">
-                    <i class="bi bi-arrow-counterclockwise me-1"></i> Reset To Factory Demo Data
-                  </button>
-                </div>
+            <h4 class="fw-bold mb-1">Display Preferences</h4>
+            <p class="small text-secondary mb-4">These preferences are saved only in this browser. Database and signing-key settings are managed through the backend environment.</p>
+            <form id="settingsForm" onsubmit="handleSaveSettings(event)" novalidate>
+              <div class="form-check form-switch mb-4">
+                <input id="reduceMotionInput" class="form-check-input" type="checkbox" role="switch">
+                <label for="reduceMotionInput" class="form-check-label fw-semibold">Reduce animation and motion</label>
+                <div class="small text-muted">Applies an accessibility-friendly motion setting to this browser.</div>
               </div>
+              <button type="submit" class="btn btn-medicare-primary">Save preferences</button>
             </form>
           </div>
         </div>
 
+        <div id="tab-staff" class="admin-tab-pane">
+          <div class="card-custom p-4 mb-4">
+            <h4 class="fw-bold mb-1">Create Staff Account</h4>
+            <p class="small text-secondary mb-4">Only administrators can provision staff accounts. New passwords are stored as BCrypt hashes by the server.</p>
+            <form id="staffAccountForm" onsubmit="createStaffAccount(event)" novalidate>
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label for="staffFullNameInput" class="form-label small fw-semibold">Full name</label>
+                  <input id="staffFullNameInput" class="form-control form-control-custom" required maxlength="120">
+                </div>
+                <div class="col-md-4">
+                  <label for="staffEmailInput" class="form-label small fw-semibold">Email</label>
+                  <input id="staffEmailInput" type="email" class="form-control form-control-custom" required maxlength="254">
+                </div>
+                <div class="col-md-4">
+                  <label for="staffRoleInput" class="form-label small fw-semibold">Role</label>
+                  <select id="staffRoleInput" class="form-select form-select-custom" required onchange="toggleDoctorAccountLink()">
+                    <option value="DOCTOR">DOCTOR</option>
+                    <option value="RECEPTIONIST">RECEPTIONIST</option>
+                    <option value="NURSE">NURSE</option>
+                    <option value="ADMIN">ADMIN</option>
+                  </select>
+                </div>
+                <div class="col-md-6 d-none" id="staffDoctorLinkGroup">
+                  <label for="staffDoctorIdInput" class="form-label small fw-semibold">Linked doctor profile</label>
+                  <select id="staffDoctorIdInput" class="form-select form-select-custom"></select>
+                </div>
+                <div class="col-md-6">
+                  <label for="staffAccountPasswordInput" class="form-label small fw-semibold">Temporary password (12–72 characters)</label>
+                  <input id="staffAccountPasswordInput" type="password" class="form-control form-control-custom" required minlength="12" maxlength="72" autocomplete="new-password">
+                </div>
+                <div class="col-12">
+                  <button type="submit" class="btn btn-medicare-primary"><i class="bi bi-person-plus me-1"></i> Create account</button>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="card-custom p-4">
+            <h4 class="fw-bold mb-3">Staff Accounts</h4>
+            <div class="table-responsive">
+              <table class="table-custom">
+                <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Doctor profile</th><th>Status</th><th>Action</th></tr></thead>
+                <tbody id="staff-account-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
       </main>
+    </div>
     </div>
   </div>
 
@@ -1766,6 +1900,102 @@
   <!-- =========================================================================
        3. MODALS (Add/Edit Patient, Doctor, Appointment, View Invoice, View Patient)
        ========================================================================= -->
+
+  <div class="modal fade" id="invoiceCreateModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg rounded-4">
+        <div class="modal-header border-bottom px-4 pt-4 pb-3">
+          <h5 class="modal-title fw-bold">Create Invoice</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form id="invoiceCreateForm" onsubmit="createInvoice(event)" novalidate>
+          <div class="modal-body p-4">
+            <div class="mb-3">
+              <label for="invoicePatientInput" class="form-label small fw-semibold">Patient</label>
+              <select id="invoicePatientInput" class="form-select form-select-custom" required></select>
+            </div>
+            <div class="mb-3">
+              <label for="invoiceDepartmentInput" class="form-label small fw-semibold">Department</label>
+              <select id="invoiceDepartmentInput" class="form-select form-select-custom" required></select>
+            </div>
+            <div class="mb-3">
+              <label for="invoiceDescriptionInput" class="form-label small fw-semibold">Service description</label>
+              <input id="invoiceDescriptionInput" class="form-control form-control-custom" required maxlength="240">
+            </div>
+            <div class="row g-3">
+              <div class="col-6">
+                <label for="invoiceAmountInput" class="form-label small fw-semibold">Amount ($)</label>
+                <input id="invoiceAmountInput" type="number" class="form-control form-control-custom" min="0" step="0.01" required>
+              </div>
+              <div class="col-6">
+                <label for="invoiceMethodInput" class="form-label small fw-semibold">Payment method</label>
+                <select id="invoiceMethodInput" class="form-select form-select-custom">
+                  <option>Direct Payment</option>
+                  <option>Insurance</option>
+                  <option>Card</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer border-top px-4 py-3">
+            <button type="button" class="btn btn-medicare-outline" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-medicare-primary">Create Invoice</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Patient Modal -->
+  <div class="modal fade" id="departmentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg rounded-4">
+        <div class="modal-header border-bottom px-4 pt-4 pb-3">
+          <h5 class="modal-title fw-bold" id="departmentModalTitle">Add Department</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form id="departmentForm" onsubmit="saveDepartmentForm(event)" novalidate>
+          <div class="modal-body p-4">
+            <input id="departmentIdHidden" type="hidden">
+            <div class="mb-3">
+              <label for="departmentNameInput" class="form-label small fw-semibold">Name</label>
+              <input id="departmentNameInput" class="form-control form-control-custom" required maxlength="100">
+            </div>
+            <div class="mb-3">
+              <label for="departmentCodeInput" class="form-label small fw-semibold">Code</label>
+              <input id="departmentCodeInput" class="form-control form-control-custom" required maxlength="16">
+            </div>
+            <div class="mb-3">
+              <label for="departmentDescriptionInput" class="form-label small fw-semibold">Description</label>
+              <textarea id="departmentDescriptionInput" class="form-control form-control-custom" maxlength="1000"></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="departmentLocationInput" class="form-label small fw-semibold">Location</label>
+              <input id="departmentLocationInput" class="form-control form-control-custom" maxlength="160">
+            </div>
+            <div class="mb-3">
+              <label for="departmentHeadInput" class="form-label small fw-semibold">Head physician</label>
+              <input id="departmentHeadInput" class="form-control form-control-custom" maxlength="120">
+            </div>
+            <div class="row g-3">
+              <div class="col-6">
+                <label for="departmentTotalBedsInput" class="form-label small fw-semibold">Total beds</label>
+                <input id="departmentTotalBedsInput" type="number" class="form-control form-control-custom" min="0" required>
+              </div>
+              <div class="col-6">
+                <label for="departmentOccupiedBedsInput" class="form-label small fw-semibold">Occupied beds</label>
+                <input id="departmentOccupiedBedsInput" type="number" class="form-control form-control-custom" min="0" required>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer border-top px-4 py-3">
+            <button type="button" class="btn btn-medicare-outline" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-medicare-primary">Save Department</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 
   <!-- Add/Edit Patient Modal -->
   <div class="modal fade" id="patientModal" tabindex="-1" aria-hidden="true">
@@ -1864,7 +2094,7 @@
 
   <!-- View Patient Profile Modal -->
   <div class="modal fade" id="patientViewModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
       <div class="modal-content border-0 shadow-lg rounded-4">
         <div class="modal-header border-bottom px-4 pt-4 pb-3">
           <h5 class="modal-title fw-bold">Patient Health Chart</h5>
@@ -1979,7 +2209,7 @@
             <input type="hidden" id="appointmentIdHidden">
 
             <div class="row g-3">
-              <div class="col-12">
+              <div class="col-12" id="aptPatientPickerGroup">
                 <label class="form-label small fw-semibold text-muted">Quick Pick: Existing Patient</label>
                 <select id="aptPatientSelect" class="form-select form-select-custom" onchange="onAptPatientSelected(this)">
                   <!-- Dynamically populated -->
@@ -1988,7 +2218,7 @@
 
               <div class="col-md-6">
                 <label class="form-label small fw-semibold">Patient Name *</label>
-                <input type="text" id="aptPatientNameInput" class="form-control form-control-custom" placeholder="e.g. Eleanor Vance" required>
+                <input type="text" id="aptPatientNameInput" class="form-control form-control-custom" placeholder="Patient full name" required>
                 <div class="invalid-feedback">Patient name is required.</div>
               </div>
 
@@ -2047,11 +2277,11 @@
                 </select>
               </div>
 
-              <div class="col-md-6">
+              <div class="col-md-6" id="aptStatusGroup">
                 <label class="form-label small fw-semibold">Booking Status</label>
                 <select id="aptStatusInput" class="form-select form-select-custom">
-                  <option value="Confirmed" selected>Confirmed</option>
-                  <option value="Pending">Pending</option>
+                  <option value="Pending" selected>Pending</option>
+                  <option value="Confirmed">Confirmed</option>
                   <option value="Completed">Completed</option>
                   <option value="Cancelled">Cancelled</option>
                 </select>
@@ -2091,7 +2321,7 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
   <!-- MediCare Vanilla JS Application Controller -->
-  <script src="script.js"></script>
+  <script src="script.js?v=4"></script>
 </body>
 </html>
 

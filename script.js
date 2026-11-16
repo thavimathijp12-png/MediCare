@@ -5,419 +5,77 @@
  */
 
 // ==========================================================================
-// 1. Initial Sample Seed Data (Loaded to localStorage if not already set)
+// 1. Public Doctor Catalog
 // ==========================================================================
-const INITIAL_DOCTORS = [
-  {
-    id: "DOC-101",
-    name: "Dr. Sarah Jenkins",
-    degree: "MD, FACC - Harvard Medical",
-    department: "Cardiology",
-    experience: "14 Years",
-    fee: 150,
-    phone: "+1 (555) 234-8901",
-    email: "sarah.jenkins@medicare.health",
-    status: "Available",
-    rating: 4.9,
-    reviews: 128,
-    image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=600&q=80",
-    about: "Senior Interventional Cardiologist specializing in heart rhythm disorders, minimally invasive valve repair, and preventive coronary care."
-  },
-  {
-    id: "DOC-102",
-    name: "Dr. Alexander Chen",
-    degree: "MD, Ph.D. - Johns Hopkins",
-    department: "Neurology",
-    experience: "16 Years",
-    fee: 180,
-    phone: "+1 (555) 345-6789",
-    email: "alexander.chen@medicare.health",
-    status: "Available",
-    rating: 4.95,
-    reviews: 94,
-    image: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=600&q=80",
-    about: "Neurosurgeon and Clinical Neurologist focusing on neuro-oncology, complex spine disorders, and stroke rehabilitation."
-  },
-  {
-    id: "DOC-103",
-    name: "Dr. Elena Rostova",
-    degree: "MD, FAAP - Stanford Medicine",
-    department: "Pediatrics",
-    experience: "11 Years",
-    fee: 120,
-    phone: "+1 (555) 456-7890",
-    email: "elena.rostova@medicare.health",
-    status: "Available",
-    rating: 4.88,
-    reviews: 142,
-    image: "https://images.unsplash.com/photo-1594824813587-0b5c16309855?auto=format&fit=crop&w=600&q=80",
-    about: "Compassionate Pediatric Specialist dedicated to neonatal wellness, pediatric chronic care, and adolescent developmental health."
-  },
-  {
-    id: "DOC-104",
-    name: "Dr. Marcus Vance",
-    degree: "MD, FAAOS - Mayo Clinic",
-    department: "Orthopedics",
-    experience: "18 Years",
-    fee: 160,
-    phone: "+1 (555) 567-8901",
-    email: "marcus.vance@medicare.health",
-    status: "In Surgery",
-    rating: 4.85,
-    reviews: 110,
-    image: "https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&w=600&q=80",
-    about: "Reconstructive orthopedic surgeon specializing in robotic joint replacement, sports injury trauma, and arthroscopy."
-  },
-  {
-    id: "DOC-105",
-    name: "Dr. Aisha Patel",
-    degree: "MD, FAAD - Columbia University",
-    department: "Dermatology",
-    experience: "9 Years",
-    fee: 130,
-    phone: "+1 (555) 678-9012",
-    email: "aisha.patel@medicare.health",
-    status: "Available",
-    rating: 4.92,
-    reviews: 86,
-    image: "https://images.unsplash.com/photo-1614608682850-e0d6ed316d47?auto=format&fit=crop&w=600&q=80",
-    about: "Clinical and aesthetic dermatologist offering advanced laser therapeutics, pediatric dermatology, and autoimmune skin treatment."
-  },
-  {
-    id: "DOC-106",
-    name: "Dr. David Sterling",
-    degree: "MD, FACP - Yale School of Medicine",
-    department: "General Medicine",
-    experience: "21 Years",
-    fee: 110,
-    phone: "+1 (555) 789-0123",
-    email: "david.sterling@medicare.health",
-    status: "Available",
-    rating: 4.9,
-    reviews: 215,
-    image: "https://images.unsplash.com/photo-1582750433449-648ed127bb54?auto=format&fit=crop&w=600&q=80",
-    about: "Chief Internal Medicine Consultant specializing in metabolic disorders, comprehensive executive diagnostics, and preventive geriatrics."
-  }
-];
+const INITIAL_DOCTORS = [];
+const DOCTOR_PLACEHOLDER_IMAGE = "assets/doctor-placeholder.svg";
 
-const INITIAL_PATIENTS = [
-  {
-    id: "PAT-001",
-    name: "Eleanor Vance",
-    age: 48,
-    gender: "Female",
-    phone: "+1 (555) 812-4091",
-    email: "eleanor.vance@example.com",
-    bloodGroup: "O+",
-    condition: "Hypertension Stage 2",
-    doctor: "Dr. Sarah Jenkins",
-    status: "Admitted",
-    admissionDate: "2026-11-10",
-    address: "742 Evergreen Terrace, Springfield"
-  },
-  {
-    id: "PAT-002",
-    name: "Lucas Reynolds",
-    age: 34,
-    gender: "Male",
-    phone: "+1 (555) 492-8812",
-    email: "lucas.reynolds@example.com",
-    bloodGroup: "A+",
-    condition: "Post-ACL Reconstruction",
-    doctor: "Dr. Marcus Vance",
-    status: "Discharged",
-    admissionDate: "2026-11-05",
-    address: "124 Baker Street, Boston, MA"
-  },
-  {
-    id: "PAT-003",
-    name: "Sophia Martinez",
-    age: 29,
-    gender: "Female",
-    phone: "+1 (555) 604-1299",
-    email: "sophia.m@example.com",
-    bloodGroup: "B+",
-    condition: "Severe Migraine Aura",
-    doctor: "Dr. Alexander Chen",
-    status: "Outpatient",
-    admissionDate: "2026-11-12",
-    address: "88 Ocean Parkway, Brooklyn, NY"
-  },
-  {
-    id: "PAT-004",
-    name: "Ethan Wright",
-    age: 7,
-    gender: "Male",
-    phone: "+1 (555) 301-7781",
-    email: "wright.family@example.com",
-    bloodGroup: "AB+",
-    condition: "Acute Bronchitis Recovery",
-    doctor: "Dr. Elena Rostova",
-    status: "Admitted",
-    admissionDate: "2026-11-11",
-    address: "512 Pinecrest Blvd, Cambridge, MA"
-  },
-  {
-    id: "PAT-005",
-    name: "Amara Robinson",
-    age: 52,
-    gender: "Female",
-    phone: "+1 (555) 918-3401",
-    email: "amara.robinson@example.com",
-    bloodGroup: "O-",
-    condition: "Type 2 Diabetes Mellitus",
-    doctor: "Dr. David Sterling",
-    status: "Outpatient",
-    admissionDate: "2026-11-08",
-    address: "303 Sunset Strip, Los Angeles, CA"
-  },
-  {
-    id: "PAT-006",
-    name: "Julian Thorne",
-    age: 41,
-    gender: "Male",
-    phone: "+1 (555) 231-6677",
-    email: "julian.thorne@example.com",
-    bloodGroup: "A-",
-    condition: "Contact Psoriasis",
-    doctor: "Dr. Aisha Patel",
-    status: "Outpatient",
-    admissionDate: "2026-11-09",
-    address: "45 Riverfront Way, Chicago, IL"
-  }
+const LEGACY_LOCAL_STORAGE_KEYS = [
+  "medicare_activities",
+  "medicare_invoices",
+  "medicare_doctors",
+  "medicare_patients",
+  "medicare_appointments"
 ];
-
-const INITIAL_APPOINTMENTS = [
-  {
-    id: "APT-2026-01",
-    patientName: "Eleanor Vance",
-    patientPhone: "+1 (555) 812-4091",
-    doctorName: "Dr. Sarah Jenkins",
-    department: "Cardiology",
-    date: "2026-11-12",
-    time: "09:30 AM",
-    status: "Confirmed",
-    reason: "Echocardiogram follow-up & BP review",
-    type: "In-Person"
-  },
-  {
-    id: "APT-2026-02",
-    patientName: "Sophia Martinez",
-    patientPhone: "+1 (555) 604-1299",
-    doctorName: "Dr. Alexander Chen",
-    department: "Neurology",
-    date: "2026-11-12",
-    time: "11:00 AM",
-    status: "Pending",
-    reason: "Brain MRI consultation",
-    type: "In-Person"
-  },
-  {
-    id: "APT-2026-03",
-    patientName: "Lucas Reynolds",
-    patientPhone: "+1 (555) 492-8812",
-    doctorName: "Dr. Marcus Vance",
-    department: "Orthopedics",
-    date: "2026-11-12",
-    time: "02:15 PM",
-    status: "Confirmed",
-    reason: "Knee physical therapy check",
-    type: "Telehealth"
-  },
-  {
-    id: "APT-2026-04",
-    patientName: "Ethan Wright",
-    patientPhone: "+1 (555) 301-7781",
-    doctorName: "Dr. Elena Rostova",
-    department: "Pediatrics",
-    date: "2026-11-12",
-    time: "03:45 PM",
-    status: "Confirmed",
-    reason: "Post-nebulizer discharge check",
-    type: "In-Person"
-  },
-  {
-    id: "APT-2026-05",
-    patientName: "Amara Robinson",
-    patientPhone: "+1 (555) 918-3401",
-    doctorName: "Dr. David Sterling",
-    department: "General Medicine",
-    date: "2026-11-13",
-    time: "10:00 AM",
-    status: "Pending",
-    reason: "HbA1c Blood Sugar Review",
-    type: "In-Person"
-  },
-  {
-    id: "APT-2026-06",
-    patientName: "Julian Thorne",
-    patientPhone: "+1 (555) 231-6677",
-    doctorName: "Dr. Aisha Patel",
-    department: "Dermatology",
-    date: "2026-11-11",
-    time: "04:30 PM",
-    status: "Completed",
-    reason: "Topical prescription follow-up",
-    type: "In-Person"
-  }
-];
-
-const INITIAL_INVOICES = [
-  {
-    id: "INV-8901",
-    patientName: "Eleanor Vance",
-    department: "Cardiology",
-    date: "2026-11-10",
-    amount: 1450,
-    status: "Paid",
-    method: "Credit Card",
-    items: [
-      { desc: "Comprehensive Cardiac Stress Test", cost: 650 },
-      { desc: "Specialist Consultation (Dr. Jenkins)", cost: 150 },
-      { desc: "Continuous Holter Monitor Diagnostic", cost: 650 }
-    ]
-  },
-  {
-    id: "INV-8902",
-    patientName: "Lucas Reynolds",
-    department: "Orthopedics",
-    date: "2026-11-05",
-    amount: 3200,
-    status: "Paid",
-    method: "Health Insurance",
-    items: [
-      { desc: "Robotic Arthroscopy Surgical Suite", cost: 2400 },
-      { desc: "Anesthesia Services", cost: 500 },
-      { desc: "Rehabilitation Orthosis Brace", cost: 300 }
-    ]
-  },
-  {
-    id: "INV-8903",
-    patientName: "Sophia Martinez",
-    department: "Neurology",
-    date: "2026-11-12",
-    amount: 850,
-    status: "Pending",
-    method: "Direct Debit",
-    items: [
-      { desc: "High-Resolution Neuro MRI Scan", cost: 670 },
-      { desc: "Neurologist Consultation (Dr. Chen)", cost: 180 }
-    ]
-  },
-  {
-    id: "INV-8904",
-    patientName: "Ethan Wright",
-    department: "Pediatrics",
-    date: "2026-11-11",
-    amount: 420,
-    status: "Paid",
-    method: "Apple Pay",
-    items: [
-      { desc: "Pediatric Emergency Evaluation", cost: 200 },
-      { desc: "Nebulizer Therapy Session (x2)", cost: 120 },
-      { desc: "Laboratory Biomarker Panel", cost: 100 }
-    ]
-  },
-  {
-    id: "INV-8905",
-    patientName: "Amara Robinson",
-    department: "General Medicine",
-    date: "2026-10-28",
-    amount: 290,
-    status: "Overdue",
-    method: "Bank Transfer",
-    items: [
-      { desc: "Executive Health Blood Panel", cost: 180 },
-      { desc: "Internal Medicine Consultation", cost: 110 }
-    ]
-  }
-];
-
-const INITIAL_ACTIVITIES = [
-  {
-    id: 1,
-    icon: "bi-person-check",
-    color: "badge-mint",
-    title: "Patient Admitted",
-    detail: "Eleanor Vance admitted to Cardiology Ward Room 304.",
-    time: "15 mins ago"
-  },
-  {
-    id: 2,
-    icon: "bi-calendar-check",
-    color: "badge-blue",
-    title: "Appointment Confirmed",
-    detail: "Sophia Martinez scheduled with Dr. Alexander Chen.",
-    time: "42 mins ago"
-  },
-  {
-    id: 3,
-    icon: "bi-receipt-cutoff",
-    color: "badge-lavender",
-    title: "Payment Received",
-    detail: "Invoice INV-8901 ($1,450.00) settled via Stripe CC.",
-    time: "2 hours ago"
-  },
-  {
-    id: 4,
-    icon: "bi-heart-pulse",
-    color: "badge-pink",
-    title: "Surgical Case Concluded",
-    detail: "Dr. Marcus Vance finished knee reconstruction surgery.",
-    time: "4 hours ago"
-  }
-];
+try {
+  LEGACY_LOCAL_STORAGE_KEYS.forEach(key => window.localStorage.removeItem(key));
+} catch (error) {
+  console.error("Unable to clear the retired browser-side hospital data cache.", error);
+}
 
 // ==========================================================================
-// 2. LocalStorage Persistence Manager
+// 2. API-backed Session State
 // ==========================================================================
-const DB = {
-  get(key, defaultValue) {
-    try {
-      const data = localStorage.getItem(`medicare_${key}`);
-      return data ? JSON.parse(data) : defaultValue;
-    } catch (e) {
-      console.error("Storage error:", e);
-      return defaultValue;
+function getApiBaseUrl() {
+  const configured = document.querySelector('meta[name="medicare-api-base-url"]')?.content.trim();
+  if (configured) {
+    const url = new URL(configured, window.location.origin);
+    if (!["http:", "https:"].includes(url.protocol)
+        || url.username
+        || url.password
+        || (url.pathname !== "/" && url.pathname !== "")
+        || url.search
+        || url.hash) {
+      throw new Error("The MediCare API base URL must be an HTTP(S) origin without credentials or a path.");
     }
-  },
-  set(key, value) {
-    try {
-      localStorage.setItem(`medicare_${key}`, JSON.stringify(value));
-    } catch (e) {
-      console.error("Storage save error:", e);
-    }
-  },
-  init() {
-    if (!localStorage.getItem("medicare_doctors")) {
-      this.set("doctors", INITIAL_DOCTORS);
-    }
-    if (!localStorage.getItem("medicare_patients")) {
-      this.set("patients", INITIAL_PATIENTS);
-    }
-    if (!localStorage.getItem("medicare_appointments")) {
-      this.set("appointments", INITIAL_APPOINTMENTS);
-    }
-    if (!localStorage.getItem("medicare_invoices")) {
-      this.set("invoices", INITIAL_INVOICES);
-    }
-    if (!localStorage.getItem("medicare_activities")) {
-      this.set("activities", INITIAL_ACTIVITIES);
-    }
-  },
-  reset() {
-    this.set("doctors", INITIAL_DOCTORS);
-    this.set("patients", INITIAL_PATIENTS);
-    this.set("appointments", INITIAL_APPOINTMENTS);
-    this.set("invoices", INITIAL_INVOICES);
-    this.set("activities", INITIAL_ACTIVITIES);
-    showToast("Demo data restored to initial state!", "info");
-    refreshAllViews();
+    return url.origin;
   }
+
+  const hostname = window.location.hostname || "127.0.0.1";
+  if (["localhost", "127.0.0.1", "::1"].includes(hostname)) {
+    const protocol = window.location.protocol === "https:" ? "https:" : "http:";
+    return `${protocol}//${hostname}:8080`;
+  }
+  return window.location.origin;
+}
+
+const API_BASE_URL = getApiBaseUrl();
+const LOCAL_SETTINGS_KEY = "medicare_settings_reduce_motion";
+const authState = { token: null, user: null };
+const patientState = { token: null, dashboard: null };
+let activeClinicalPatientId = null;
+let activeClinicalData = null;
+const appData = {
+  doctors: [],
+  departments: [],
+  patients: [],
+  appointments: [],
+  invoices: [],
+  activities: [],
+  staffAccounts: [],
+  dashboardStats: null
 };
 
-// Initialize DB immediately
-DB.init();
+const DB = {
+  get(key, defaultValue) {
+    return Object.prototype.hasOwnProperty.call(appData, key) ? appData[key] : defaultValue;
+  },
+  set(key, value) {
+    if (Object.prototype.hasOwnProperty.call(appData, key)) {
+      appData[key] = value;
+    }
+  }
+};
 
 // ==========================================================================
 // 3. Navigation & View Controller
@@ -429,13 +87,36 @@ function switchMainView(targetView) {
   const adminView = document.getElementById("admin-view");
   const publicNavbar = document.querySelector(".public-navbar");
 
+  if (targetView === "patient") {
+    publicView.classList.add("d-none");
+    if (publicNavbar) publicNavbar.classList.add("d-none");
+    adminView.classList.remove("d-none");
+    document.getElementById("staff-login-panel")?.classList.add("d-none");
+    document.getElementById("staff-dashboard")?.classList.add("d-none");
+    document.getElementById("patient-portal")?.classList.remove("d-none");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (patientState.token) loadPatientDashboard();
+    return;
+  }
+
   if (targetView === "admin") {
+    document.getElementById("patient-portal")?.classList.add("d-none");
     publicView.classList.add("d-none");
     if (publicNavbar) publicNavbar.classList.add("d-none");
     adminView.classList.remove("d-none");
     window.scrollTo({ top: 0, behavior: "smooth" });
-    switchAdminTab("dashboard");
-    renderDashboardCharts();
+    const loginPanel = document.getElementById("staff-login-panel");
+    const dashboard = document.getElementById("staff-dashboard");
+    if (!authState.token || !authState.user) {
+      if (loginPanel) loginPanel.classList.remove("d-none");
+      if (dashboard) dashboard.classList.add("d-none");
+      document.getElementById("staffUsernameInput")?.focus();
+      return;
+    }
+    if (loginPanel) loginPanel.classList.add("d-none");
+    if (dashboard) dashboard.classList.remove("d-none");
+    applyRolePermissions();
+    switchAdminTab(firstAllowedTab());
   } else {
     adminView.classList.add("d-none");
     publicView.classList.remove("d-none");
@@ -445,6 +126,15 @@ function switchMainView(targetView) {
 }
 
 function switchAdminTab(tabName) {
+  if (!authState.token || !authState.user) {
+    switchMainView("admin");
+    return;
+  }
+  const allowedTabs = allowedTabsForRole(authState.user.role);
+  if (!allowedTabs.includes(tabName)) {
+    showToast("Your staff role does not have access to that page.", "error");
+    return;
+  }
   currentPortalTab = tabName;
 
   // Update sidebar active state
@@ -484,9 +174,59 @@ function switchAdminTab(tabName) {
     renderAppointmentsTable();
   } else if (tabName === "billing") {
     renderBillingTable();
+  } else if (tabName === "departments") {
+    renderDepartments();
   } else if (tabName === "reports") {
-    setTimeout(renderReportsCharts, 100);
+    setTimeout(() => {
+      renderReportsCharts();
+      updateReportMetrics();
+    }, 100);
+  } else if (tabName === "staff") {
+    renderStaffAccounts();
   }
+}
+
+function allowedTabsForRole(role) {
+  const permissions = {
+    ADMIN: ["dashboard", "patients", "doctors", "appointments", "departments", "billing", "reports", "settings", "staff"],
+    DOCTOR: ["patients", "appointments"],
+    RECEPTIONIST: ["patients", "appointments", "billing"],
+    NURSE: ["patients", "appointments"]
+  };
+  return permissions[role] || [];
+}
+
+function firstAllowedTab() {
+  return allowedTabsForRole(authState.user?.role)[0] || "patients";
+}
+
+function applyRolePermissions() {
+  const allowedTabs = new Set(allowedTabsForRole(authState.user.role));
+  document.querySelectorAll(".sidebar-nav-link[data-tab]").forEach(link => {
+    link.classList.toggle("d-none", !allowedTabs.has(link.dataset.tab));
+  });
+  document.querySelectorAll(".admin-tab-pane").forEach(pane => {
+    const tabName = pane.id.replace("tab-", "");
+    pane.classList.toggle("d-none", !allowedTabs.has(tabName));
+  });
+
+  const dashboardHeaderName = document.getElementById("staffDisplayName");
+  const dashboardHeaderRole = document.getElementById("staffDisplayRole");
+  const welcomeName = document.getElementById("staffWelcomeName");
+  const todayDate = document.getElementById("staffTodayDate");
+  if (dashboardHeaderName) dashboardHeaderName.textContent = authState.user.fullName;
+  if (dashboardHeaderRole) dashboardHeaderRole.textContent = authState.user.role;
+  if (welcomeName) welcomeName.textContent = authState.user.fullName;
+  if (todayDate) todayDate.textContent = new Date().toLocaleDateString();
+  document.querySelectorAll(".staff-dashboard .admin-only").forEach(element => {
+    element.classList.toggle("d-none", authState.user.role !== "ADMIN");
+  });
+  document.querySelectorAll(".staff-dashboard .patient-create-action").forEach(element => {
+    element.classList.toggle("d-none", !["ADMIN", "RECEPTIONIST"].includes(authState.user.role));
+  });
+  document.querySelectorAll(".staff-dashboard .appointment-create-action").forEach(element => {
+    element.classList.toggle("d-none", !["ADMIN", "RECEPTIONIST"].includes(authState.user.role));
+  });
 }
 
 function toggleMobileSidebar() {
@@ -531,7 +271,7 @@ function showToast(message, type = "success") {
     <i class="bi ${iconClass} fs-5"></i>
     <div class="flex-grow-1">
       <div class="fw-bold" style="font-size: 0.9rem;">${type.toUpperCase()}</div>
-      <div style="font-size: 0.85rem; color: var(--text-secondary);">${message}</div>
+      <div style="font-size: 0.85rem; color: var(--text-secondary);">${escapeHtml(message)}</div>
     </div>
     <button type="button" class="btn-close ms-2" style="font-size: 0.75rem;" onclick="this.parentElement.remove()"></button>
   `;
@@ -545,6 +285,666 @@ function showToast(message, type = "success") {
   }, 4000);
 }
 
+async function apiRequest(path, options = {}) {
+  const headers = { Accept: "application/json" };
+  const request = { method: options.method || "GET", headers };
+  if (options.body !== undefined) {
+    headers["Content-Type"] = "application/json";
+    request.body = JSON.stringify(options.body);
+  }
+  const requestToken = options.token !== undefined ? options.token : authState.token;
+  if (options.authenticated !== false && requestToken) {
+    headers.Authorization = `Bearer ${requestToken}`;
+  }
+
+  let response;
+  try {
+    response = await fetch(`${API_BASE_URL}${path}`, request);
+  } catch (error) {
+    console.error("MediCare API request could not reach the server.", error);
+    throw new Error(`Unable to connect to the MediCare API at ${API_BASE_URL}. Check that the backend is running and CORS allows this page.`);
+  }
+  if (response.status === 204) return null;
+  if (!response.ok) {
+    let message = `Request failed (${response.status}).`;
+    try {
+      const error = await response.json();
+      if (error.message) message = error.message;
+    } catch (error) {
+      message = `Request failed (${response.status}); the server returned an unreadable error response.`;
+    }
+
+    if (response.status === 401 && authState.token && requestToken === authState.token && path !== "/api/auth/login") {
+      clearStaffSession("Your staff session expired. Please sign in again.");
+    }
+    throw new Error(message);
+  }
+  return response.json();
+}
+
+function showPatientPortalForm(mode) {
+  const isRegister = mode === "register";
+  document.getElementById("patientLoginForm").classList.toggle("d-none", isRegister);
+  document.getElementById("patientRegisterForm").classList.toggle("d-none", !isRegister);
+  document.getElementById("patientLoginTab").classList.toggle("btn-medicare-primary", !isRegister);
+  document.getElementById("patientLoginTab").classList.toggle("btn-medicare-secondary", isRegister);
+  document.getElementById("patientRegisterTab").classList.toggle("btn-medicare-primary", isRegister);
+  document.getElementById("patientRegisterTab").classList.toggle("btn-medicare-secondary", !isRegister);
+}
+
+async function establishPatientSession(login) {
+  if (login.role !== "PATIENT") {
+    throw new Error("This sign-in is only for patient accounts. Use Staff Login for hospital staff.");
+  }
+  patientState.token = login.token;
+  document.getElementById("patientPortalAuth").classList.add("d-none");
+  document.getElementById("patientPortalDashboard").classList.remove("d-none");
+  await loadPatientDashboard();
+}
+
+async function handlePatientLogin(event) {
+  event.preventDefault();
+  const form = document.getElementById("patientLoginForm");
+  const error = document.getElementById("patientLoginError");
+  if (!form.checkValidity()) {
+    form.classList.add("was-validated");
+    return;
+  }
+  error.textContent = "";
+  const submit = form.querySelector('button[type="submit"]');
+  submit.disabled = true;
+  try {
+    const login = await apiRequest("/api/auth/login", {
+      method: "POST",
+      authenticated: false,
+      body: {
+        email: document.getElementById("patientLoginEmail").value.trim(),
+        password: document.getElementById("patientLoginPassword").value
+      }
+    });
+    await establishPatientSession(login);
+    form.reset();
+    form.classList.remove("was-validated");
+  } catch (requestError) {
+    patientState.token = null;
+    error.textContent = requestError.message;
+  } finally {
+    submit.disabled = false;
+  }
+}
+
+async function handlePatientRegistration(event) {
+  event.preventDefault();
+  const form = document.getElementById("patientRegisterForm");
+  const error = document.getElementById("patientRegisterError");
+  if (!form.checkValidity()) {
+    form.classList.add("was-validated");
+    return;
+  }
+  error.textContent = "";
+  const submit = form.querySelector('button[type="submit"]');
+  submit.disabled = true;
+  try {
+    const registration = await apiRequest("/api/auth/register", {
+      method: "POST",
+      authenticated: false,
+      body: {
+        fullName: document.getElementById("patientRegisterName").value.trim(),
+        email: document.getElementById("patientRegisterEmail").value.trim(),
+        password: document.getElementById("patientRegisterPassword").value,
+        age: Number(document.getElementById("patientRegisterAge").value),
+        gender: document.getElementById("patientRegisterGender").value.trim(),
+        phone: document.getElementById("patientRegisterPhone").value.trim(),
+        address: document.getElementById("patientRegisterAddress").value.trim()
+      }
+    });
+    await establishPatientSession(registration);
+    form.reset();
+    form.classList.remove("was-validated");
+  } catch (requestError) {
+    patientState.token = null;
+    error.textContent = requestError.message;
+  } finally {
+    submit.disabled = false;
+  }
+}
+
+async function loadPatientDashboard() {
+  const content = document.getElementById("patientDashboardContent");
+  const error = document.getElementById("patientDashboardError");
+  error.textContent = "";
+  content.textContent = "Loading your records…";
+  try {
+    const dashboard = await apiRequest("/api/patient-portal/me", { token: patientState.token });
+    patientState.dashboard = dashboard;
+    document.getElementById("patientDashboardName").textContent =
+      `${dashboard.profile.name} · Patient ID ${dashboard.profile.id}`;
+    const doctorSelect = document.getElementById("patientAppointmentDoctor");
+    if (DB.get("doctors", []).length === 0) {
+      await loadPublicCatalog();
+    }
+    const doctors = DB.get("doctors", []);
+    doctorSelect.innerHTML = doctors.map(doctor =>
+      `<option value="${escapeHtml(doctor.name)}">${escapeHtml(doctor.name)} · ${escapeHtml(doctor.department)}</option>`
+    ).join("");
+    const section = (title, items, render, emptyText) => `
+      <section class="mb-4">
+        <h2 class="h5 fw-bold">${escapeHtml(title)}</h2>
+        ${items.length ? `<div class="list-group">${items.map(item => `<div class="list-group-item">${render(item)}</div>`).join("")}</div>`
+          : `<p class="text-secondary small">${escapeHtml(emptyText)}</p>`}
+      </section>`;
+    content.innerHTML = `
+      ${section("Appointments", dashboard.appointments, item =>
+        `<strong>${escapeHtml(item.date)} ${escapeHtml(item.time)}</strong> · ${escapeHtml(item.doctorName)} · ${escapeHtml(item.status)}`,
+      "No appointments are currently linked to your account.")}
+      ${section("Invoices", dashboard.invoices, item =>
+        `<strong>${escapeHtml(item.id)}</strong> · ${escapeHtml(item.department)} · ${escapeHtml(item.status)} · ${escapeHtml(item.amount)}`
+        + (["pending", "overdue"].includes(item.status?.toLowerCase()) && item.patientId
+          ? ` <button type="button" class="btn btn-sm btn-outline-primary ms-2" data-pay-invoice="${escapeHtml(item.id)}">Pay securely</button>`
+          : ""),
+      "No invoices are currently linked to your account.")}
+      ${section("Clinical records", dashboard.clinicalRecords, item =>
+        `<strong>${escapeHtml(item.diagnosis || "Clinical record")}</strong><div>${escapeHtml(item.clinicalNote || "")}</div>`,
+      "No clinical records are available.")}
+      ${section("Prescriptions", dashboard.prescriptions, item =>
+        `<strong>${escapeHtml(item.medication || "Prescription")}</strong> · ${escapeHtml(item.dose || "")} · ${escapeHtml(item.status || "")}`,
+      "No prescriptions are available.")}
+      ${section("Vitals", dashboard.vitals, item =>
+        `<strong>${escapeHtml(item.type || "Vital")}</strong> · ${escapeHtml(item.value)} ${escapeHtml(item.unit || "")}`,
+      "No vitals are available.")}`;
+    content.querySelectorAll("[data-pay-invoice]").forEach(button => {
+      button.addEventListener("click", () => startInvoiceCheckout(button.dataset.payInvoice));
+    });
+  } catch (requestError) {
+    content.replaceChildren();
+    error.textContent = requestError.message;
+  }
+}
+
+async function startInvoiceCheckout(invoiceNumber) {
+  const checkoutWindow = window.open("about:blank", "_blank");
+  if (checkoutWindow) checkoutWindow.opener = null;
+  const error = document.getElementById("patientDashboardError");
+  error.textContent = "";
+  try {
+    const checkout = await apiRequest(
+      `/api/patient-portal/invoices/${encodeURIComponent(invoiceNumber)}/checkout`,
+      { method: "POST", token: patientState.token }
+    );
+    const checkoutUrl = new URL(checkout.checkoutUrl);
+    if (checkoutUrl.protocol !== "https:" || checkoutUrl.hostname !== "checkout.stripe.com") {
+      throw new Error("The payment provider returned an unsafe checkout URL.");
+    }
+    if (checkoutWindow) {
+      checkoutWindow.location.assign(checkoutUrl.href);
+    } else {
+      error.innerHTML = `Checkout is ready. <a href="${escapeHtml(checkoutUrl.href)}" target="_blank" rel="noopener noreferrer">Continue to Stripe</a>.`;
+    }
+  } catch (requestError) {
+    if (checkoutWindow) checkoutWindow.close();
+    error.textContent = requestError.message;
+  }
+}
+
+async function bookPatientAppointment(event) {
+  event.preventDefault();
+  const form = document.getElementById("patientAppointmentForm");
+  const error = document.getElementById("patientAppointmentError");
+  if (!form.checkValidity()) {
+    form.classList.add("was-validated");
+    return;
+  }
+  error.textContent = "";
+  const submit = form.querySelector('button[type="submit"]');
+  submit.disabled = true;
+  try {
+    await apiRequest("/api/patient-portal/appointments", {
+      method: "POST",
+      token: patientState.token,
+      body: {
+        patientName: patientState.dashboard.profile.name,
+        patientPhone: patientState.dashboard.profile.phone,
+        doctorName: document.getElementById("patientAppointmentDoctor").value,
+        date: document.getElementById("patientAppointmentDate").value,
+        time: document.getElementById("patientAppointmentTime").value,
+        reason: document.getElementById("patientAppointmentReason").value.trim()
+      }
+    });
+    form.reset();
+    form.classList.remove("was-validated");
+    await loadPatientDashboard();
+    showToast("Appointment request submitted. It is pending care-team confirmation.");
+  } catch (requestError) {
+    error.textContent = requestError.message;
+  } finally {
+    submit.disabled = false;
+  }
+}
+
+async function logoutPatient() {
+  let logoutError = null;
+  if (patientState.token) {
+    try {
+      await apiRequest("/api/auth/logout", { method: "POST", token: patientState.token });
+    } catch (error) {
+      logoutError = error;
+    }
+  }
+  patientState.token = null;
+  patientState.dashboard = null;
+  document.getElementById("patientPortalDashboard").classList.add("d-none");
+  document.getElementById("patientPortalAuth").classList.remove("d-none");
+  document.getElementById("patientDashboardContent").replaceChildren();
+  document.getElementById("patientDashboardName").textContent = "";
+  document.getElementById("patientDashboardError").textContent = "";
+  showPatientPortalForm("login");
+  switchMainView("public");
+  showToast(logoutError
+    ? `Signed out in this browser; server revocation could not be confirmed: ${logoutError.message}`
+    : "You have been securely signed out.", logoutError ? "warning" : "success");
+}
+
+function clearStaffSession(loginMessage = "") {
+  authState.token = null;
+  authState.user = null;
+  activeClinicalPatientId = null;
+  activeClinicalData = null;
+  const patientProfile = document.getElementById("patientViewModalContent");
+  if (patientProfile) patientProfile.replaceChildren();
+  DB.set("patients", []);
+  DB.set("appointments", []);
+  DB.set("invoices", []);
+  DB.set("activities", []);
+  DB.set("staffAccounts", []);
+  DB.set("dashboardStats", null);
+
+  ["patients-table-body", "appointments-table-body", "billing-table-body",
+    "dashboard-recent-appointments-body", "dashboard-activity-feed", "staff-account-table-body"]
+    .forEach(id => {
+      const element = document.getElementById(id);
+      if (element) element.replaceChildren();
+    });
+
+  const dashboard = document.getElementById("staff-dashboard");
+  const loginPanel = document.getElementById("staff-login-panel");
+  if (dashboard) dashboard.classList.add("d-none");
+  if (loginPanel && !document.getElementById("admin-view").classList.contains("d-none")) {
+    loginPanel.classList.remove("d-none");
+  }
+  const message = document.getElementById("staffLoginError");
+  if (message) message.textContent = loginMessage;
+}
+
+function normalizeDoctor(doctor) {
+  return {
+    ...doctor,
+    image: doctor.image || "",
+    rating: Number(doctor.rating || 0),
+    reviews: Number(doctor.reviews || 0),
+    experience: doctor.experience || "Experience not listed",
+    fee: Number(doctor.fee || 0),
+    about: doctor.about || ""
+  };
+}
+
+async function loadPublicCatalog() {
+  const [doctors, departments] = await Promise.all([
+    apiRequest("/api/doctors", { authenticated: false }),
+    apiRequest("/api/departments", { authenticated: false })
+  ]);
+  DB.set("doctors", doctors.map(normalizeDoctor));
+  DB.set("departments", departments);
+  renderPublicFeaturedDoctors();
+  renderDepartments();
+  populateDepartmentOptions();
+}
+
+async function loadStaffData() {
+  const role = authState.user.role;
+  const requests = [
+    loadPublicCatalog(),
+    apiRequest("/api/patients").then(data => DB.set("patients", data)),
+    apiRequest("/api/appointments").then(data => DB.set("appointments", data))
+  ];
+
+  if (role === "ADMIN" || role === "RECEPTIONIST") {
+    requests.push(apiRequest("/api/billing").then(data => DB.set("invoices", data)));
+  }
+  if (role === "ADMIN") {
+    requests.push(
+      apiRequest("/api/dashboard/stats").then(data => DB.set("dashboardStats", data)),
+      apiRequest("/api/activity?limit=10").then(data => {
+        DB.set("activities", data.map(activity => ({
+          ...activity,
+          time: activity.time || formatActivityTime(activity.timestamp)
+        })));
+      }),
+      apiRequest("/api/admin/staff").then(data => DB.set("staffAccounts", data))
+    );
+  }
+  await Promise.all(requests);
+}
+
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, character => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[character]);
+}
+
+function safeHttpUrl(value) {
+  if (!value) return "";
+  try {
+    const url = new URL(String(value || ""), window.location.origin);
+    return ["http:", "https:"].includes(url.protocol) ? url.href : "";
+  } catch {
+    return "";
+  }
+}
+
+function populateDepartmentOptions() {
+  const departments = DB.get("departments", []);
+  ["docDeptInput", "aptDeptInput", "appointmentFilterDept", "doctorFilterDept"].forEach(id => {
+    const select = document.getElementById(id);
+    if (!select) return;
+    const selected = select.value;
+    const includeAll = id.endsWith("FilterDept");
+    select.innerHTML = includeAll ? `<option value="">All Departments</option>` : `<option value="">Select Department</option>`;
+    select.insertAdjacentHTML("beforeend", departments
+      .map(department => `<option value="${escapeHtml(department.name)}">${escapeHtml(department.name)}</option>`)
+      .join(""));
+    select.value = departments.some(department => department.name === selected) ? selected : "";
+  });
+}
+
+function renderDepartments() {
+  const departments = DB.get("departments", []);
+  const colors = ["badge-pink", "badge-lavender", "badge-cream", "badge-mint", "badge-blue"];
+  const icons = ["bi-heart-pulse", "bi-diagram-3", "bi-person-walking", "bi-balloon", "bi-droplet-half"];
+  const containers = [
+    { element: document.getElementById("public-departments-grid"), publicView: true },
+    { element: document.getElementById("departments-cards-grid"), publicView: false }
+  ];
+
+  containers.forEach(({ element, publicView }) => {
+    if (!element) return;
+    element.replaceChildren();
+    if (departments.length === 0) {
+      element.innerHTML = `<div class="col-12 text-center text-muted py-4">Department information is not available.</div>`;
+      return;
+    }
+
+    departments.forEach((department, index) => {
+      const doctor = DB.get("doctors", []).find(item => item.department === department.name);
+      const occupancy = department.totalBeds > 0
+        ? Math.round((department.occupiedBeds / department.totalBeds) * 100)
+        : 0;
+      const col = document.createElement("div");
+      col.className = "col-lg-4 col-md-6";
+      col.innerHTML = publicView ? `
+        <div class="dept-card">
+          <div class="dept-icon-circle ${colors[index % colors.length]}">
+            <i class="bi ${icons[index % icons.length]}"></i>
+          </div>
+          <h4 class="fw-bold mb-2">${escapeHtml(department.name)}</h4>
+          <p class="text-secondary small mb-3">${escapeHtml(department.description || "Hospital clinical department.")}</p>
+          <div class="small text-muted mb-3">${escapeHtml(department.location || "Location not listed")}</div>
+          <div class="mt-auto d-flex justify-content-between align-items-center pt-3 border-top">
+            <span class="small fw-semibold text-muted">${escapeHtml(department.headDoctorName || "Clinical team")}</span>
+            ${doctor ? `<button class="btn btn-sm btn-outline-primary" onclick="openBookAppointmentForDoctor(${escapeHtml(JSON.stringify(doctor.name))}, ${escapeHtml(JSON.stringify(department.name))})">Book Consult</button>` : ""}
+          </div>
+        </div>
+      ` : `
+        <div class="card-custom p-4 h-100">
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <div class="dept-icon-circle ${colors[index % colors.length]} mb-0" style="width: 52px; height: 52px; font-size: 1.4rem;">
+              <i class="bi ${icons[index % icons.length]}"></i>
+            </div>
+            <div>
+              <h5 class="fw-bold mb-0">${escapeHtml(department.name)}</h5>
+              <span class="small text-muted">${escapeHtml(department.location || "Location not listed")}</span>
+            </div>
+          </div>
+          <p class="small text-secondary">${escapeHtml(department.description || "No description available.")}</p>
+          <div class="p-3 bg-light rounded-3 mb-3 small">
+            <div class="d-flex justify-content-between mb-1"><span class="text-secondary">Head of Department:</span><strong>${escapeHtml(department.headDoctorName || "Not assigned")}</strong></div>
+            <div class="d-flex justify-content-between"><span class="text-secondary">Bed capacity:</span><strong>${Number(department.occupiedBeds || 0)} / ${Number(department.totalBeds || 0)} (${occupancy}%)</strong></div>
+          </div>
+          <div class="d-flex gap-2 admin-only">
+            <button class="btn btn-sm btn-outline-primary flex-grow-1" onclick="openDepartmentModal(${Number(department.id)})">Edit</button>
+            <button class="btn btn-sm btn-outline-danger" onclick="deleteDepartment(${Number(department.id)})">Delete</button>
+          </div>
+        </div>
+      `;
+      element.appendChild(col);
+    });
+  });
+}
+
+function openDepartmentModal(departmentId = null) {
+  const form = document.getElementById("departmentForm");
+  if (!form) return;
+  form.reset();
+  const department = DB.get("departments", []).find(item => Number(item.id) === Number(departmentId));
+  document.getElementById("departmentIdHidden").value = department ? department.id : "";
+  document.getElementById("departmentModalTitle").textContent = department ? "Edit Department" : "Add Department";
+  if (department) {
+    document.getElementById("departmentNameInput").value = department.name || "";
+    document.getElementById("departmentCodeInput").value = department.code || "";
+    document.getElementById("departmentDescriptionInput").value = department.description || "";
+    document.getElementById("departmentLocationInput").value = department.location || "";
+    document.getElementById("departmentHeadInput").value = department.headDoctorName || "";
+    document.getElementById("departmentTotalBedsInput").value = department.totalBeds || 0;
+    document.getElementById("departmentOccupiedBedsInput").value = department.occupiedBeds || 0;
+  }
+  bootstrap.Modal.getOrCreateInstance(document.getElementById("departmentModal")).show();
+}
+
+async function saveDepartmentForm(event) {
+  event.preventDefault();
+  const form = document.getElementById("departmentForm");
+  if (!form.checkValidity()) {
+    form.classList.add("was-validated");
+    return;
+  }
+  const id = document.getElementById("departmentIdHidden").value;
+  const department = {
+    name: document.getElementById("departmentNameInput").value.trim(),
+    code: document.getElementById("departmentCodeInput").value.trim(),
+    description: document.getElementById("departmentDescriptionInput").value.trim(),
+    location: document.getElementById("departmentLocationInput").value.trim(),
+    headDoctorName: document.getElementById("departmentHeadInput").value.trim(),
+    totalBeds: Number(document.getElementById("departmentTotalBedsInput").value),
+    occupiedBeds: Number(document.getElementById("departmentOccupiedBedsInput").value)
+  };
+  try {
+    await apiRequest(id ? `/api/departments/${encodeURIComponent(id)}` : "/api/departments", {
+      method: id ? "PUT" : "POST",
+      body: department
+    });
+    bootstrap.Modal.getInstance(document.getElementById("departmentModal"))?.hide();
+    await loadPublicCatalog();
+    renderDepartments();
+    showToast(`Department ${department.name} saved.`);
+  } catch (error) {
+    showToast(`Unable to save department: ${error.message}`, "error");
+  }
+}
+
+async function deleteDepartment(id) {
+  if (!confirm("Delete this department? The server may reject deletion if existing records reference it.")) return;
+  try {
+    await apiRequest(`/api/departments/${encodeURIComponent(id)}`, { method: "DELETE" });
+    await loadPublicCatalog();
+    renderDepartments();
+    showToast("Department deleted.", "warning");
+  } catch (error) {
+    showToast(`Unable to delete department: ${error.message}`, "error");
+  }
+}
+
+function toggleDoctorAccountLink() {
+  const role = document.getElementById("staffRoleInput")?.value;
+  const group = document.getElementById("staffDoctorLinkGroup");
+  const doctorSelect = document.getElementById("staffDoctorIdInput");
+  if (!group || !doctorSelect) return;
+  const isDoctor = role === "DOCTOR";
+  group.classList.toggle("d-none", !isDoctor);
+  doctorSelect.required = isDoctor;
+  doctorSelect.innerHTML = DB.get("doctors", [])
+    .map(doctor => `<option value="${escapeHtml(doctor.id)}">${escapeHtml(doctor.name)} (${escapeHtml(doctor.department)})</option>`)
+    .join("");
+}
+
+function renderStaffAccounts() {
+  const tbody = document.getElementById("staff-account-table-body");
+  if (!tbody) return;
+  const accounts = DB.get("staffAccounts", []);
+  if (accounts.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">No staff accounts found.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = accounts.map(account => `
+    <tr>
+      <td>${escapeHtml(account.fullName)}</td>
+      <td>${escapeHtml(account.email)}</td>
+      <td>${escapeHtml(account.role)}</td>
+      <td>${escapeHtml(account.doctorName || "—")}</td>
+      <td><span class="status-badge ${account.enabled ? "status-confirmed" : "status-cancelled"}">${account.enabled ? "Enabled" : "Disabled"}</span></td>
+      <td><button class="btn btn-sm ${account.enabled ? "btn-outline-danger" : "btn-outline-success"}" onclick="setStaffAccountEnabled(${escapeHtml(JSON.stringify(account.email))}, ${!account.enabled})">${account.enabled ? "Disable" : "Enable"}</button></td>
+    </tr>
+  `).join("");
+}
+
+async function createStaffAccount(event) {
+  event.preventDefault();
+  const form = document.getElementById("staffAccountForm");
+  if (!form.checkValidity()) {
+    form.classList.add("was-validated");
+    return;
+  }
+  const role = document.getElementById("staffRoleInput").value;
+  const account = {
+    fullName: document.getElementById("staffFullNameInput").value.trim(),
+    email: document.getElementById("staffEmailInput").value.trim(),
+    password: document.getElementById("staffAccountPasswordInput").value,
+    role,
+    doctorId: role === "DOCTOR" ? document.getElementById("staffDoctorIdInput").value : null
+  };
+  try {
+    await apiRequest("/api/admin/staff", { method: "POST", body: account });
+    form.reset();
+    form.classList.remove("was-validated");
+    toggleDoctorAccountLink();
+    await loadStaffData();
+    renderStaffAccounts();
+    showToast(`Staff account for ${account.fullName} created.`);
+  } catch (error) {
+    showToast(`Unable to create staff account: ${error.message}`, "error");
+  }
+}
+
+async function setStaffAccountEnabled(email, enabled) {
+  try {
+    await apiRequest(`/api/admin/staff/${encodeURIComponent(email)}/status`, {
+      method: "PATCH",
+      body: { enabled }
+    });
+    await loadStaffData();
+    renderStaffAccounts();
+    showToast(`Staff account ${enabled ? "enabled" : "disabled"}.`, enabled ? "success" : "warning");
+  } catch (error) {
+    showToast(`Unable to update staff account: ${error.message}`, "error");
+  }
+}
+
+function formatActivityTime(timestamp) {
+  if (!timestamp) return "Recently";
+  const minutes = Math.max(0, Math.floor((Date.now() - new Date(timestamp).getTime()) / 60000));
+  if (minutes < 1) return "Just now";
+  if (minutes < 60) return `${minutes} min ago`;
+  if (minutes < 1440) return `${Math.floor(minutes / 60)}h ago`;
+  return `${Math.floor(minutes / 1440)}d ago`;
+}
+
+async function handleStaffLogin(event) {
+  event.preventDefault();
+  const form = document.getElementById("staffLoginForm");
+  const error = document.getElementById("staffLoginError");
+  const submitButton = form.querySelector('button[type="submit"]');
+  if (!form.checkValidity()) {
+    form.classList.add("was-validated");
+    return;
+  }
+
+  if (error) error.textContent = "";
+  submitButton.disabled = true;
+  try {
+    const credentials = {
+      email: document.getElementById("staffUsernameInput").value.trim(),
+      password: document.getElementById("staffPasswordInput").value
+    };
+    const login = await apiRequest("/api/auth/login", {
+      method: "POST",
+      body: credentials,
+      authenticated: false
+    });
+    authState.token = login.token;
+    authState.user = await apiRequest("/api/auth/me");
+    if (!allowedTabsForRole(authState.user.role).length) {
+      clearStaffSession();
+      throw new Error("This account is not permitted to access the staff portal.");
+    }
+
+    await loadStaffData();
+    document.getElementById("staff-login-panel").classList.add("d-none");
+    document.getElementById("staff-dashboard").classList.remove("d-none");
+    applyRolePermissions();
+    switchAdminTab(firstAllowedTab());
+    form.reset();
+    form.classList.remove("was-validated");
+    showToast(`Welcome, ${authState.user.fullName}.`);
+  } catch (requestError) {
+    clearStaffSession();
+    if (error) error.textContent = requestError.message;
+  } finally {
+    submitButton.disabled = false;
+  }
+}
+
+async function logoutStaff() {
+  let logoutError = null;
+  if (authState.token) {
+    try {
+      await apiRequest("/api/auth/logout", { method: "POST" });
+    } catch (error) {
+      logoutError = error;
+    }
+  }
+  clearStaffSession();
+  switchMainView("public");
+  showToast(logoutError
+    ? `Signed out in this browser, but the server could not confirm token revocation: ${logoutError.message}`
+    : "You have been securely signed out.", logoutError ? "warning" : "success");
+}
+
+async function refreshStaffData() {
+  if (!authState.token || !authState.user) {
+    switchMainView("admin");
+    return;
+  }
+  try {
+    await loadStaffData();
+    refreshAllViews();
+    showToast("Hospital data refreshed from the server.", "info");
+  } catch (error) {
+    showToast(`Unable to refresh hospital data: ${error.message}`, "error");
+  }
+}
+
 // ==========================================================================
 // 5. Dashboard Stats & Calculations
 // ==========================================================================
@@ -553,23 +953,24 @@ function updateDashboardStats() {
   const doctors = DB.get("doctors", []);
   const appointments = DB.get("appointments", []);
   const invoices = DB.get("invoices", []);
+  const stats = DB.get("dashboardStats");
 
   // Total patients
   const patientStat = document.getElementById("stat-total-patients");
-  if (patientStat) patientStat.textContent = patients.length;
+  if (patientStat) patientStat.textContent = stats ? stats.totalPatients : patients.length;
 
   // Total doctors
   const doctorStat = document.getElementById("stat-total-doctors");
-  if (doctorStat) doctorStat.textContent = doctors.length;
+  if (doctorStat) doctorStat.textContent = stats ? stats.totalDoctors : doctors.length;
 
   // Today's appointments (filter today or show pending/confirmed count)
-  const todayDate = "2026-11-12";
+  const todayDate = new Date().toISOString().slice(0, 10);
   const todayApts = appointments.filter(a => a.date === todayDate);
   const aptStat = document.getElementById("stat-today-appointments");
-  if (aptStat) aptStat.textContent = todayApts.length > 0 ? todayApts.length : appointments.length;
+  if (aptStat) aptStat.textContent = stats ? stats.todayAppointments : todayApts.length;
 
-  // Total Revenue
-  const totalRev = invoices
+  // Sum of invoices whose status is Paid; this does not confirm payment processing.
+  const totalRev = stats ? Number(stats.totalRevenue || 0) : invoices
     .filter(inv => inv.status === "Paid")
     .reduce((sum, inv) => sum + Number(inv.amount), 0);
   const revStat = document.getElementById("stat-total-revenue");
@@ -593,28 +994,28 @@ function renderRecentAppointmentsTable() {
     const statusClass = getStatusClass(apt.status);
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td><span class="fw-bold">${apt.id}</span></td>
+      <td><span class="fw-bold">${escapeHtml(apt.id)}</span></td>
       <td>
-        <div class="fw-semibold">${apt.patientName}</div>
-        <div class="small text-muted">${apt.patientPhone || 'N/A'}</div>
+        <div class="fw-semibold">${escapeHtml(apt.patientName)}</div>
+        <div class="small text-muted">${escapeHtml(apt.patientPhone || "N/A")}</div>
       </td>
       <td>
-        <div>${apt.doctorName}</div>
-        <span class="badge-pill-pastel badge-blue" style="font-size: 0.72rem; padding: 2px 8px;">${apt.department}</span>
+        <div>${escapeHtml(apt.doctorName)}</div>
+        <span class="badge-pill-pastel badge-blue" style="font-size: 0.72rem; padding: 2px 8px;">${escapeHtml(apt.department)}</span>
       </td>
       <td>
-        <div>${apt.date}</div>
-        <div class="small text-muted">${apt.time}</div>
+        <div>${escapeHtml(apt.date)}</div>
+        <div class="small text-muted">${escapeHtml(apt.time)}</div>
       </td>
       <td>
-        <span class="status-badge ${statusClass}">${apt.status}</span>
+        <span class="status-badge ${statusClass}">${escapeHtml(apt.status)}</span>
       </td>
       <td>
         <div class="d-flex gap-1">
-          <button class="btn-table-action" title="Mark Completed" onclick="quickUpdateAppointmentStatus('${apt.id}', 'Completed')">
+          <button class="btn-table-action" title="Mark Completed" onclick="quickUpdateAppointmentStatus(${escapeHtml(JSON.stringify(apt.id))}, 'Completed')">
             <i class="bi bi-check2"></i>
           </button>
-          <button class="btn-table-action btn-delete" title="Cancel Appointment" onclick="quickUpdateAppointmentStatus('${apt.id}', 'Cancelled')">
+          <button class="btn-table-action btn-delete" title="Cancel Appointment" onclick="quickUpdateAppointmentStatus(${escapeHtml(JSON.stringify(apt.id))}, 'Cancelled')">
             <i class="bi bi-x"></i>
           </button>
         </div>
@@ -634,32 +1035,17 @@ function renderActivityFeed() {
     const div = document.createElement("div");
     div.className = "activity-item";
     div.innerHTML = `
-      <div class="activity-dot-circle ${act.color}">
-        <i class="bi ${act.icon}"></i>
+      <div class="activity-dot-circle ${escapeHtml(act.color)}">
+        <i class="bi ${escapeHtml(act.icon)}"></i>
       </div>
       <div>
-        <div class="fw-semibold" style="font-size: 0.92rem;">${act.title}</div>
-        <div class="text-secondary" style="font-size: 0.85rem;">${act.detail}</div>
-        <div class="text-muted" style="font-size: 0.75rem; margin-top: 2px;">${act.time}</div>
+        <div class="fw-semibold" style="font-size: 0.92rem;">${escapeHtml(act.title)}</div>
+        <div class="text-secondary" style="font-size: 0.85rem;">${escapeHtml(act.detail)}</div>
+        <div class="text-muted" style="font-size: 0.75rem; margin-top: 2px;">${escapeHtml(act.time)}</div>
       </div>
     `;
     container.appendChild(div);
   });
-}
-
-function logActivity(icon, color, title, detail) {
-  const activities = DB.get("activities", []);
-  activities.unshift({
-    id: Date.now(),
-    icon,
-    color,
-    title,
-    detail,
-    time: "Just now"
-  });
-  if (activities.length > 8) activities.pop();
-  DB.set("activities", activities);
-  renderActivityFeed();
 }
 
 function getStatusClass(status) {
@@ -712,10 +1098,11 @@ function renderWeeklyChart() {
   const h = 260;
   ctx.clearRect(0, 0, w, h);
 
-  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-  const appointmentsData = [24, 38, 42, 35, 52, 28, 18];
-  const admissionsData = [8, 12, 16, 11, 19, 9, 6];
-  const maxVal = 60;
+  const stats = DB.get("dashboardStats");
+  const days = stats?.weeklyDays || [];
+  const appointmentsData = stats?.weeklyAppointments || [];
+  const admissionsData = stats?.weeklyAdmissions || [];
+  const maxVal = Math.max(1, ...appointmentsData, ...admissionsData);
 
   const paddingLeft = 40;
   const paddingBottom = 35;
@@ -787,15 +1174,16 @@ function renderDepartmentDonut() {
   const h = 260;
   ctx.clearRect(0, 0, w, h);
 
-  const data = [
-    { label: "Cardiology", value: 34, color: "#1C5D99" },
-    { label: "Neurology", value: 22, color: "#6C5CE7" },
-    { label: "Pediatrics", value: 18, color: "#0E9F6E" },
-    { label: "Orthopedics", value: 16, color: "#D97706" },
-    { label: "General & Derm", value: 10, color: "#E11D48" }
-  ];
+  const data = DB.get("dashboardStats")?.departmentShare || [];
 
   const total = data.reduce((acc, d) => acc + d.value, 0);
+  if (!total) {
+    ctx.fillStyle = "#8F9CAE";
+    ctx.font = "14px 'Plus Jakarta Sans', sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("No appointment data available", w / 2, h / 2);
+    return;
+  }
   const centerX = w / 2;
   const centerY = h / 2 - 10;
   const outerRadius = 85;
@@ -819,10 +1207,10 @@ function renderDepartmentDonut() {
   ctx.fillStyle = "#27364B";
   ctx.font = "bold 20px 'Plus Jakarta Sans', sans-serif";
   ctx.textAlign = "center";
-  ctx.fillText("100%", centerX, centerY + 2);
+  ctx.fillText(`${Math.round(total)}%`, centerX, centerY + 2);
   ctx.fillStyle = "#8F9CAE";
   ctx.font = "11px 'Plus Jakarta Sans', sans-serif";
-  ctx.fillText("Clinical Share", centerX, centerY + 18);
+  ctx.fillText("Appointments", centerX, centerY + 18);
 }
 
 function renderReportsCharts() {
@@ -841,9 +1229,22 @@ function renderReportsCharts() {
   const h = 280;
   ctx.clearRect(0, 0, w, h);
 
-  const months = ["Jun", "Jul", "Aug", "Sep", "Oct", "Nov"];
-  const revenue = [42000, 56000, 61000, 58000, 72000, 84500];
-  const max = 100000;
+  const monthlyRevenue = new Map();
+  DB.get("invoices", []).forEach(invoice => {
+    if (invoice.status !== "Paid" || !invoice.date) return;
+    const month = invoice.date.slice(0, 7);
+    monthlyRevenue.set(month, (monthlyRevenue.get(month) || 0) + Number(invoice.amount || 0));
+  });
+  const months = Array.from({ length: 6 }, (_, index) => {
+    const date = new Date();
+    date.setDate(1);
+    date.setMonth(date.getMonth() - (5 - index));
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+  });
+  const revenue = months.map(month => monthlyRevenue.get(month) || 0);
+  const max = Math.max(1, ...revenue);
+  const monthLabels = months.map(month =>
+    new Date(`${month}-01T00:00:00`).toLocaleDateString(undefined, { month: "short" }));
 
   const padLeft = 60;
   const padBottom = 35;
@@ -863,7 +1264,7 @@ function renderReportsCharts() {
     ctx.fillStyle = "#8F9CAE";
     ctx.font = "11px 'Plus Jakarta Sans', sans-serif";
     ctx.textAlign = "right";
-    ctx.fillText(`$${(100 - i * 25)}k`, padLeft - 10, y + 4);
+    ctx.fillText(`$${Math.round((max * (4 - i) / 4) / 1000)}k`, padLeft - 10, y + 4);
   }
 
   // Draw smooth gradient curve
@@ -912,8 +1313,33 @@ function renderReportsCharts() {
     ctx.fillStyle = "#5C6B7E";
     ctx.font = "600 12px 'Plus Jakarta Sans', sans-serif";
     ctx.textAlign = "center";
-    ctx.fillText(months[idx], p.x, h - 10);
+    ctx.fillText(monthLabels[idx], p.x, h - 10);
   });
+}
+
+function updateReportMetrics() {
+  const departments = DB.get("departments", []);
+  const totalBeds = departments.reduce((total, department) => total + Number(department.totalBeds || 0), 0);
+  const occupiedBeds = departments.reduce((total, department) => total + Number(department.occupiedBeds || 0), 0);
+  const occupancy = totalBeds ? Math.round((occupiedBeds / totalBeds) * 100) : 0;
+  const invoices = DB.get("invoices", []);
+  const appointments = DB.get("appointments", []);
+  const now = new Date();
+  const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+
+  const occupancyElement = document.getElementById("report-bed-occupancy");
+  const bedCountElement = document.getElementById("report-bed-count");
+  const invoiceCountElement = document.getElementById("report-invoice-count");
+  const outstandingElement = document.getElementById("report-outstanding-count");
+  const monthAppointmentsElement = document.getElementById("report-month-appointments");
+  if (occupancyElement) occupancyElement.textContent = `${occupancy}%`;
+  if (bedCountElement) bedCountElement.textContent = `${occupiedBeds} of ${totalBeds} beds`;
+  if (invoiceCountElement) invoiceCountElement.textContent = invoices.length;
+  if (outstandingElement) outstandingElement.textContent = invoices.filter(invoice => invoice.status !== "Paid").length;
+  if (monthAppointmentsElement) {
+    monthAppointmentsElement.textContent = appointments.filter(appointment =>
+      (appointment.date || "").slice(0, 7) === currentMonth).length;
+  }
 }
 
 function roundRect(ctx, x, y, width, height, radius) {
@@ -949,8 +1375,8 @@ function renderPatientsTable() {
 
   const filtered = patients.filter(p => {
     const matchQuery = !query ||
-      p.name.toLowerCase().includes(query) ||
-      p.id.toLowerCase().includes(query) ||
+      String(p.name || "").toLowerCase().includes(query) ||
+      String(p.id || "").toLowerCase().includes(query) ||
       (p.condition && p.condition.toLowerCase().includes(query)) ||
       (p.doctor && p.doctor.toLowerCase().includes(query));
 
@@ -978,41 +1404,40 @@ function renderPatientsTable() {
     const avatarColor = pat.gender === "Female" ? "background-color: var(--pastel-pink); color: var(--pastel-pink-dark);" : "background-color: var(--pastel-blue); color: var(--pastel-blue-dark);";
     const statusClass = getStatusClass(pat.status);
 
+    const role = authState.user?.role;
+    const canEdit = role === "ADMIN" || role === "RECEPTIONIST" || role === "DOCTOR";
+    const canDelete = role === "ADMIN";
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td><span class="fw-bold">${pat.id}</span></td>
+      <td><span class="fw-bold">${escapeHtml(pat.id)}</span></td>
       <td>
         <div class="d-flex align-items-center gap-3">
-          <div class="patient-avatar-box" style="${avatarColor}">${initials}</div>
+          <div class="patient-avatar-box" style="${avatarColor}">${escapeHtml(initials)}</div>
           <div>
-            <div class="fw-bold text-dark">${pat.name}</div>
-            <div class="small text-muted">${pat.email || 'No email registered'}</div>
+            <div class="fw-bold text-dark">${escapeHtml(pat.name)}</div>
+            <div class="small text-muted">${escapeHtml(pat.email || "No email registered")}</div>
           </div>
         </div>
       </td>
-      <td>${pat.age} yrs / ${pat.gender}</td>
+      <td>${Number(pat.age)} yrs / ${escapeHtml(pat.gender)}</td>
       <td>
-        <div>${pat.phone}</div>
-        <span class="badge-pill-pastel badge-cream py-0 px-2" style="font-size: 0.7rem;">Blood: ${pat.bloodGroup || 'N/A'}</span>
+        <div>${escapeHtml(pat.phone)}</div>
+        <span class="badge-pill-pastel badge-cream py-0 px-2" style="font-size: 0.7rem;">Blood: ${escapeHtml(pat.bloodGroup || "N/A")}</span>
       </td>
       <td>
-        <div class="fw-semibold text-truncate" style="max-width: 180px;">${pat.condition || 'General Routine'}</div>
-        <div class="small text-muted">${pat.doctor || 'Unassigned'}</div>
+        <div class="fw-semibold text-truncate" style="max-width: 180px;">${escapeHtml(pat.condition || "No condition recorded")}</div>
+        <div class="small text-muted">${escapeHtml(pat.doctor || "Unassigned")}</div>
       </td>
       <td>
-        <span class="status-badge ${statusClass}">${pat.status}</span>
+        <span class="status-badge ${statusClass}">${escapeHtml(pat.status)}</span>
       </td>
       <td>
         <div class="d-flex gap-1">
-          <button class="btn-table-action" title="View Patient Profile" onclick="viewPatientDetails('${pat.id}')">
+          <button class="btn-table-action" title="View Patient Profile" onclick="viewPatientDetails(${escapeHtml(JSON.stringify(pat.id))})">
             <i class="bi bi-eye"></i>
           </button>
-          <button class="btn-table-action" title="Edit Patient" onclick="openPatientModal('${pat.id}')">
-            <i class="bi bi-pencil"></i>
-          </button>
-          <button class="btn-table-action btn-delete" title="Delete Patient" onclick="deletePatientRecord('${pat.id}')">
-            <i class="bi bi-trash3"></i>
-          </button>
+          ${canEdit ? `<button class="btn-table-action" title="Edit Patient" onclick="openPatientModal(${escapeHtml(JSON.stringify(pat.id))})"><i class="bi bi-pencil"></i></button>` : ""}
+          ${canDelete ? `<button class="btn-table-action btn-delete" title="Delete Patient" onclick="deletePatientRecord(${escapeHtml(JSON.stringify(pat.id))})"><i class="bi bi-trash3"></i></button>` : ""}
         </div>
       </td>
     `;
@@ -1032,8 +1457,13 @@ function openPatientModal(patientId = null) {
   const doctors = DB.get("doctors", []);
   const docSelect = document.getElementById("patDoctorInput");
   if (docSelect) {
+    const doctorRole = authState.user?.role === "DOCTOR";
+    const availableDoctors = doctorRole
+      ? doctors.filter(d => d.name === authState.user.doctorName)
+      : doctors;
     docSelect.innerHTML = `<option value="">Select Primary Physician</option>` +
-      doctors.map(d => `<option value="${d.name}">${d.name} (${d.department})</option>`).join("");
+      availableDoctors.map(d => `<option value="${escapeHtml(d.name)}">${escapeHtml(d.name)} (${escapeHtml(d.department)})</option>`).join("");
+    docSelect.disabled = doctorRole;
   }
 
   if (patientId) {
@@ -1063,7 +1493,7 @@ function openPatientModal(patientId = null) {
   modal.show();
 }
 
-function savePatientForm(e) {
+async function savePatientForm(e) {
   e.preventDefault();
   const form = document.getElementById("patientForm");
   if (!form.checkValidity()) {
@@ -1083,51 +1513,28 @@ function savePatientForm(e) {
   const status = document.getElementById("patStatusInput").value;
   const address = document.getElementById("patAddressInput").value.trim();
 
-  let patients = DB.get("patients", []);
-
-  if (id) {
-    // Update existing
-    patients = patients.map(p => {
-      if (p.id === id) {
-        return { ...p, name, age, gender, bloodGroup, phone, email, condition, doctor, status, address };
-      }
-      return p;
-    });
-    showToast(`Patient record for ${name} updated successfully.`);
-    logActivity("bi-pencil-square", "badge-blue", "Patient Updated", `${name}'s medical chart was updated.`);
-  } else {
-    // Create new
-    const newId = `PAT-${String(patients.length + 1).padStart(3, "0")}`;
-    const newPatient = {
-      id: newId,
-      name,
-      age,
-      gender,
-      bloodGroup,
-      phone,
-      email,
-      condition,
-      doctor,
-      status,
-      address,
-      admissionDate: new Date().toISOString().split("T")[0]
-    };
-    patients.unshift(newPatient);
-    showToast(`New patient ${name} registered with ID ${newId}.`);
-    logActivity("bi-person-plus", "badge-mint", "New Patient Registered", `${name} was admitted to records.`);
+  const patient = { name, age, gender, bloodGroup, phone, email, condition, doctor, status, address };
+  try {
+    const saved = id
+      ? await apiRequest(`/api/patients/${encodeURIComponent(id)}`, { method: "PUT", body: patient })
+      : await apiRequest("/api/patients", { method: "POST", body: patient });
+    const modal = bootstrap.Modal.getInstance(document.getElementById("patientModal"));
+    if (modal) modal.hide();
+    showToast(id
+      ? `Patient record for ${saved.name} updated.`
+      : `Patient ${saved.name} registered as ${saved.id}.`);
+    try {
+      await loadStaffData();
+      refreshAllViews();
+    } catch (refreshError) {
+      showToast(`Patient record saved, but the latest data could not be loaded: ${refreshError.message}`, "warning");
+    }
+  } catch (error) {
+    showToast(`Unable to save patient record: ${error.message}`, "error");
   }
-
-  DB.set("patients", patients);
-
-  const modalEl = document.getElementById("patientModal");
-  const modal = bootstrap.Modal.getInstance(modalEl);
-  if (modal) modal.hide();
-
-  renderPatientsTable();
-  updateDashboardStats();
 }
 
-function viewPatientDetails(patientId) {
+async function viewPatientDetails(patientId) {
   const patients = DB.get("patients", []);
   const pat = patients.find(p => p.id === patientId);
   if (!pat) return;
@@ -1136,71 +1543,345 @@ function viewPatientDetails(patientId) {
   if (!content) return;
 
   const statusClass = getStatusClass(pat.status);
+  const initials = pat.name.split(" ").map(n => n[0]).join("");
   content.innerHTML = `
     <div class="text-center pb-3 border-bottom">
       <div class="patient-avatar-box mx-auto mb-2" style="width: 64px; height: 64px; font-size: 1.5rem; background: var(--pastel-blue); color: var(--brand-primary);">
-        ${pat.name.split(" ").map(n => n[0]).join("")}
+        ${escapeHtml(initials)}
       </div>
-      <h4 class="fw-bold mb-1">${pat.name}</h4>
-      <div class="text-muted small">Record ID: ${pat.id}</div>
-      <span class="status-badge ${statusClass} mt-2">${pat.status}</span>
+      <h4 class="fw-bold mb-1">${escapeHtml(pat.name)}</h4>
+      <div class="text-muted small">Record ID: ${escapeHtml(pat.id)}</div>
+      <span class="status-badge ${statusClass} mt-2">${escapeHtml(pat.status)}</span>
     </div>
     <div class="row g-3 mt-2">
       <div class="col-6">
         <label class="small text-muted">Age / Gender</label>
-        <div class="fw-semibold">${pat.age} Years (${pat.gender})</div>
+        <div class="fw-semibold">${Number(pat.age)} Years (${escapeHtml(pat.gender)})</div>
       </div>
       <div class="col-6">
         <label class="small text-muted">Blood Group</label>
-        <div class="fw-semibold text-danger">${pat.bloodGroup || 'Not Recorded'}</div>
+        <div class="fw-semibold text-danger">${escapeHtml(pat.bloodGroup || "Not Recorded")}</div>
       </div>
       <div class="col-6">
         <label class="small text-muted">Contact Phone</label>
-        <div class="fw-semibold">${pat.phone}</div>
+        <div class="fw-semibold">${escapeHtml(pat.phone)}</div>
       </div>
       <div class="col-6">
         <label class="small text-muted">Email Address</label>
-        <div class="fw-semibold text-truncate">${pat.email || 'N/A'}</div>
+        <div class="fw-semibold text-truncate">${escapeHtml(pat.email || "N/A")}</div>
       </div>
       <div class="col-12">
         <label class="small text-muted">Primary Diagnosed Condition</label>
-        <div class="p-2 rounded bg-light border fw-semibold text-primary">${pat.condition || 'General Checkup'}</div>
+        <div class="p-2 rounded bg-light border fw-semibold text-primary">${escapeHtml(pat.condition || "No condition recorded")}</div>
       </div>
       <div class="col-6">
         <label class="small text-muted">Assigned Physician</label>
-        <div class="fw-semibold">${pat.doctor || 'Unassigned'}</div>
+        <div class="fw-semibold">${escapeHtml(pat.doctor || "Unassigned")}</div>
       </div>
       <div class="col-6">
         <label class="small text-muted">Admission Date</label>
-        <div class="fw-semibold">${pat.admissionDate || '2026-11-12'}</div>
+        <div class="fw-semibold">${escapeHtml(pat.admissionDate || "Not recorded")}</div>
       </div>
       <div class="col-12">
         <label class="small text-muted">Residential Address</label>
-        <div class="text-secondary small">${pat.address || 'Address on file'}</div>
+        <div class="text-secondary small">${escapeHtml(pat.address || "Not recorded")}</div>
       </div>
     </div>
+    <div id="patientClinicalPanel" class="mt-4"></div>
   `;
 
   const modalEl = document.getElementById("patientViewModal");
+  if (!modalEl.dataset.clinicalCleanupBound) {
+    modalEl.addEventListener("hidden.bs.modal", () => {
+      activeClinicalPatientId = null;
+      activeClinicalData = null;
+      document.getElementById("patientViewModalContent")?.replaceChildren();
+    });
+    modalEl.dataset.clinicalCleanupBound = "true";
+  }
   const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
   modal.show();
+  await loadPatientClinicalData(patientId);
 }
 
-function deletePatientRecord(patientId) {
-  if (!confirm(`Are you sure you want to permanently delete patient ${patientId}?`)) return;
-
-  let patients = DB.get("patients", []);
-  const target = patients.find(p => p.id === patientId);
-  patients = patients.filter(p => p.id !== patientId);
-  DB.set("patients", patients);
-
-  showToast(`Patient record ${patientId} deleted.`, "danger");
-  if (target) {
-    logActivity("bi-trash", "badge-pink", "Patient Deleted", `Record for ${target.name} was removed.`);
+async function loadPatientClinicalData(patientId) {
+  const panel = document.getElementById("patientClinicalPanel");
+  if (!panel) return;
+  activeClinicalPatientId = patientId;
+  activeClinicalData = null;
+  const role = authState.user?.role;
+  if (!["ADMIN", "DOCTOR", "NURSE"].includes(role)) {
+    panel.innerHTML = `<div class="alert alert-secondary mb-0">Clinical records are not available for your role.</div>`;
+    return;
   }
 
-  renderPatientsTable();
-  updateDashboardStats();
+  panel.innerHTML = `<div class="text-center text-muted py-3"><span class="spinner-border spinner-border-sm me-2"></span>Loading assigned clinical data...</div>`;
+  const base = `/api/patients/${encodeURIComponent(patientId)}`;
+  try {
+    const [clinicalRecords, prescriptions, vitals, nursingNotes, careTasks] = await Promise.all([
+      apiRequest(`${base}/clinical-records`),
+      apiRequest(`${base}/prescriptions`),
+      apiRequest(`${base}/vitals`),
+      apiRequest(`${base}/nursing-notes`),
+      apiRequest(`${base}/nursing-tasks`)
+    ]);
+    if (activeClinicalPatientId !== patientId) return;
+    activeClinicalData = { clinicalRecords, prescriptions, vitals, nursingNotes, careTasks };
+    panel.innerHTML = renderPatientClinicalData(patientId, activeClinicalData, role);
+  } catch (error) {
+    if (activeClinicalPatientId === patientId) {
+      panel.innerHTML = `<div class="alert alert-danger mb-0">Unable to load clinical data: ${escapeHtml(error.message)}</div>`;
+    }
+  }
+}
+
+function renderPatientClinicalData(patientId, data, role) {
+  const canEditDoctorData = role === "ADMIN" || role === "DOCTOR";
+  const canEditVitals = canEditDoctorData || role === "NURSE";
+  const canEditNursingNotes = role === "ADMIN" || role === "NURSE";
+  const canUpdateTasks = role === "ADMIN" || role === "DOCTOR" || role === "NURSE";
+  const sections = [];
+
+  sections.push(renderPatientClinicalSection(
+    "clinicalRecords",
+    "Doctor Clinical Records",
+    data.clinicalRecords,
+    [
+      { name: "diagnosis", label: "Diagnosis", type: "text", required: true, maxLength: 500 },
+      { name: "clinicalNote", label: "Clinical note", type: "textarea", required: true, maxLength: 5000 },
+      { name: "allergies", label: "Allergies", type: "text", maxLength: 2000 }
+    ],
+    canEditDoctorData,
+    record => `
+      <div class="fw-semibold">${escapeHtml(record.diagnosis)}</div>
+      <div class="small text-secondary mt-1">${escapeHtml(record.clinicalNote)}</div>
+      <div class="small mt-1"><strong>Allergies:</strong> ${escapeHtml(record.allergies || "Not recorded")}</div>
+      <div class="small text-muted mt-1">${escapeHtml(record.author)} · ${formatClinicalDateTime(record.recordedAt)}</div>`
+  ));
+
+  sections.push(renderPatientClinicalSection(
+    "prescriptions",
+    "Prescriptions",
+    data.prescriptions,
+    [
+      { name: "medication", label: "Medication", type: "text", required: true, maxLength: 120 },
+      { name: "strength", label: "Strength", type: "text", required: true, maxLength: 80 },
+      { name: "dose", label: "Dose", type: "text", required: true, maxLength: 120 },
+      { name: "route", label: "Route", type: "text", required: true, maxLength: 80 },
+      { name: "frequency", label: "Frequency", type: "text", required: true, maxLength: 120 },
+      { name: "duration", label: "Duration", type: "text", required: true, maxLength: 120 },
+      { name: "refills", label: "Refills", type: "number", min: 0, max: 99, required: true },
+      { name: "status", label: "Status", type: "text", required: true, maxLength: 32 }
+    ],
+    canEditDoctorData,
+    prescription => `
+      <div class="fw-semibold">${escapeHtml(prescription.medication)} ${escapeHtml(prescription.strength)}</div>
+      <div class="small text-secondary">${escapeHtml(prescription.dose)} · ${escapeHtml(prescription.route)} · ${escapeHtml(prescription.frequency)} · ${escapeHtml(prescription.duration)}</div>
+      <div class="small text-muted mt-1">Refills: ${Number(prescription.refills)} · ${escapeHtml(prescription.status)} · ${escapeHtml(prescription.author)}</div>`
+  ));
+
+  sections.push(renderPatientClinicalSection(
+    "vitals",
+    "Vital Signs",
+    data.vitals,
+    [
+      {
+        name: "type",
+        label: "Measurement",
+        type: "select",
+        required: true,
+        options: [
+          ["TEMPERATURE_C", "Temperature (°C)"],
+          ["HEART_RATE_BPM", "Heart rate (bpm)"],
+          ["RESPIRATORY_RATE_PER_MIN", "Respiratory rate (breaths/min)"],
+          ["SYSTOLIC_BP_MMHG", "Systolic blood pressure (mmHg)"],
+          ["DIASTOLIC_BP_MMHG", "Diastolic blood pressure (mmHg)"],
+          ["OXYGEN_SATURATION_PERCENT", "Oxygen saturation (%)"],
+          ["WEIGHT_KG", "Weight (kg)"],
+          ["HEIGHT_CM", "Height (cm)"]
+        ]
+      },
+      { name: "value", label: "Value", type: "number", min: 0.001, step: 0.001, required: true }
+    ],
+    canEditVitals,
+    vital => `
+      <div class="fw-semibold">${escapeHtml(vital.type.replaceAll("_", " "))}: ${escapeHtml(vital.value)} ${escapeHtml(vital.unit)}</div>
+      <div class="small text-muted">${escapeHtml(vital.author)} · ${formatClinicalDateTime(vital.recordedAt)}</div>`
+  ));
+
+  sections.push(renderPatientClinicalSection(
+    "nursingNotes",
+    "Nursing Notes",
+    data.nursingNotes,
+    [{ name: "content", label: "Nursing note", type: "textarea", required: true, maxLength: 10000 }],
+    canEditNursingNotes,
+    note => `
+      <div class="small text-secondary">${escapeHtml(note.content)}</div>
+      <div class="small text-muted mt-1">${escapeHtml(note.author)} · ${formatClinicalDateTime(note.createdAt)}</div>`
+  ));
+
+  sections.push(renderPatientCareTasks(patientId, data.careTasks, role, canUpdateTasks));
+  return sections.join("");
+}
+
+function renderPatientClinicalSection(kind, title, items, fields, canEdit, renderItem) {
+  const form = canEdit ? `
+    <form id="${kind}Form" class="bg-light border rounded-3 p-3 mb-3" onsubmit="savePatientClinicalData(event, '${kind}')" novalidate>
+      <input type="hidden" name="id">
+      <div class="row g-2">
+        ${fields.map(renderPatientClinicalField).join("")}
+      </div>
+      <div class="d-flex justify-content-end gap-2 mt-3">
+        <button type="button" class="btn btn-sm btn-medicare-outline" onclick="resetPatientClinicalForm('${kind}')">Clear</button>
+        <button type="submit" class="btn btn-sm btn-medicare-primary">Save</button>
+      </div>
+    </form>` : "";
+  const list = items.length ? items.map(item => `
+    <div class="border rounded-3 p-3 mb-2">
+      ${renderItem(item)}
+      ${canEdit ? `<button type="button" class="btn btn-sm btn-medicare-outline mt-2" onclick="editPatientClinicalItem('${kind}', ${escapeHtml(JSON.stringify(item.id))})">Edit</button>` : ""}
+    </div>`).join("") : `<div class="small text-muted py-2">No records yet.</div>`;
+
+  return `
+    <section class="border-top pt-3 mt-3">
+      <h6 class="fw-bold mb-3">${title}</h6>
+      ${form}
+      <div>${list}</div>
+    </section>`;
+}
+
+function renderPatientClinicalField(field) {
+  const required = field.required ? "required" : "";
+  const min = field.min !== undefined ? `min="${field.min}"` : "";
+  const max = field.max !== undefined ? `max="${field.max}"` : "";
+  const step = field.step ? `step="${field.step}"` : "";
+  const maxLength = field.maxLength || 240;
+  let input;
+  if (field.type === "textarea") {
+    input = `<textarea class="form-control form-control-sm" name="${field.name}" rows="2" ${required} maxlength="${maxLength}"></textarea>`;
+  } else if (field.type === "select") {
+    input = `<select class="form-select form-select-sm" name="${field.name}" ${required}>${field.options.map(([value, label]) => `<option value="${value}">${label}</option>`).join("")}</select>`;
+  } else {
+    input = `<input class="form-control form-control-sm" name="${field.name}" type="${field.type}" ${min} ${max} ${step} ${required} ${field.type === "text" ? `maxlength="${maxLength}"` : ""}>`;
+  }
+  return `<div class="col-md-6"><label class="form-label small fw-semibold">${field.label}</label>${input}</div>`;
+}
+
+function renderPatientCareTasks(patientId, tasks, role, canUpdate) {
+  const canCreate = role === "ADMIN" || role === "DOCTOR";
+  const form = canCreate ? `
+    <form id="nursingTasksForm" class="bg-light border rounded-3 p-3 mb-3" onsubmit="savePatientClinicalData(event, 'nursingTasks')" novalidate>
+      <input type="hidden" name="id">
+      <label class="form-label small fw-semibold">New care task</label>
+      <input class="form-control form-control-sm" name="description" maxlength="500" required>
+      <div class="d-flex justify-content-end mt-2"><button type="submit" class="btn btn-sm btn-medicare-primary">Add task</button></div>
+    </form>` : "";
+  const list = tasks.length ? tasks.map(task => `
+    <div class="border rounded-3 p-3 mb-2">
+      <div class="fw-semibold">${escapeHtml(task.description)}</div>
+      <div class="small text-muted mb-2">Added by ${escapeHtml(task.createdBy)} · ${formatClinicalDateTime(task.createdAt)}</div>
+      ${canUpdate
+        ? `<select class="form-select form-select-sm" aria-label="Care task status" onchange="saveCareTaskStatus(event, ${escapeHtml(JSON.stringify(patientId))}, ${escapeHtml(JSON.stringify(task.id))})">
+             ${[["PENDING", "Pending"], ["IN_PROGRESS", "In Progress"], ["COMPLETED", "Completed"]]
+               .map(([value, label]) => `<option value="${value}" ${task.status === value ? "selected" : ""}>${label}</option>`).join("")}
+           </select>`
+        : `<span class="badge text-bg-secondary">${escapeHtml(task.status.replaceAll("_", " "))}</span>`}
+    </div>`).join("") : `<div class="small text-muted py-2">No care tasks yet.</div>`;
+  return `
+    <section class="border-top pt-3 mt-3">
+      <h6 class="fw-bold mb-3">Nursing Care Tasks</h6>
+      ${form}
+      <div>${list}</div>
+    </section>`;
+}
+
+function formatClinicalDateTime(value) {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? "Time not recorded" : date.toLocaleString();
+}
+
+function editPatientClinicalItem(kind, id) {
+  const item = activeClinicalData?.[kind]?.find(entry => entry.id === id);
+  const form = document.getElementById(`${kind}Form`);
+  if (!item || !form) return;
+  form.elements.namedItem("id").value = item.id;
+  Object.keys(item).forEach(key => {
+    const field = form.elements.namedItem(key);
+    if (field && item[key] !== null && item[key] !== undefined) field.value = item[key];
+  });
+  form.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+function resetPatientClinicalForm(kind) {
+  const form = document.getElementById(`${kind}Form`);
+  if (form) form.reset();
+}
+
+async function savePatientClinicalData(event, kind) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  for (const element of form.elements) {
+    if (element.name && element.type !== "hidden" && typeof element.value === "string") {
+      element.value = element.value.trim();
+    }
+  }
+  if (!form.checkValidity()) {
+    form.classList.add("was-validated");
+    return;
+  }
+
+  const config = {
+    clinicalRecords: { path: "clinical-records", fields: ["diagnosis", "clinicalNote", "allergies"] },
+    prescriptions: { path: "prescriptions", fields: ["medication", "strength", "dose", "route", "frequency", "duration", "refills", "status"] },
+    vitals: { path: "vitals", fields: ["type", "value"] },
+    nursingNotes: { path: "nursing-notes", fields: ["content"] },
+    nursingTasks: { path: "nursing-tasks", fields: ["description"] }
+  }[kind];
+  if (!config || !activeClinicalPatientId) return;
+
+  const recordId = form.elements.namedItem("id").value;
+  const body = {};
+  config.fields.forEach(field => {
+    const input = form.elements.namedItem(field);
+    body[field] = input.type === "number" ? Number(input.value) : input.value;
+  });
+  const path = `/api/patients/${encodeURIComponent(activeClinicalPatientId)}/${config.path}`;
+  try {
+    await apiRequest(recordId ? `${path}/${encodeURIComponent(recordId)}` : path, {
+      method: recordId ? "PUT" : "POST",
+      body
+    });
+    showToast("Clinical information saved.");
+    await loadPatientClinicalData(activeClinicalPatientId);
+  } catch (error) {
+    showToast(`Unable to save clinical information: ${error.message}`, "error");
+  }
+}
+
+async function saveCareTaskStatus(event, patientId, taskId) {
+  try {
+    await apiRequest(`/api/patients/${encodeURIComponent(patientId)}/nursing-tasks/${encodeURIComponent(taskId)}/status`, {
+      method: "PATCH",
+      body: { status: event.currentTarget.value }
+    });
+    showToast("Care task status updated.");
+    await loadPatientClinicalData(patientId);
+  } catch (error) {
+    showToast(`Unable to update care task: ${error.message}`, "error");
+    await loadPatientClinicalData(patientId);
+  }
+}
+
+async function deletePatientRecord(patientId) {
+  if (!confirm(`Are you sure you want to permanently delete patient ${patientId}?`)) return;
+  try {
+    await apiRequest(`/api/patients/${encodeURIComponent(patientId)}`, { method: "DELETE" });
+    showToast(`Patient record ${patientId} deleted.`, "warning");
+    await loadStaffData();
+    refreshAllViews();
+  } catch (error) {
+    showToast(`Unable to delete patient record: ${error.message}`, "error");
+  }
 }
 
 // ==========================================================================
@@ -1244,49 +1925,56 @@ function renderDoctorsGrid() {
   filtered.forEach(doc => {
     const isAvail = doc.status === "Available";
     const statusBg = isAvail ? "background: #DFF3EA; color: #0E9F6E;" : "background: #FFF4E5; color: #D97706;";
+    const canManage = authState.user?.role === "ADMIN";
 
     const col = document.createElement("div");
     col.className = "col-lg-4 col-md-6";
     col.innerHTML = `
       <div class="doctor-card">
         <div class="doctor-img-wrap">
-          <img src="${doc.image}" alt="${doc.name}" loading="lazy">
-          <span class="doctor-dept-pill">${doc.department}</span>
+          <img src="${escapeHtml(safeHttpUrl(doc.image) || DOCTOR_PLACEHOLDER_IMAGE)}" alt="${escapeHtml(doc.name)}" loading="lazy">
+          <span class="doctor-dept-pill">${escapeHtml(doc.department)}</span>
           <span class="doctor-availability-pill" style="${statusBg}">
-            <i class="bi bi-circle-fill me-1" style="font-size: 0.5rem;"></i>${doc.status}
+            <i class="bi bi-circle-fill me-1" style="font-size: 0.5rem;"></i>${escapeHtml(doc.status)}
           </span>
         </div>
         <div class="doctor-body">
           <div>
             <div class="d-flex justify-content-between align-items-start mb-1">
-              <h5 class="doctor-name mb-0">${doc.name}</h5>
+              <h5 class="doctor-name mb-0">${escapeHtml(doc.name)}</h5>
               <div class="doctor-rating">
-                <i class="bi bi-star-fill"></i> ${doc.rating}
+                <i class="bi bi-star-fill"></i> ${Number(doc.rating || 0)}
               </div>
             </div>
-            <div class="doctor-sub">${doc.degree}</div>
+            <div class="doctor-sub">${escapeHtml(doc.degree)}</div>
             <p class="small text-secondary mb-3" style="line-height: 1.5; height: 42px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
-              ${doc.about || 'Dedicated clinical practitioner focused on high-standard patient care.'}
+              ${escapeHtml(doc.about || "Professional biography not provided.")}
             </p>
             <div class="d-flex justify-content-between align-items-center py-2 px-3 rounded bg-light border mb-3 small">
-              <span class="text-muted"><i class="bi bi-briefcase me-1"></i> ${doc.experience}</span>
-              <span class="fw-bold text-primary"><i class="bi bi-cash me-1"></i> $${doc.fee}/Visit</span>
+              <span class="text-muted"><i class="bi bi-briefcase me-1"></i> ${escapeHtml(doc.experience)}</span>
+              <span class="fw-bold text-primary"><i class="bi bi-cash me-1"></i> $${Number(doc.fee || 0)}/Visit</span>
             </div>
           </div>
           <div class="d-flex gap-2">
-            <button class="btn btn-sm btn-outline-secondary flex-grow-1" onclick="openDoctorModal('${doc.id}')">
+            ${canManage ? `<button class="btn btn-sm btn-outline-secondary flex-grow-1" onclick="openDoctorModal(${escapeHtml(JSON.stringify(doc.id))})">
               <i class="bi bi-pencil me-1"></i> Edit
-            </button>
-            <button class="btn btn-sm btn-medicare-primary flex-grow-1" onclick="openBookAppointmentForDoctor('${doc.name}', '${doc.department}')">
+            </button>` : ""}
+            <button class="btn btn-sm btn-medicare-primary flex-grow-1" onclick="openBookAppointmentForDoctor(${escapeHtml(JSON.stringify(doc.name))}, ${escapeHtml(JSON.stringify(doc.department))})">
               <i class="bi bi-calendar-plus me-1"></i> Book
             </button>
-            <button class="btn btn-sm btn-outline-danger" title="Remove Doctor" onclick="deleteDoctorRecord('${doc.id}')">
+            ${canManage ? `<button class="btn btn-sm btn-outline-danger" title="Remove Doctor" onclick="deleteDoctorRecord(${escapeHtml(JSON.stringify(doc.id))})">
               <i class="bi bi-trash"></i>
-            </button>
+            </button>` : ""}
           </div>
         </div>
       </div>
     `;
+    col.querySelector("img").addEventListener("error", event => {
+      const image = event.currentTarget;
+      if (image.getAttribute("src") !== DOCTOR_PLACEHOLDER_IMAGE) {
+        image.src = DOCTOR_PLACEHOLDER_IMAGE;
+      }
+    }, { once: true });
     container.appendChild(col);
   });
 }
@@ -1327,7 +2015,7 @@ function openDoctorModal(doctorId = null) {
   modal.show();
 }
 
-function saveDoctorForm(e) {
+async function saveDoctorForm(e) {
   e.preventDefault();
   const form = document.getElementById("doctorForm");
   if (!form.checkValidity()) {
@@ -1347,64 +2035,41 @@ function saveDoctorForm(e) {
   const image = document.getElementById("docImageInput").value.trim() || "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=600&q=80";
   const about = document.getElementById("docAboutInput").value.trim();
 
-  let doctors = DB.get("doctors", []);
-
-  if (id) {
-    doctors = doctors.map(d => {
-      if (d.id === id) {
-        return { ...d, name, department, degree, experience, fee, phone, email, status, image, about };
-      }
-      return d;
-    });
-    showToast(`Doctor profile for ${name} updated.`);
-  } else {
-    const newId = `DOC-${100 + doctors.length + 1}`;
-    doctors.unshift({
-      id: newId,
-      name,
-      department,
-      degree,
-      experience,
-      fee,
-      phone,
-      email,
-      status,
-      image,
-      about,
-      rating: 5.0,
-      reviews: 1
-    });
-    showToast(`Specialist ${name} successfully onboarded.`);
-    logActivity("bi-person-badge", "badge-lavender", "Doctor Onboarded", `${name} joined ${department}.`);
+  const doctor = {
+    name, department, degree, experience, fee, phone, email, status, image, about,
+    rating: id ? DB.get("doctors", []).find(item => item.id === id)?.rating || 0 : 0,
+    reviews: id ? DB.get("doctors", []).find(item => item.id === id)?.reviews || 0 : 0
+  };
+  try {
+    const saved = id
+      ? await apiRequest(`/api/doctors/${encodeURIComponent(id)}`, { method: "PUT", body: doctor })
+      : await apiRequest("/api/doctors", { method: "POST", body: doctor });
+    const modal = bootstrap.Modal.getInstance(document.getElementById("doctorModal"));
+    if (modal) modal.hide();
+    showToast(id
+      ? `Doctor profile for ${saved.name} updated.`
+      : `Specialist ${saved.name} added to the directory.`);
+    try {
+      await loadStaffData();
+      refreshAllViews();
+    } catch (refreshError) {
+      showToast(`Doctor profile saved, but the latest data could not be loaded: ${refreshError.message}`, "warning");
+    }
+  } catch (error) {
+    showToast(`Unable to save doctor profile: ${error.message}`, "error");
   }
-
-  DB.set("doctors", doctors);
-
-  const modalEl = document.getElementById("doctorModal");
-  const modal = bootstrap.Modal.getInstance(modalEl);
-  if (modal) modal.hide();
-
-  renderDoctorsGrid();
-  renderPublicFeaturedDoctors();
-  updateDashboardStats();
 }
 
-function deleteDoctorRecord(doctorId) {
+async function deleteDoctorRecord(doctorId) {
   if (!confirm(`Are you sure you want to remove doctor record ${doctorId}?`)) return;
-
-  let doctors = DB.get("doctors", []);
-  const doc = doctors.find(d => d.id === doctorId);
-  doctors = doctors.filter(d => d.id !== doctorId);
-  DB.set("doctors", doctors);
-
-  showToast(`Specialist record removed.`, "danger");
-  if (doc) {
-    logActivity("bi-person-x", "badge-pink", "Specialist Removed", `${doc.name} was removed from medical directory.`);
+  try {
+    await apiRequest(`/api/doctors/${encodeURIComponent(doctorId)}`, { method: "DELETE" });
+    showToast("Specialist profile removed.", "warning");
+    await loadStaffData();
+    refreshAllViews();
+  } catch (error) {
+    showToast(`Unable to remove the doctor profile: ${error.message}`, "error");
   }
-
-  renderDoctorsGrid();
-  renderPublicFeaturedDoctors();
-  updateDashboardStats();
 }
 
 // ==========================================================================
@@ -1450,41 +2115,44 @@ function renderAppointmentsTable() {
 
   filtered.forEach(apt => {
     const statusClass = getStatusClass(apt.status);
+    const canManage = ["ADMIN", "RECEPTIONIST"].includes(authState.user?.role);
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td><span class="fw-bold">${apt.id}</span></td>
+      <td><span class="fw-bold">${escapeHtml(apt.id)}</span></td>
       <td>
-        <div class="fw-bold">${apt.patientName}</div>
-        <div class="small text-muted">${apt.patientPhone || 'No phone'}</div>
+        <div class="fw-bold">${escapeHtml(apt.patientName)}</div>
+        <div class="small text-muted">${escapeHtml(apt.patientPhone || "No phone")}</div>
       </td>
       <td>
-        <div class="fw-semibold">${apt.doctorName}</div>
-        <span class="badge-pill-pastel badge-blue" style="font-size: 0.72rem; padding: 2px 8px;">${apt.department}</span>
+        <div class="fw-semibold">${escapeHtml(apt.doctorName)}</div>
+        <span class="badge-pill-pastel badge-blue" style="font-size: 0.72rem; padding: 2px 8px;">${escapeHtml(apt.department)}</span>
       </td>
       <td>
-        <div><i class="bi bi-calendar3 me-1 text-muted"></i> ${apt.date}</div>
-        <div class="small text-muted"><i class="bi bi-clock me-1"></i> ${apt.time}</div>
+        <div><i class="bi bi-calendar3 me-1 text-muted"></i> ${escapeHtml(apt.date)}</div>
+        <div class="small text-muted"><i class="bi bi-clock me-1"></i> ${escapeHtml(apt.time)}</div>
       </td>
       <td>
-        <div class="text-truncate" style="max-width: 180px;">${apt.reason || 'General Health Consultation'}</div>
-        <span class="badge bg-light text-secondary border" style="font-size: 0.7rem;">${apt.type || 'In-Person'}</span>
+        <div class="text-truncate" style="max-width: 180px;">${escapeHtml(apt.reason || "No reason provided")}</div>
+        <span class="badge bg-light text-secondary border" style="font-size: 0.7rem;">${escapeHtml(apt.type || "In-Person")}</span>
       </td>
       <td>
-        <span class="status-badge ${statusClass}">${apt.status}</span>
+        <span class="status-badge ${statusClass}">${escapeHtml(apt.status)}</span>
       </td>
       <td>
+        ${canManage ? `
         <div class="dropdown">
           <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
             Action
           </button>
           <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-            <li><a class="dropdown-item" href="javascript:void(0)" onclick="quickUpdateAppointmentStatus('${apt.id}', 'Confirmed')"><i class="bi bi-check2-circle text-success me-2"></i> Confirm</a></li>
-            <li><a class="dropdown-item" href="javascript:void(0)" onclick="quickUpdateAppointmentStatus('${apt.id}', 'Completed')"><i class="bi bi-clipboard2-check text-primary me-2"></i> Mark Completed</a></li>
-            <li><a class="dropdown-item" href="javascript:void(0)" onclick="quickUpdateAppointmentStatus('${apt.id}', 'Cancelled')"><i class="bi bi-x-circle text-danger me-2"></i> Cancel</a></li>
+            <li><a class="dropdown-item" href="javascript:void(0)" onclick="quickUpdateAppointmentStatus(${escapeHtml(JSON.stringify(apt.id))}, 'Confirmed')"><i class="bi bi-check2-circle text-success me-2"></i> Confirm</a></li>
+            <li><a class="dropdown-item" href="javascript:void(0)" onclick="quickUpdateAppointmentStatus(${escapeHtml(JSON.stringify(apt.id))}, 'Completed')"><i class="bi bi-clipboard2-check text-primary me-2"></i> Mark Completed</a></li>
+            <li><a class="dropdown-item" href="javascript:void(0)" onclick="quickUpdateAppointmentStatus(${escapeHtml(JSON.stringify(apt.id))}, 'Cancelled')"><i class="bi bi-x-circle text-danger me-2"></i> Cancel</a></li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="javascript:void(0)" onclick="openAppointmentModal('${apt.id}')"><i class="bi bi-pencil me-2"></i> Edit Details</a></li>
+            <li><a class="dropdown-item" href="javascript:void(0)" onclick="openAppointmentModal(${escapeHtml(JSON.stringify(apt.id))})"><i class="bi bi-pencil me-2"></i> Edit Details</a></li>
           </ul>
         </div>
+        ` : `<span class="text-muted">Read only</span>`}
       </td>
     `;
     tbody.appendChild(tr);
@@ -1504,7 +2172,7 @@ function openAppointmentModal(appointmentId = null) {
   const docSelect = document.getElementById("aptDoctorInput");
   if (docSelect) {
     docSelect.innerHTML = `<option value="">Select Doctor</option>` +
-      doctors.map(d => `<option value="${d.name}" data-dept="${d.department}">${d.name} (${d.department})</option>`).join("");
+      doctors.map(d => `<option value="${escapeHtml(d.name)}" data-dept="${escapeHtml(d.department)}">${escapeHtml(d.name)} (${escapeHtml(d.department)})</option>`).join("");
   }
 
   // Populate patient suggestions
@@ -1512,8 +2180,13 @@ function openAppointmentModal(appointmentId = null) {
   const patientSelect = document.getElementById("aptPatientSelect");
   if (patientSelect) {
     patientSelect.innerHTML = `<option value="">-- Or Select Existing Registered Patient --</option>` +
-      patients.map(p => `<option value="${p.name}" data-phone="${p.phone}">${p.name} (${p.id})</option>`).join("");
+      patients.map(p => `<option value="${escapeHtml(p.id)}" data-name="${escapeHtml(p.name)}" data-phone="${escapeHtml(p.phone)}">${escapeHtml(p.name)} (${escapeHtml(p.id)})</option>`).join("");
   }
+  const canManage = ["ADMIN", "RECEPTIONIST"].includes(authState.user?.role);
+  const patientPicker = document.getElementById("aptPatientPickerGroup");
+  const statusGroup = document.getElementById("aptStatusGroup");
+  if (patientPicker) patientPicker.classList.toggle("d-none", !canManage);
+  if (statusGroup) statusGroup.classList.toggle("d-none", !canManage);
 
   if (appointmentId) {
     const appointments = DB.get("appointments", []);
@@ -1523,6 +2196,7 @@ function openAppointmentModal(appointmentId = null) {
       idInput.value = apt.id;
       document.getElementById("aptPatientNameInput").value = apt.patientName;
       document.getElementById("aptPatientPhoneInput").value = apt.patientPhone || "";
+      if (patientSelect) patientSelect.value = apt.patientId || "";
       document.getElementById("aptDoctorInput").value = apt.doctorName;
       document.getElementById("aptDeptInput").value = apt.department;
       document.getElementById("aptDateInput").value = apt.date;
@@ -1536,6 +2210,7 @@ function openAppointmentModal(appointmentId = null) {
     idInput.value = "";
     document.getElementById("aptDateInput").value = new Date().toISOString().split("T")[0];
     document.getElementById("aptTimeInput").value = "10:00 AM";
+    document.getElementById("aptStatusInput").value = canManage ? "Confirmed" : "Pending";
   }
 
   const modalEl = document.getElementById("appointmentModal");
@@ -1556,7 +2231,7 @@ function openBookAppointmentForDoctor(doctorName, department) {
 function onAptPatientSelected(selectEl) {
   const selected = selectEl.options[selectEl.selectedIndex];
   if (selected.value) {
-    document.getElementById("aptPatientNameInput").value = selected.value;
+    document.getElementById("aptPatientNameInput").value = selected.dataset.name || "";
     document.getElementById("aptPatientPhoneInput").value = selected.dataset.phone || "";
   }
 }
@@ -1569,7 +2244,7 @@ function onAptDoctorSelected(selectEl) {
   }
 }
 
-function saveAppointmentForm(e) {
+async function saveAppointmentForm(e) {
   e.preventDefault();
   const form = document.getElementById("appointmentForm");
   if (!form.checkValidity()) {
@@ -1587,60 +2262,53 @@ function saveAppointmentForm(e) {
   const type = document.getElementById("aptTypeInput").value;
   const status = document.getElementById("aptStatusInput").value;
   const reason = document.getElementById("aptReasonInput").value.trim();
+  const patientId = document.getElementById("aptPatientSelect")?.value || "";
 
-  let appointments = DB.get("appointments", []);
+  const canManage = ["ADMIN", "RECEPTIONIST"].includes(authState.user?.role);
+  const appointment = {
+    patientId: patientId || null,
+    patientName, patientPhone, doctorName, department, date, time, type,
+    status: canManage ? status : "Pending",
+    reason
+  };
+  try {
+    const saved = id
+      ? await apiRequest(`/api/appointments/${encodeURIComponent(id)}`, { method: "PUT", body: appointment })
+      : await apiRequest("/api/appointments", { method: "POST", body: appointment });
+    const modal = bootstrap.Modal.getInstance(document.getElementById("appointmentModal"));
+    if (modal) modal.hide();
 
-  if (id) {
-    appointments = appointments.map(a => {
-      if (a.id === id) {
-        return { ...a, patientName, patientPhone, doctorName, department, date, time, type, status, reason };
-      }
-      return a;
-    });
-    showToast(`Appointment ${id} details updated.`);
-  } else {
-    const newId = `APT-2026-${String(appointments.length + 1).padStart(2, "0")}`;
-    appointments.unshift({
-      id: newId,
-      patientName,
-      patientPhone,
-      doctorName,
-      department,
-      date,
-      time,
-      type,
-      status,
-      reason
-    });
-    showToast(`Appointment confirmed for ${patientName} on ${date} at ${time}.`);
-    logActivity("bi-calendar2-plus", "badge-blue", "Appointment Booked", `${patientName} with ${doctorName}.`);
+    if (!authState.token) {
+      showToast(`Appointment request ${saved.id} submitted for ${saved.patientName}. It is pending hospital confirmation.`, "success");
+      return;
+    }
+
+    showToast(id
+      ? `Appointment ${saved.id} updated.`
+      : `Appointment request ${saved.id} created.`);
+    try {
+      await loadStaffData();
+      refreshAllViews();
+    } catch (refreshError) {
+      showToast(`Appointment saved, but the latest data could not be loaded: ${refreshError.message}`, "warning");
+    }
+  } catch (error) {
+    showToast(`Unable to save appointment: ${error.message}`, "error");
   }
-
-  DB.set("appointments", appointments);
-
-  const modalEl = document.getElementById("appointmentModal");
-  const modal = bootstrap.Modal.getInstance(modalEl);
-  if (modal) modal.hide();
-
-  renderAppointmentsTable();
-  renderRecentAppointmentsTable();
-  updateDashboardStats();
 }
 
-function quickUpdateAppointmentStatus(aptId, newStatus) {
-  let appointments = DB.get("appointments", []);
-  const apt = appointments.find(a => a.id === aptId);
-  if (!apt) return;
-
-  apt.status = newStatus;
-  DB.set("appointments", appointments);
-
-  showToast(`Appointment ${aptId} status set to ${newStatus}.`, newStatus === "Cancelled" ? "warning" : "success");
-  logActivity("bi-arrow-repeat", "badge-cream", "Status Changed", `Appointment ${aptId} marked as ${newStatus}.`);
-
-  renderAppointmentsTable();
-  renderRecentAppointmentsTable();
-  updateDashboardStats();
+async function quickUpdateAppointmentStatus(aptId, newStatus) {
+  try {
+    await apiRequest(`/api/appointments/${encodeURIComponent(aptId)}/status`, {
+      method: "PATCH",
+      body: { status: newStatus }
+    });
+    showToast(`Appointment ${aptId} status set to ${newStatus}.`, newStatus === "Cancelled" ? "warning" : "success");
+    await loadStaffData();
+    refreshAllViews();
+  } catch (error) {
+    showToast(`Unable to update appointment status: ${error.message}`, "error");
+  }
 }
 
 // ==========================================================================
@@ -1695,26 +2363,26 @@ function renderBillingTable() {
     const statusClass = getStatusClass(inv.status);
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td><span class="fw-bold">${inv.id}</span></td>
+      <td><span class="fw-bold">${escapeHtml(inv.id)}</span></td>
       <td>
-        <div class="fw-bold">${inv.patientName}</div>
-        <div class="small text-muted">${inv.department}</div>
+        <div class="fw-bold">${escapeHtml(inv.patientName)}</div>
+        <div class="small text-muted">${escapeHtml(inv.department)}</div>
       </td>
-      <td>${inv.date}</td>
+      <td>${escapeHtml(inv.date)}</td>
       <td class="fw-bold text-dark">$${Number(inv.amount).toLocaleString()}.00</td>
       <td>
-        <span class="small text-secondary"><i class="bi bi-credit-card me-1"></i> ${inv.method || 'Standard Pay'}</span>
+        <span class="small text-secondary"><i class="bi bi-credit-card me-1"></i> ${escapeHtml(inv.method || "Direct Payment")}</span>
       </td>
       <td>
-        <span class="status-badge ${statusClass}">${inv.status}</span>
+        <span class="status-badge ${statusClass}">${escapeHtml(inv.status)}</span>
       </td>
       <td>
         <div class="d-flex gap-1">
-          <button class="btn btn-sm btn-medicare-secondary py-1 px-3" onclick="viewInvoiceModal('${inv.id}')">
-            <i class="bi bi-file-earmark-text me-1"></i> View Receipt
+          <button class="btn btn-sm btn-medicare-secondary py-1 px-3" onclick="viewInvoiceModal(${escapeHtml(JSON.stringify(inv.id))})">
+            <i class="bi bi-file-earmark-text me-1"></i> View Invoice
           </button>
           ${inv.status !== 'Paid' ? `
-            <button class="btn btn-sm btn-outline-success py-1 px-2" title="Mark as Paid" onclick="markInvoicePaid('${inv.id}')">
+            <button class="btn btn-sm btn-outline-success py-1 px-2" title="Record the payment status; no payment is processed" onclick="markInvoicePaid(${escapeHtml(JSON.stringify(inv.id))})">
               <i class="bi bi-check-lg"></i>
             </button>
           ` : ''}
@@ -1737,7 +2405,7 @@ function viewInvoiceModal(invoiceId) {
     { desc: "General Medical Examination & Clinical Assessment", cost: inv.amount }
   ]).map(item => `
     <tr>
-      <td class="py-2">${item.desc}</td>
+      <td class="py-2">${escapeHtml(item.desc)}</td>
       <td class="text-end py-2">$${Number(item.cost).toFixed(2)}</td>
     </tr>
   `).join("");
@@ -1759,18 +2427,18 @@ function viewInvoiceModal(invoiceId) {
         </div>
         <div class="text-end">
           <h5 class="fw-bold text-primary mb-1">INVOICE</h5>
-          <div class="fw-bold">${inv.id}</div>
-          <div class="small text-muted">Date: ${inv.date}</div>
-          <span class="status-badge ${statusClass} mt-2">${inv.status}</span>
+          <div class="fw-bold">${escapeHtml(inv.id)}</div>
+          <div class="small text-muted">Date: ${escapeHtml(inv.date)}</div>
+          <span class="status-badge ${statusClass} mt-2">${escapeHtml(inv.status)}</span>
         </div>
       </div>
 
       <div class="row g-3 mb-4">
         <div class="col-6">
           <div class="small text-muted text-uppercase fw-bold">Billed To</div>
-          <div class="fw-bold fs-6">${inv.patientName}</div>
-          <div class="small text-muted">Department: ${inv.department}</div>
-          <div class="small text-muted">Payment: ${inv.method || 'Direct'}</div>
+          <div class="fw-bold fs-6">${escapeHtml(inv.patientName)}</div>
+          <div class="small text-muted">Department: ${escapeHtml(inv.department)}</div>
+          <div class="small text-muted">Payment: ${escapeHtml(inv.method || "Direct")}</div>
         </div>
         <div class="col-6 text-end">
           <div class="small text-muted text-uppercase fw-bold">Hospital Tax ID</div>
@@ -1808,7 +2476,7 @@ function viewInvoiceModal(invoiceId) {
           Thank you for trusting MediCare Healthcare Systems.
         </div>
         <button class="btn btn-sm btn-outline-secondary" onclick="window.print()">
-          <i class="bi bi-printer me-1"></i> Print Receipt
+          <i class="bi bi-printer me-1"></i> Print Invoice
         </button>
       </div>
     </div>
@@ -1819,19 +2487,70 @@ function viewInvoiceModal(invoiceId) {
   modal.show();
 }
 
-function markInvoicePaid(invoiceId) {
-  let invoices = DB.get("invoices", []);
-  const inv = invoices.find(i => i.id === invoiceId);
-  if (!inv) return;
+async function markInvoicePaid(invoiceId) {
+  try {
+    await apiRequest(`/api/billing/${encodeURIComponent(invoiceId)}/pay`, { method: "PATCH" });
+    showToast(`Invoice ${invoiceId} was marked Paid in the record. No payment was processed.`);
+    await loadStaffData();
+    refreshAllViews();
+  } catch (error) {
+    showToast(`Unable to update invoice payment: ${error.message}`, "error");
+  }
+}
 
-  inv.status = "Paid";
-  DB.set("invoices", invoices);
+function openInvoiceModal() {
+  const form = document.getElementById("invoiceCreateForm");
+  if (!form) return;
+  form.reset();
+  const patientSelect = document.getElementById("invoicePatientInput");
+  const departmentSelect = document.getElementById("invoiceDepartmentInput");
+  patientSelect.innerHTML = DB.get("patients", [])
+    .map(patient => `<option value="${escapeHtml(patient.id)}">${escapeHtml(patient.name)} (${escapeHtml(patient.id)})</option>`)
+    .join("");
+  departmentSelect.innerHTML = DB.get("departments", [])
+    .map(department => `<option value="${escapeHtml(department.name)}">${escapeHtml(department.name)}</option>`)
+    .join("");
+  if (patientSelect.options.length === 0 || departmentSelect.options.length === 0) {
+    showToast("A patient and department are required before creating an invoice.", "warning");
+    return;
+  }
+  bootstrap.Modal.getOrCreateInstance(document.getElementById("invoiceCreateModal")).show();
+}
 
-  showToast(`Invoice ${invoiceId} marked as fully Paid!`);
-  logActivity("bi-cash-coin", "badge-mint", "Payment Received", `Invoice ${invoiceId} ($${inv.amount}) marked as paid.`);
-
-  renderBillingTable();
-  updateDashboardStats();
+async function createInvoice(event) {
+  event.preventDefault();
+  const form = document.getElementById("invoiceCreateForm");
+  const descriptionInput = document.getElementById("invoiceDescriptionInput");
+  descriptionInput.value = descriptionInput.value.trim();
+  if (!form.checkValidity()) {
+    form.classList.add("was-validated");
+    return;
+  }
+  const amount = Number(document.getElementById("invoiceAmountInput").value);
+  const selectedPatient = DB.get("patients", []).find(patient =>
+    patient.id === document.getElementById("invoicePatientInput").value);
+  if (!selectedPatient) {
+    showToast("Select a valid patient record before creating an invoice.", "error");
+    return;
+  }
+  const invoice = {
+    patientId: selectedPatient.id,
+    patientName: selectedPatient.name,
+    department: document.getElementById("invoiceDepartmentInput").value,
+    date: new Date().toISOString().slice(0, 10),
+    amount,
+    method: document.getElementById("invoiceMethodInput").value,
+    items: [{ desc: descriptionInput.value, cost: amount }]
+  };
+  try {
+    const saved = await apiRequest("/api/billing", { method: "POST", body: invoice });
+    bootstrap.Modal.getInstance(document.getElementById("invoiceCreateModal"))?.hide();
+    showToast(`Invoice ${saved.id} created.`);
+    await loadStaffData();
+    refreshAllViews();
+  } catch (error) {
+    showToast(`Unable to create invoice: ${error.message}`, "error");
+  }
 }
 
 // ==========================================================================
@@ -1845,6 +2564,10 @@ function renderPublicFeaturedDoctors() {
   container.innerHTML = "";
   // Show first 4
   const featured = doctors.slice(0, 4);
+  if (featured.length === 0) {
+    container.innerHTML = `<div class="col-12 text-center text-muted py-4">Doctor profiles are currently unavailable.</div>`;
+    return;
+  }
 
   featured.forEach(doc => {
     const col = document.createElement("div");
@@ -1852,44 +2575,86 @@ function renderPublicFeaturedDoctors() {
     col.innerHTML = `
       <div class="doctor-card">
         <div class="doctor-img-wrap">
-          <img src="${doc.image}" alt="${doc.name}" loading="lazy">
-          <span class="doctor-dept-pill">${doc.department}</span>
+          <img src="${escapeHtml(safeHttpUrl(doc.image) || DOCTOR_PLACEHOLDER_IMAGE)}" alt="${escapeHtml(doc.name)}" loading="lazy">
+          <span class="doctor-dept-pill">${escapeHtml(doc.department)}</span>
         </div>
         <div class="doctor-body">
           <div>
             <div class="d-flex justify-content-between align-items-start mb-1">
-              <h5 class="doctor-name mb-0">${doc.name}</h5>
+              <h5 class="doctor-name mb-0">${escapeHtml(doc.name)}</h5>
             </div>
-            <div class="doctor-sub">${doc.degree}</div>
+            <div class="doctor-sub">${escapeHtml(doc.degree)}</div>
             <div class="doctor-rating mb-3">
-              <i class="bi bi-star-fill"></i> ${doc.rating} <span class="text-muted fw-normal">(${doc.reviews} reviews)</span>
+              <i class="bi bi-star-fill"></i> ${Number(doc.rating || 0)} <span class="text-muted fw-normal">(${Number(doc.reviews || 0)} reviews)</span>
             </div>
           </div>
-          <button class="btn btn-medicare-secondary w-100 btn-sm" onclick="openBookAppointmentForDoctor('${doc.name}', '${doc.department}')">
+          <button class="btn btn-medicare-secondary w-100 btn-sm" onclick="openBookAppointmentForDoctor(${escapeHtml(JSON.stringify(doc.name))}, ${escapeHtml(JSON.stringify(doc.department))})">
             <i class="bi bi-calendar-event me-1"></i> Consult Specialist
           </button>
         </div>
       </div>
     `;
+    col.querySelector("img").addEventListener("error", event => {
+      const image = event.currentTarget;
+      if (image.getAttribute("src") !== DOCTOR_PLACEHOLDER_IMAGE) {
+        image.src = DOCTOR_PLACEHOLDER_IMAGE;
+      }
+    }, { once: true });
     container.appendChild(col);
   });
 }
 
-function handlePublicContactSubmit(e) {
+async function handlePublicContactSubmit(e) {
   e.preventDefault();
   const form = e.target;
   if (!form.checkValidity()) {
     form.classList.add("was-validated");
     return;
   }
-  showToast("Thank you! Your inquiry has been sent to our patient support team.");
-  form.reset();
-  form.classList.remove("was-validated");
+
+  const submitButton = form.querySelector('button[type="submit"]');
+  if (submitButton) submitButton.disabled = true;
+  const formData = new FormData(form);
+  try {
+    await apiRequest("/api/contact", {
+      method: "POST",
+      authenticated: false,
+      body: Object.fromEntries(formData.entries())
+    });
+    form.reset();
+    form.classList.remove("was-validated");
+    showToast("Your inquiry was accepted by the email service.", "success");
+  } catch (error) {
+    showToast(`Your inquiry could not be sent. ${error.message}`, "error");
+  } finally {
+    if (submitButton) submitButton.disabled = false;
+  }
 }
 
 function handleSaveSettings(e) {
   e.preventDefault();
-  showToast("Hospital configurations and profile settings updated successfully!");
+  const reduceMotion = document.getElementById("reduceMotionInput").checked;
+  try {
+    window.localStorage.setItem(LOCAL_SETTINGS_KEY, String(reduceMotion));
+    document.documentElement.classList.toggle("reduce-motion", reduceMotion);
+    showToast("Display preference saved in this browser.", "success");
+  } catch (error) {
+    console.error("Unable to save the browser display preference.", error);
+    showToast("Unable to save this preference. Check browser storage permissions.", "error");
+  }
+}
+
+function loadLocalSettings() {
+  const input = document.getElementById("reduceMotionInput");
+  if (!input) return;
+  try {
+    const reduceMotion = window.localStorage.getItem(LOCAL_SETTINGS_KEY) === "true";
+    input.checked = reduceMotion;
+    document.documentElement.classList.toggle("reduce-motion", reduceMotion);
+  } catch (error) {
+    console.error("Unable to load the browser display preference.", error);
+    showToast("Browser display preferences could not be loaded.", "warning");
+  }
 }
 
 // ==========================================================================
@@ -1940,6 +2705,8 @@ function refreshAllViews() {
   renderAppointmentsTable();
   renderBillingTable();
   renderPublicFeaturedDoctors();
+  renderDepartments();
+  if (authState.user?.role === "ADMIN") renderStaffAccounts();
   setTimeout(renderDashboardCharts, 100);
 }
 
@@ -1947,8 +2714,19 @@ function refreshAllViews() {
 // 13. DOM Ready Initialization & Event Wiring
 // ==========================================================================
 document.addEventListener("DOMContentLoaded", () => {
+  loadLocalSettings();
   // Initial renders
   refreshAllViews();
+  loadPublicCatalog().catch(error => {
+    showToast(`Public hospital information could not be loaded: ${error.message}`, "error");
+  });
+  const paymentResult = new URLSearchParams(window.location.search).get("payment");
+  if (paymentResult === "success") {
+    showToast("Checkout completed. The invoice changes only after verified payment confirmation arrives.", "info");
+  } else if (paymentResult === "cancelled") {
+    showToast("Checkout was cancelled. No payment was confirmed.", "warning");
+  }
+  toggleDoctorAccountLink();
 
   // Resize listener to re-draw canvas charts sharply
   window.addEventListener("resize", () => {

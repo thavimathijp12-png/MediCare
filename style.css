@@ -1356,6 +1356,46 @@ canvas.chart-canvas {
 /* ==========================================================================
    Responsive Adaptations
    ========================================================================== */
+.staff-dashboard {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.staff-login-panel {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  background:
+    radial-gradient(circle at 15% 15%, rgba(108, 92, 231, 0.1), transparent 30%),
+    radial-gradient(circle at 85% 85%, rgba(14, 159, 110, 0.1), transparent 30%),
+    var(--bg-primary);
+}
+
+.staff-login-card {
+  width: min(100%, 440px);
+  padding: 36px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
+  box-shadow: var(--shadow-lg);
+}
+
+.staff-login-icon {
+  display: inline-flex;
+  width: 56px;
+  height: 56px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: var(--brand-primary);
+  background: var(--pastel-blue);
+  font-size: 1.4rem;
+}
+
 @media (max-width: 1199.98px) {
   .hero-title {
     font-size: 2.8rem;
@@ -1399,6 +1439,10 @@ canvas.chart-canvas {
 }
 
 @media (max-width: 767.98px) {
+  .staff-login-card {
+    padding: 28px 22px;
+  }
+
   .hero-title {
     font-size: 2rem;
   }
@@ -1415,4 +1459,19 @@ canvas.chart-canvas {
   .hero-section {
     padding: 40px 0 60px;
   }
+}
+
+@media (max-width: 575.98px) {
+  .row.g-5 {
+    --bs-gutter-x: 1.5rem;
+  }
+}
+
+.reduce-motion *,
+.reduce-motion *::before,
+.reduce-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  scroll-behavior: auto !important;
+  transition-duration: 0.01ms !important;
 }
