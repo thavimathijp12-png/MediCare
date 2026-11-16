@@ -9,3 +9,10 @@ data/
 
 # Local development secrets
 backend/src/main/resources/application-dev.properties
+
+# Playwright test artifacts
+test-results/
+test-results-run/
+playwright-report/
+playwright/.cache/
+
