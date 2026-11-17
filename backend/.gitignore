@@ -6,8 +6,11 @@ target/
 .idea/
 *.iml
 
+<<<<<<< HEAD
+=======
 # Persistent H2 database storage
 data/
 *.mv.db
 *.trace.db
 
+>>>>>>> upstream/main

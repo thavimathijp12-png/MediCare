@@ -16,7 +16,6 @@ const contentTypes = {
   ".json": "application/json; charset=utf-8"
 };
 
-
 const server = http.createServer((request, response) => {
   let pathname;
   try {

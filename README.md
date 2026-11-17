@@ -1,6 +1,6 @@
 # MediCare – Hospital Management System
 
-[![Java](https://img.shields.io/badge/Java-17-orange.svg?style=flat&logo=openjdk)](https://openjdk.org/)
+[![Java](https://img.shields.io/badge/Java-25-orange.svg?style=flat&logo=openjdk)](https://openjdk.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.16-brightgreen.svg?style=flat&logo=springboot)](https://spring.io/projects/spring-boot)
 [![Spring Security](https://img.shields.io/badge/Spring%20Security-JWT-blue.svg?style=flat&logo=springsecurity)](https://spring.io/projects/spring-security)
 [![Database](https://img.shields.io/badge/Database-H2%20File%20%7C%20MySQL-blueviolet.svg?style=flat&logo=h2)](https://h2database.com/)
@@ -101,7 +101,7 @@ MediCare is structured into a lightweight, decoupled frontend and a robust Java 
 ## Technology Stack
 
 ### Backend
-- **Language:** Java 17
+- **Language:** Java 25
 - **Framework:** Spring Boot 3.5.16
 - **Security:** Spring Security 6 with JJWT (`io.jsonwebtoken 0.11.5`) & BCrypt password hashing
 - **Persistence:** Spring Data JPA, Hibernate 6.6
@@ -173,7 +173,7 @@ Medi Care/
 
 Before running the project, ensure you have the following installed on your machine:
 
-1. **Java Development Kit (JDK):** Version 17 or higher
+1. **Java Development Kit (JDK):** Version 25 or higher (Java 25 LTS is the backend target)
    ```bash
    java -version
    ```

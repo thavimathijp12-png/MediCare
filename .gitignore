@@ -1,18 +1,16 @@
 node_modules/
+target/
 backend/target/
 backend/data/
 data/
 *.mv.db
 *.trace.db
+.env
+.env.*
+!.env.example
 *.log
-
-
-# Local development secrets
-backend/src/main/resources/application-dev.properties
-
-# Playwright test artifacts
-test-results/
-test-results-run/
-playwright-report/
-playwright/.cache/
-
+.classpath
+.project
+.settings/
+.idea/
+*.iml
