@@ -2007,3 +2007,40 @@ canvas.chart-canvas {
   box-shadow: 0 2px 8px rgba(15, 39, 68, 0.04);
 }
 
+/* Patient Portal Mobile & Responsive Adaptations */
+#patient-portal,
+.patient-portal-page,
+#patientPortalDashboard,
+.patient-tab-pane {
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
+}
+
+@media (max-width: 767.98px) {
+  .patient-profile-header-card {
+    padding: 20px 16px;
+  }
+  .patient-profile-avatar-lg {
+    width: 60px;
+    height: 60px;
+  }
+  .patient-profile-header-card h1 {
+    font-size: 1.35rem;
+  }
+  .patient-quick-action-btn {
+    font-size: 0.82rem;
+    padding: 8px 12px;
+  }
+  .patient-kpi-card {
+    padding: 14px 16px;
+  }
+  .admin-topbar {
+    padding: 0 12px;
+  }
+  .admin-content-area {
+    padding: 16px 12px;
+  }
+}
+
+

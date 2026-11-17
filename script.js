@@ -1266,7 +1266,7 @@ function renderPatientBilling(invoices) {
             <td><span class="status-badge status-${escapeHtml(inv.status?.toLowerCase() || 'pending')}">${escapeHtml(inv.status)}</span></td>
             <td class="text-end">
               ${["pending", "overdue"].includes(inv.status?.toLowerCase()) ? `
-                <button type="button" class="btn btn-sm btn-medicare-primary rounded-pill me-1" data-pay-invoice="${escapeHtml(inv.id)}" onclick="startInvoiceCheckout('${escapeHtml(inv.id)}')">
+                <button type="button" class="btn btn-sm btn-medicare-primary rounded-pill me-1" onclick="startInvoiceCheckout('${escapeHtml(inv.id)}')">
                   <i class="bi bi-credit-card me-1"></i>Pay securely
                 </button>
               ` : ""}
