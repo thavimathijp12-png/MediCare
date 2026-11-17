@@ -24,6 +24,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class AppointmentServiceTest {
@@ -46,8 +47,8 @@ class AppointmentServiceTest {
         Doctor doctor = new Doctor(1L, "DOC-101", "Dr. Sarah Jenkins", "MD", "Cardiology", 14,
                 BigDecimal.valueOf(150), "555-0101", "sarah@example.test", "Available",
                 BigDecimal.valueOf(4.9), 10, null, "Cardiology specialist");
-        when(doctorRepository.findByNameIgnoreCase("Dr. Sarah Jenkins")).thenReturn(Optional.of(doctor));
-        when(doctorRepository.findByNameIgnoreCase("Dr. Marcus Vance"))
+        when(doctorRepository.findForAppointmentBooking("Dr. Sarah Jenkins")).thenReturn(Optional.of(doctor));
+        when(doctorRepository.findForAppointmentBooking("Dr. Marcus Vance"))
                 .thenReturn(Optional.of(new Doctor(2L, "DOC-104", "Dr. Marcus Vance", "MD", "Orthopedics",
                         18, BigDecimal.valueOf(160), "555-0104", "marcus@example.test", "In Surgery",
                         BigDecimal.valueOf(4.8), 10, null, "Orthopedic surgeon")));
@@ -73,6 +74,7 @@ class AppointmentServiceTest {
         assertEquals(1, saved.getTokenNumber());
         assertEquals("Confirmed", saved.getStatus());
         assertTrue(saved.getId().startsWith("APT-"));
+        verify(doctorRepository).findForAppointmentBooking("Dr. Sarah Jenkins");
     }
 
     @Test

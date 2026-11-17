@@ -153,7 +153,7 @@ public class AppointmentService {
         }
 
         // Validate doctor existence and availability
-        Optional<Doctor> docOpt = doctorRepository.findByNameIgnoreCase(dto.getDoctorName());
+        Optional<Doctor> docOpt = doctorRepository.findForAppointmentBooking(dto.getDoctorName());
         Doctor doctor = docOpt.orElseThrow(() -> new ResourceNotFoundException("The selected doctor was not found."));
         String department = doctor.getDepartment();
 
@@ -227,7 +227,7 @@ public class AppointmentService {
             throw new BusinessRuleException("Invalid date format. Expected YYYY-MM-DD.");
         }
 
-        Doctor doctor = doctorRepository.findByNameIgnoreCase(dto.getDoctorName())
+        Doctor doctor = doctorRepository.findForAppointmentBooking(dto.getDoctorName())
                 .orElseThrow(() -> new ResourceNotFoundException("The selected doctor was not found."));
         if ("On Leave".equalsIgnoreCase(doctor.getStatus())
                 || ("In Surgery".equalsIgnoreCase(doctor.getStatus()) && appointmentDate.equals(LocalDate.now()))) {
