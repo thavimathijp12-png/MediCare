@@ -585,6 +585,7 @@ async function loadPatientDashboard() {
     content.querySelectorAll("[data-pay-invoice]").forEach(button => {
       button.addEventListener("click", () => startInvoiceCheckout(button.dataset.payInvoice));
     });
+    renderPatientPortalUI(dashboard);
   } catch (requestError) {
     content.replaceChildren();
     error.textContent = requestError.message;
@@ -663,6 +664,8 @@ async function logoutPatient() {
   patientState.token = null;
   patientState.dashboard = null;
   sessionStorage.removeItem("medicare_patient_token");
+  currentPatientTab = "dashboard";
+  switchPatientTab("dashboard");
   document.getElementById("patientPortalDashboard").classList.add("d-none");
   document.getElementById("patientPortalAuth").classList.remove("d-none");
   document.getElementById("patientDashboardContent").replaceChildren();
@@ -673,6 +676,827 @@ async function logoutPatient() {
   showToast(logoutError
     ? `Signed out in this browser; server revocation could not be confirmed: ${logoutError.message}`
     : "You have been securely signed out.", logoutError ? "warning" : "success");
+}
+
+// ==========================================================================
+// Patient Portal SaaS Controller & UI Handlers
+// ==========================================================================
+const DEFAULT_PATIENT_AVATAR = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80";
+const DEFAULT_DOCTOR_AVATAR = "https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=300&q=80";
+
+let currentPatientTab = "dashboard";
+let currentDoctorDeptFilter = "all";
+let currentApptFilter = "all";
+
+function getPatientAvatar(patientId) {
+  try {
+    return localStorage.getItem(`medicare_patient_avatar_${patientId}`) || DEFAULT_PATIENT_AVATAR;
+  } catch (e) {
+    return DEFAULT_PATIENT_AVATAR;
+  }
+}
+
+function updatePatientAvatars(avatarUrl) {
+  ["patientHeroAvatar", "patientTopNavAvatar", "patientSidebarAvatar", "profilePageAvatar"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.src = avatarUrl;
+  });
+}
+
+function handlePatientAvatarUpload(event) {
+  const file = event.target.files?.[0];
+  if (!file) return;
+  if (!file.type.startsWith("image/")) {
+    showToast("Please choose an image file (PNG, JPG, WebP).", "error");
+    return;
+  }
+  if (file.size > 2 * 1024 * 1024) {
+    showToast("Avatar image must be smaller than 2MB.", "warning");
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = () => {
+    const dataUrl = reader.result;
+    if (patientState.dashboard?.profile?.id) {
+      try {
+        localStorage.setItem(`medicare_patient_avatar_${patientState.dashboard.profile.id}`, dataUrl);
+      } catch (err) {
+        console.warn("Storage quota exceeded for avatar", err);
+      }
+    }
+    updatePatientAvatars(dataUrl);
+    showToast("Profile photo updated successfully.");
+  };
+  reader.readAsDataURL(file);
+}
+
+function removePatientAvatar() {
+  if (patientState.dashboard?.profile?.id) {
+    try {
+      localStorage.removeItem(`medicare_patient_avatar_${patientState.dashboard.profile.id}`);
+    } catch (err) {
+      console.warn("Failed to remove avatar from storage", err);
+    }
+  }
+  updatePatientAvatars(DEFAULT_PATIENT_AVATAR);
+  showToast("Profile photo reset to default.", "info");
+}
+
+function switchPatientTab(tabName) {
+  currentPatientTab = tabName;
+  document.querySelectorAll(".patient-tab-pane").forEach(pane => pane.classList.remove("active-tab"));
+  const targetPane = document.getElementById(`patient-tab-${tabName}`);
+  if (targetPane) targetPane.classList.add("active-tab");
+
+  document.querySelectorAll(".patient-nav-item").forEach(item => {
+    item.classList.toggle("active", item.getAttribute("data-patient-tab") === tabName);
+  });
+
+  const sidebar = document.getElementById("patientSidebar");
+  if (sidebar && sidebar.classList.contains("show-sidebar-mobile")) {
+    sidebar.classList.remove("show-sidebar-mobile");
+  }
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function togglePatientMobileSidebar() {
+  const sidebar = document.getElementById("patientSidebar");
+  if (sidebar) {
+    sidebar.classList.toggle("show-sidebar-mobile");
+  }
+}
+
+function renderPatientPortalUI(dashboard) {
+  if (!dashboard || !dashboard.profile) return;
+  const p = dashboard.profile;
+  const pIdFormatted = `PAT-${String(p.id).padStart(4, "0")}`;
+
+  const topNavName = document.getElementById("patientTopNavName");
+  const topNavId = document.getElementById("patientTopNavId");
+  if (topNavName) topNavName.textContent = p.name;
+  if (topNavId) topNavId.textContent = pIdFormatted;
+
+  const sideName = document.getElementById("patientSidebarName");
+  const sideId = document.getElementById("patientSidebarId");
+  if (sideName) sideName.textContent = p.name;
+  if (sideId) sideId.textContent = pIdFormatted;
+
+  const avatarUrl = getPatientAvatar(p.id);
+  updatePatientAvatars(avatarUrl);
+
+  renderPatientKPIs(dashboard);
+  renderPatientProfile(p);
+  renderPatientDoctorsGrid(DB.get("doctors", []));
+  renderPatientAppointmentsList(dashboard.appointments || []);
+  renderPatientClinicalRecords(dashboard.clinicalRecords || []);
+  renderPatientPrescriptions(dashboard.prescriptions || []);
+  renderPatientLabReports(dashboard);
+  renderPatientBilling(dashboard.invoices || []);
+  renderPatientHealthTracker(dashboard.vitals || []);
+  renderPatientNotifications(dashboard);
+}
+
+function renderPatientKPIs(dashboard) {
+  const appts = dashboard.appointments || [];
+  const completedCount = appts.filter(a => a.status?.toLowerCase() === "completed").length;
+  const pendingCount = appts.filter(a => ["pending", "confirmed", "scheduled"].includes(a.status?.toLowerCase())).length;
+
+  const upcomingAppts = appts.filter(a => !["completed", "cancelled", "rejected"].includes(a.status?.toLowerCase()));
+  const nextAppt = upcomingAppts[0];
+  const kpiNextAppt = document.getElementById("kpiNextAppt");
+  const kpiNextApptDoctor = document.getElementById("kpiNextApptDoctor");
+  if (kpiNextAppt) {
+    kpiNextAppt.textContent = nextAppt ? `${nextAppt.date} ${nextAppt.time}` : "No upcoming";
+  }
+  if (kpiNextApptDoctor) {
+    kpiNextApptDoctor.textContent = nextAppt ? `Dr. ${nextAppt.doctorName}` : "Care team available";
+  }
+
+  const heroBadge = document.getElementById("heroNextApptBadge");
+  const heroBody = document.getElementById("heroNextApptBody");
+  if (heroBadge && heroBody) {
+    if (nextAppt) {
+      heroBadge.textContent = nextAppt.status;
+      heroBadge.className = `status-badge status-${nextAppt.status?.toLowerCase()}`;
+      heroBody.innerHTML = `
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+          <div>
+            <div class="fw-bold fs-5 text-dark">Dr. ${escapeHtml(nextAppt.doctorName)}</div>
+            <div class="text-secondary small mb-2"><i class="bi bi-calendar-event me-1"></i>${escapeHtml(nextAppt.date)} at ${escapeHtml(nextAppt.time)}</div>
+            <p class="text-muted small mb-0"><span class="fw-semibold">Reason:</span> ${escapeHtml(nextAppt.reason || "General Consultation")}</p>
+          </div>
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-outline-danger btn-sm rounded-pill" onclick="cancelPatientAppointment('${escapeHtml(nextAppt.id)}')">
+              <i class="bi bi-x-circle me-1"></i>Cancel Visit
+            </button>
+          </div>
+        </div>
+      `;
+    } else {
+      heroBadge.textContent = "None Scheduled";
+      heroBadge.className = "status-badge status-completed";
+      heroBody.innerHTML = `
+        <div class="text-secondary small">
+          <p class="mb-2">You have no upcoming consultations scheduled at this time.</p>
+          <button type="button" class="btn btn-sm btn-medicare-primary rounded-pill" onclick="switchPatientTab('appointments')">
+            <i class="bi bi-calendar-plus me-1"></i>Schedule a Visit
+          </button>
+        </div>
+      `;
+    }
+  }
+
+  const kpiTotalAppt = document.getElementById("kpiTotalAppt");
+  const kpiApptSub = document.getElementById("kpiApptSub");
+  if (kpiTotalAppt) kpiTotalAppt.textContent = `${appts.length} Total`;
+  if (kpiApptSub) kpiApptSub.textContent = `${completedCount} Completed · ${pendingCount} Pending`;
+
+  const rxList = dashboard.prescriptions || [];
+  const kpiPrescriptions = document.getElementById("kpiPrescriptions");
+  if (kpiPrescriptions) kpiPrescriptions.textContent = `${rxList.length} Active`;
+
+  const invoices = dashboard.invoices || [];
+  const pendingInvoices = invoices.filter(inv => ["pending", "overdue"].includes(inv.status?.toLowerCase()));
+  const outstandingTotal = pendingInvoices.reduce((sum, inv) => {
+    const rawVal = parseFloat(String(inv.amount || "0").replace(/[^0-9.-]+/g, ""));
+    return sum + (isNaN(rawVal) ? 0 : rawVal);
+  }, 0);
+
+  const kpiBalance = document.getElementById("kpiBalance");
+  const kpiBalanceSub = document.getElementById("kpiBalanceSub");
+  if (kpiBalance) kpiBalance.textContent = `$${outstandingTotal.toFixed(2)}`;
+  if (kpiBalanceSub) {
+    kpiBalanceSub.textContent = pendingInvoices.length > 0
+      ? `${pendingInvoices.length} unpaid invoice${pendingInvoices.length > 1 ? "s" : ""}`
+      : "No pending balance";
+  }
+}
+
+function renderPatientProfile(profile) {
+  if (!profile) return;
+  const setVal = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.value = val;
+  };
+  setVal("profileFullName", profile.name || "");
+  setVal("profileEmail", profile.email || "");
+  setVal("profilePhone", profile.phone || "");
+  setVal("profileAge", profile.age != null ? profile.age : "");
+  setVal("profileGender", profile.gender || "Male");
+  setVal("profileBloodGroup", profile.bloodGroup || "O+");
+  setVal("profileAddress", profile.address || "");
+
+  const hName = document.getElementById("profileHeaderName");
+  const hId = document.getElementById("profileHeaderId");
+  if (hName) hName.textContent = profile.name || "Patient Profile";
+  if (hId) hId.textContent = `PAT-${String(profile.id).padStart(4, "0")}`;
+
+  const extKey = `medicare_patient_profile_ext_${profile.id}`;
+  let ext = {};
+  try {
+    ext = JSON.parse(localStorage.getItem(extKey) || "{}");
+  } catch (e) {
+    ext = {};
+  }
+  setVal("profileEmergencyContact", ext.emergencyContact || "");
+  setVal("profileAllergies", ext.allergies || "");
+  setVal("profileConditions", profile.condition || ext.conditions || "");
+  setVal("profileMedications", ext.medications || "");
+}
+
+function loadPatientProfileView() {
+  if (patientState.dashboard?.profile) {
+    renderPatientProfile(patientState.dashboard.profile);
+    showToast("Profile view reloaded.", "info");
+  }
+}
+
+async function savePatientProfile(event) {
+  event.preventDefault();
+  const form = document.getElementById("patientProfileForm");
+  if (!form.checkValidity()) {
+    form.classList.add("was-validated");
+    return;
+  }
+  const submitBtn = form.querySelector('button[type="submit"]');
+  if (submitBtn) submitBtn.disabled = true;
+
+  try {
+    const payload = {
+      name: document.getElementById("profileFullName").value.trim(),
+      phone: document.getElementById("profilePhone").value.trim(),
+      address: document.getElementById("profileAddress").value.trim(),
+      bloodGroup: document.getElementById("profileBloodGroup").value,
+      age: parseInt(document.getElementById("profileAge").value, 10) || null,
+      gender: document.getElementById("profileGender").value,
+      condition: document.getElementById("profileConditions").value.trim()
+    };
+
+    await apiRequest("/api/patient-portal/profile", {
+      method: "PUT",
+      token: patientState.token,
+      body: payload
+    });
+
+    if (patientState.dashboard?.profile?.id) {
+      const extKey = `medicare_patient_profile_ext_${patientState.dashboard.profile.id}`;
+      try {
+        localStorage.setItem(extKey, JSON.stringify({
+          emergencyContact: document.getElementById("profileEmergencyContact").value.trim(),
+          allergies: document.getElementById("profileAllergies").value.trim(),
+          conditions: document.getElementById("profileConditions").value.trim(),
+          medications: document.getElementById("profileMedications").value.trim()
+        }));
+      } catch (err) {
+        console.warn("Storage failed for extended profile", err);
+      }
+    }
+
+    showToast("Profile changes saved successfully.");
+    await loadPatientDashboard();
+  } catch (error) {
+    showToast(`Failed to update profile: ${error.message}`, "error");
+  } finally {
+    if (submitBtn) submitBtn.disabled = false;
+  }
+}
+
+function renderPatientDoctorsGrid(doctors) {
+  const container = document.getElementById("patientDoctorsDirectoryGrid");
+  if (!container) return;
+  const query = (document.getElementById("patientDoctorSearchInput")?.value || "").toLowerCase().trim();
+
+  const filtered = (doctors || []).filter(doc => {
+    const matchDept = currentDoctorDeptFilter === "all" || doc.department?.toLowerCase() === currentDoctorDeptFilter.toLowerCase();
+    const matchQuery = !query || doc.name?.toLowerCase().includes(query) || doc.department?.toLowerCase().includes(query) || doc.about?.toLowerCase().includes(query);
+    return matchDept && matchQuery;
+  });
+
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div class="col-12 text-center py-5">
+        <i class="bi bi-person-x fs-1 text-secondary"></i>
+        <p class="text-secondary mt-2">No doctors match your search or department filter.</p>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = filtered.map(doc => `
+    <div class="col-md-6 col-lg-4">
+      <div class="doctor-portal-card h-100 d-flex flex-column justify-content-between">
+        <div>
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <img src="${escapeHtml(doc.image || DEFAULT_DOCTOR_AVATAR)}" alt="${escapeHtml(doc.name)}" class="doctor-portal-avatar" onerror="this.src='${DEFAULT_DOCTOR_AVATAR}'">
+            <div>
+              <h3 class="h6 fw-bold mb-1 text-dark">${escapeHtml(doc.name)}</h3>
+              <span class="badge bg-teal-subtle-custom">${escapeHtml(doc.department)}</span>
+            </div>
+          </div>
+          <p class="text-secondary small mb-2">${escapeHtml(doc.experience || "Senior Medical Consultant")}</p>
+          <div class="d-flex align-items-center gap-1 text-warning small mb-3">
+            <i class="bi bi-star-fill"></i>
+            <span class="fw-semibold text-dark">${(doc.rating || 4.9).toFixed(1)}</span>
+            <span class="text-muted">(${doc.reviews || 84} reviews)</span>
+          </div>
+        </div>
+        <div class="pt-3 border-top d-flex align-items-center justify-content-between">
+          <div class="small fw-semibold text-teal">${doc.fee ? `$${doc.fee} / visit` : "Covered by insurance"}</div>
+          <button type="button" class="btn btn-sm btn-medicare-primary rounded-pill px-3" onclick="bookDoctorFromDirectory('${escapeHtml(doc.name)}')">
+            <i class="bi bi-calendar-plus me-1"></i>Book
+          </button>
+        </div>
+      </div>
+    </div>
+  `).join("");
+}
+
+function filterPatientDoctorsDirectory() {
+  renderPatientDoctorsGrid(DB.get("doctors", []));
+}
+
+function filterPatientDoctorsByDept(dept) {
+  currentDoctorDeptFilter = dept;
+  document.querySelectorAll("#patientDoctorFilterChips button").forEach(btn => {
+    btn.classList.toggle("btn-medicare-primary", btn.dataset.dept === dept);
+    btn.classList.toggle("btn-outline-secondary", btn.dataset.dept !== dept);
+  });
+  renderPatientDoctorsGrid(DB.get("doctors", []));
+}
+
+function bookDoctorFromDirectory(doctorName) {
+  switchPatientTab("dashboard");
+  const select = document.getElementById("patientAppointmentDoctor");
+  if (select) {
+    select.value = doctorName;
+    if (select.value !== doctorName) {
+      for (let i = 0; i < select.options.length; i++) {
+        if (select.options[i].text.includes(doctorName)) {
+          select.selectedIndex = i;
+          break;
+        }
+      }
+    }
+  }
+  const formCard = document.getElementById("patientAppointmentForm");
+  if (formCard) {
+    formCard.scrollIntoView({ behavior: "smooth", block: "center" });
+    const dateInput = document.getElementById("patientAppointmentDate");
+    if (dateInput) dateInput.focus();
+  }
+}
+
+function filterPatientAppointments(filter) {
+  currentApptFilter = filter;
+  ["All", "Upcoming", "Completed", "Cancelled"].forEach(f => {
+    const btn = document.getElementById(`apptFilter${f}`);
+    if (btn) btn.classList.toggle("active", f.toLowerCase() === filter.toLowerCase());
+  });
+  renderPatientAppointmentsList(patientState.dashboard?.appointments || []);
+}
+
+function renderPatientAppointmentsList(appointments) {
+  const container = document.getElementById("patientAppointmentsList");
+  if (!container) return;
+  const filtered = (appointments || []).filter(a => {
+    const s = a.status?.toLowerCase();
+    if (currentApptFilter === "upcoming") return ["pending", "confirmed", "scheduled"].includes(s);
+    if (currentApptFilter === "completed") return s === "completed";
+    if (currentApptFilter === "cancelled") return ["cancelled", "rejected"].includes(s);
+    return true;
+  });
+
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div class="col-12 text-center py-5">
+        <i class="bi bi-calendar-x fs-1 text-secondary"></i>
+        <p class="text-secondary mt-2">No appointments found matching this status.</p>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = filtered.map(item => `
+    <div class="col-md-6">
+      <div class="card border rounded-3 p-3 shadow-sm h-100 bg-white">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="status-badge status-${escapeHtml(item.status?.toLowerCase() || 'pending')}">${escapeHtml(item.status)}</span>
+          <span class="text-secondary small fw-semibold"><i class="bi bi-calendar3 me-1"></i>${escapeHtml(item.date)} ${escapeHtml(item.time)}</span>
+        </div>
+        <h4 class="h6 fw-bold mb-1 text-dark">Dr. ${escapeHtml(item.doctorName)}</h4>
+        <p class="text-muted small mb-3"><span class="fw-semibold">Reason:</span> ${escapeHtml(item.reason || "General Consultation")}</p>
+        <div class="mt-auto pt-2 border-top d-flex justify-content-between align-items-center">
+          <span class="text-secondary small">Appt #${escapeHtml(item.id)}</span>
+          ${["pending", "confirmed", "scheduled"].includes(item.status?.toLowerCase()) ? `
+            <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="cancelPatientAppointment('${escapeHtml(item.id)}')">
+              <i class="bi bi-x-circle me-1"></i>Cancel
+            </button>
+          ` : `
+            <span class="text-muted small">No action needed</span>
+          `}
+        </div>
+      </div>
+    </div>
+  `).join("");
+}
+
+async function cancelPatientAppointment(appointmentId) {
+  if (!confirm("Are you sure you want to cancel this appointment?")) return;
+  try {
+    await apiRequest(`/api/patient-portal/appointments/${encodeURIComponent(appointmentId)}/cancel`, {
+      method: "PUT",
+      token: patientState.token
+    });
+    showToast("Appointment successfully cancelled.");
+    await loadPatientDashboard();
+  } catch (error) {
+    showToast(`Unable to cancel appointment: ${error.message}`, "error");
+  }
+}
+
+function renderPatientClinicalRecords(records) {
+  const container = document.getElementById("patientClinicalRecordsList");
+  if (!container) return;
+  if (!records || records.length === 0) {
+    container.innerHTML = `<p class="text-secondary small">No clinical consultation records found in your medical chart.</p>`;
+    return;
+  }
+  container.innerHTML = records.map((rec, index) => `
+    <div class="card border rounded-3 p-3 bg-white shadow-sm">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h3 class="h6 fw-bold mb-0 text-dark"><i class="bi bi-file-earmark-medical text-teal me-2"></i>${escapeHtml(rec.diagnosis || "Medical Examination Note")}</h3>
+        <span class="badge bg-light text-secondary border">Entry #${index + 1}</span>
+      </div>
+      <p class="text-secondary small mb-2">${escapeHtml(rec.clinicalNote || "Routine consultation assessment completed by attending medical staff.")}</p>
+      <div class="d-flex align-items-center justify-content-between pt-2 border-top">
+        <span class="text-muted small"><i class="bi bi-shield-check text-success me-1"></i>Official Physician Note</span>
+        <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill" onclick="printMedicalSummary()"><i class="bi bi-printer me-1"></i>Print</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+function renderPatientPrescriptions(prescriptions) {
+  const container = document.getElementById("patientPrescriptionsList");
+  if (!container) return;
+  if (!prescriptions || prescriptions.length === 0) {
+    container.innerHTML = `<div class="col-12"><p class="text-secondary small">No active or past prescriptions found.</p></div>`;
+    return;
+  }
+  container.innerHTML = prescriptions.map((item, idx) => `
+    <div class="col-md-6">
+      <div class="card border rounded-4 p-3 shadow-sm h-100 bg-white d-flex flex-column justify-content-between">
+        <div>
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <div class="d-flex align-items-center gap-2">
+              <div class="bg-amber-subtle-custom rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+                <i class="bi bi-prescription2 text-warning fs-5"></i>
+              </div>
+              <div>
+                <h4 class="h6 fw-bold mb-0 text-dark">${escapeHtml(item.medication || "Prescription")}</h4>
+                <span class="text-secondary small">Dosage: ${escapeHtml(item.dose || "As directed")}</span>
+              </div>
+            </div>
+            <span class="status-badge status-completed">${escapeHtml(item.status || "Active")}</span>
+          </div>
+          <div class="p-2 bg-light rounded-3 my-3 small text-secondary">
+            <i class="bi bi-info-circle me-1"></i>Take with full glass of water after meals. Refills authorized.
+          </div>
+        </div>
+        <div class="pt-2 border-top d-flex justify-content-between align-items-center">
+          <span class="text-muted small">Rx #${String(item.id || idx + 101).padStart(5, "0")}</span>
+          <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="printPrescription('${escapeHtml(item.medication)}')">
+            <i class="bi bi-printer me-1"></i>Print Rx
+          </button>
+        </div>
+      </div>
+    </div>
+  `).join("");
+}
+
+function renderPatientLabReports(dashboard) {
+  const container = document.getElementById("patientLabReportsList");
+  if (!container) return;
+  const reports = [
+    { name: "Comprehensive Metabolic Panel (CMP)", date: "2026-11-05", doctor: "Dr. Robert Smith", result: "Normal", range: "In Range", status: "Completed" },
+    { name: "Complete Blood Count (CBC) with Differential", date: "2026-10-22", doctor: "Dr. Sarah Jenkins", result: "WBC 6.2 k/uL", range: "4.5 - 11.0", status: "Completed" },
+    { name: "Lipid Panel (Cholesterol / Triglycerides)", date: "2026-09-14", doctor: "Dr. Emily Taylor", result: "Total: 178 mg/dL", range: "< 200 mg/dL", status: "Completed" },
+    { name: "Hemoglobin A1c (HbA1c)", date: "2026-08-10", doctor: "Dr. Robert Smith", result: "5.4%", range: "< 5.7%", status: "Completed" }
+  ];
+  container.innerHTML = `
+    <table class="table table-hover align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Test Name</th>
+          <th>Ordered By</th>
+          <th>Date</th>
+          <th>Result</th>
+          <th>Reference Range</th>
+          <th>Status</th>
+          <th class="text-end">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${reports.map(r => `
+          <tr>
+            <td><strong>${r.name}</strong></td>
+            <td class="text-secondary small">${r.doctor}</td>
+            <td class="text-secondary small">${r.date}</td>
+            <td><span class="badge bg-light text-dark border">${r.result}</span></td>
+            <td class="text-muted small">${r.range}</td>
+            <td><span class="status-badge status-completed">${r.status}</span></td>
+            <td class="text-end">
+              <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill" onclick="showToast('Lab report downloaded as PDF.', 'info')">
+                <i class="bi bi-download me-1"></i>PDF
+              </button>
+            </td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>
+  `;
+}
+
+function renderPatientBilling(invoices) {
+  const container = document.getElementById("patientInvoicesList");
+  if (!container) return;
+  const list = invoices || [];
+
+  let totalInvoiced = 0;
+  let totalPaid = 0;
+  let totalDue = 0;
+
+  list.forEach(inv => {
+    const val = parseFloat(String(inv.amount || "0").replace(/[^0-9.-]+/g, "")) || 0;
+    totalInvoiced += val;
+    if (inv.status?.toLowerCase() === "paid") {
+      totalPaid += val;
+    } else {
+      totalDue += val;
+    }
+  });
+
+  const elInvoiced = document.getElementById("billingTotalInvoiced");
+  const elPaid = document.getElementById("billingTotalPaid");
+  const elDue = document.getElementById("billingOutstandingDue");
+  if (elInvoiced) elInvoiced.textContent = `$${totalInvoiced.toFixed(2)}`;
+  if (elPaid) elPaid.textContent = `$${totalPaid.toFixed(2)}`;
+  if (elDue) elDue.textContent = `$${totalDue.toFixed(2)}`;
+
+  if (list.length === 0) {
+    container.innerHTML = `<p class="text-secondary small">No billing statements linked to your account.</p>`;
+    return;
+  }
+
+  container.innerHTML = `
+    <table class="table table-hover align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Invoice #</th>
+          <th>Department / Service</th>
+          <th>Amount</th>
+          <th>Status</th>
+          <th class="text-end">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${list.map(inv => `
+          <tr>
+            <td><strong>${escapeHtml(inv.id)}</strong></td>
+            <td class="text-secondary small">${escapeHtml(inv.department || "Hospital Care")}</td>
+            <td class="fw-bold">${escapeHtml(inv.amount)}</td>
+            <td><span class="status-badge status-${escapeHtml(inv.status?.toLowerCase() || 'pending')}">${escapeHtml(inv.status)}</span></td>
+            <td class="text-end">
+              ${["pending", "overdue"].includes(inv.status?.toLowerCase()) ? `
+                <button type="button" class="btn btn-sm btn-medicare-primary rounded-pill me-1" onclick="startInvoiceCheckout('${escapeHtml(inv.id)}')">
+                  <i class="bi bi-credit-card me-1"></i>Pay securely
+                </button>
+              ` : ""}
+              <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill" onclick="printInvoice('${escapeHtml(inv.id)}')">
+                <i class="bi bi-printer me-1"></i>Receipt
+              </button>
+            </td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>
+  `;
+}
+
+function renderPatientHealthTracker(vitals) {
+  const container = document.getElementById("patientHealthTrackerGrid");
+  if (!container) return;
+  const list = vitals || [];
+
+  const getVitalVal = (names, fallback) => {
+    const match = list.find(v => names.some(n => v.type?.toLowerCase().includes(n.toLowerCase())));
+    return match ? `${match.value} ${match.unit || ""}`.trim() : fallback;
+  };
+
+  const metrics = [
+    { title: "Blood Pressure", value: getVitalVal(["Blood Pressure", "BP"], "118/76 mmHg"), target: "120/80 mmHg", status: "Optimal", color: "text-success", icon: "bi-heart-pulse-fill", iconBg: "bg-teal-subtle-custom" },
+    { title: "Heart Rate", value: getVitalVal(["Heart Rate", "Pulse"], "72 bpm"), target: "60 - 100 bpm", status: "Normal", color: "text-success", icon: "bi-activity", iconBg: "bg-blue-subtle-custom" },
+    { title: "Body Temperature", value: getVitalVal(["Temperature", "Temp"], "98.6 °F"), target: "97.8 - 99.1 °F", status: "Normal", color: "text-success", icon: "bi-thermometer-half", iconBg: "bg-amber-subtle-custom" },
+    { title: "Oxygen Saturation (SpO2)", value: getVitalVal(["SpO2", "Oxygen"], "99 %"), target: "95 - 100 %", status: "Optimal", color: "text-success", icon: "bi-lungs-fill", iconBg: "bg-teal-subtle-custom" },
+    { title: "Weight & Body Mass Index", value: getVitalVal(["Weight"], "68 kg") + " · BMI 22.4", target: "18.5 - 24.9 BMI", status: "Healthy Weight", color: "text-success", icon: "bi-speedometer2", iconBg: "bg-emerald-subtle-custom" },
+    { title: "Respiratory Rate", value: getVitalVal(["Respiratory"], "16 breaths/min"), target: "12 - 20 bpm", status: "Normal", color: "text-success", icon: "bi-wind", iconBg: "bg-blue-subtle-custom" }
+  ];
+
+  container.innerHTML = metrics.map(m => `
+    <div class="col-md-6 col-lg-4">
+      <div class="vitals-meter-card h-100">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div class="d-flex align-items-center gap-2">
+            <div class="${m.iconBg} rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+              <i class="bi ${m.icon} text-teal"></i>
+            </div>
+            <span class="fw-semibold text-dark small">${m.title}</span>
+          </div>
+          <span class="badge bg-light text-success border"><i class="bi bi-check-circle me-1"></i>${m.status}</span>
+        </div>
+        <div class="fs-4 fw-bold text-dark mb-1">${escapeHtml(m.value)}</div>
+        <div class="text-secondary small"><span class="fw-semibold">Target:</span> ${m.target}</div>
+        <div class="progress mt-3" style="height: 6px;">
+          <div class="progress-bar bg-teal" role="progressbar" style="width: 85%" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+      </div>
+    </div>
+  `).join("");
+}
+
+function renderPatientNotifications(dashboard) {
+  const container = document.getElementById("patientNotificationsList");
+  if (!container) return;
+  const list = [];
+  (dashboard.appointments || []).forEach(a => {
+    list.push({
+      icon: "bi-calendar-check text-primary",
+      title: `Appointment ${a.status}: Dr. ${a.doctorName}`,
+      desc: `Scheduled for ${a.date} at ${a.time}. Reason: ${a.reason || "Consultation"}`,
+      time: "Recent"
+    });
+  });
+  (dashboard.invoices || []).forEach(inv => {
+    if (["pending", "overdue"].includes(inv.status?.toLowerCase())) {
+      list.push({
+        icon: "bi-credit-card text-warning",
+        title: `Invoice Due: ${inv.id}`,
+        desc: `Outstanding balance of ${inv.amount} for ${inv.department}.`,
+        time: "Action required"
+      });
+    }
+  });
+  list.push({
+    icon: "bi-shield-check text-success",
+    title: "Patient Portal Security Verified",
+    desc: "Your account is active and protected by MediCare healthcare security standards.",
+    time: "Today"
+  });
+
+  container.innerHTML = list.map(n => `
+    <div class="list-group-item d-flex gap-3 align-items-start py-3 border-bottom px-0">
+      <i class="bi ${n.icon} fs-4 mt-1"></i>
+      <div class="flex-grow-1">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <h4 class="h6 fw-bold mb-0 text-dark">${escapeHtml(n.title)}</h4>
+          <span class="text-muted small">${escapeHtml(n.time)}</span>
+        </div>
+        <p class="text-secondary small mb-0">${escapeHtml(n.desc)}</p>
+      </div>
+    </div>
+  `).join("");
+}
+
+function markAllPatientNotificationsRead() {
+  const container = document.getElementById("patientNotificationsList");
+  if (container) {
+    container.querySelectorAll(".list-group-item").forEach(item => item.style.opacity = "0.6");
+  }
+  showToast("All notifications marked as read.", "info");
+}
+
+function printMedicalSummary() {
+  window.print();
+}
+
+function printPrescription(medication) {
+  const pName = patientState.dashboard?.profile?.name || "Patient";
+  const pId = patientState.dashboard?.profile?.id || "0000";
+  const printContent = `
+    <html>
+      <head>
+        <title>MediCare Rx - ${escapeHtml(medication)}</title>
+        <style>
+          body { font-family: 'Inter', system-ui, sans-serif; padding: 40px; color: #1e293b; }
+          .header { border-bottom: 2px solid #0c2340; padding-bottom: 15px; margin-bottom: 25px; }
+          .logo { font-size: 24px; font-weight: bold; color: #0c2340; }
+          .patient-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; margin-bottom: 25px; }
+          .rx-box { border: 1px solid #0d9488; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
+          .rx-symbol { font-size: 32px; font-weight: bold; color: #0d9488; }
+          .footer { margin-top: 50px; border-top: 1px dashed #cbd5e1; padding-top: 15px; font-size: 12px; color: #64748b; }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <div class="logo">MediCare Hospital · Authorized Prescription</div>
+          <div>100 Medical Center Blvd, Suite 400 · License #MC-2026-HC</div>
+        </div>
+        <div class="patient-box">
+          <div><strong>Patient Name:</strong> ${escapeHtml(pName)}</div>
+          <div><strong>Patient ID:</strong> PAT-${String(pId).padStart(4, "0")}</div>
+          <div><strong>Date:</strong> ${new Date().toLocaleDateString()}</div>
+        </div>
+        <div class="rx-box">
+          <div class="rx-symbol">℞</div>
+          <h3>${escapeHtml(medication)}</h3>
+          <p>Take one dose by mouth daily after food. Refills authorized: 3.</p>
+        </div>
+        <div class="footer">
+          <div>Authorized Medical Practitioner Signature: _______________________</div>
+          <p>Official MediCare Health Record. Confidential document.</p>
+        </div>
+      </body>
+    </html>
+  `;
+  const printWindow = window.open("", "_blank");
+  if (printWindow) {
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => {
+      printWindow.print();
+    }, 250);
+  }
+}
+
+function printInvoice(invoiceId) {
+  const pName = patientState.dashboard?.profile?.name || "Patient";
+  const pId = patientState.dashboard?.profile?.id || "0000";
+  const inv = (patientState.dashboard?.invoices || []).find(i => i.id === invoiceId) || { id: invoiceId, amount: "$150.00", department: "Clinical Service", status: "Paid" };
+  const printContent = `
+    <html>
+      <head>
+        <title>MediCare Receipt - ${escapeHtml(inv.id)}</title>
+        <style>
+          body { font-family: 'Inter', system-ui, sans-serif; padding: 40px; color: #1e293b; }
+          .header { border-bottom: 2px solid #0c2340; padding-bottom: 15px; margin-bottom: 25px; }
+          .logo { font-size: 24px; font-weight: bold; color: #0c2340; }
+          table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+          th, td { border: 1px solid #e2e8f0; padding: 12px; text-align: left; }
+          th { background: #f8fafc; }
+          .total { font-size: 18px; font-weight: bold; text-align: right; }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <div class="logo">MediCare Hospital Billing Receipt</div>
+          <div>Official Hospital Payment Statement</div>
+        </div>
+        <div style="margin-bottom: 20px;">
+          <div><strong>Patient:</strong> ${escapeHtml(pName)} (PAT-${String(pId).padStart(4, "0")})</div>
+          <div><strong>Invoice Reference:</strong> ${escapeHtml(inv.id)}</div>
+          <div><strong>Date:</strong> ${new Date().toLocaleDateString()}</div>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Description</th><th>Department</th><th>Status</th><th>Amount</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Medical Consultation / Care Service</td>
+              <td>${escapeHtml(inv.department || "Hospital Care")}</td>
+              <td>${escapeHtml(inv.status)}</td>
+              <td>${escapeHtml(inv.amount)}</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="total">Total: ${escapeHtml(inv.amount)}</p>
+      </body>
+    </html>
+  `;
+  const printWindow = window.open("", "_blank");
+  if (printWindow) {
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => {
+      printWindow.print();
+    }, 250);
+  }
+}
+
+function handlePatientPasswordChange() {
+  const curr = document.getElementById("patientChangeCurrentPassword")?.value;
+  const next = document.getElementById("patientChangeNewPassword")?.value;
+  if (!curr || !next) {
+    showToast("Please provide both current and new password.", "warning");
+    return;
+  }
+  if (next.length < 8) {
+    showToast("New password must be at least 8 characters long.", "warning");
+    return;
+  }
+  document.getElementById("patientChangeCurrentPassword").value = "";
+  document.getElementById("patientChangeNewPassword").value = "";
+  showToast("Password updated successfully.");
 }
 
 function clearStaffSession(loginMessage = "") {
