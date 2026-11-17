@@ -1,7 +1,7 @@
 const crypto = require("node:crypto");
 const { expect } = require("@playwright/test");
 
-const apiOrigin = process.env.MEDICARE_E2E_API_ORIGIN || "http://127.0.0.1:18080";
+const apiOrigin = process.env.MEDICARE_E2E_API_ORIGIN || "http://127.0.0.1:8080";
 
 function newPatient() {
   const suffix = crypto.randomUUID();
@@ -31,4 +31,13 @@ async function loginPatientInUi(page, patient) {
   await page.getByRole("button", { name: "Sign in securely" }).click();
 }
 
-module.exports = { apiOrigin, loginPatientInUi, newPatient, registerPatient };
+async function loginStaffInUi(page, email, password) {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Staff Login" }).first().click();
+  await page.locator("#staffUsernameInput").fill(email);
+  await page.locator("#staffPasswordInput").fill(password);
+  await page.locator('#staffLoginForm button[type="submit"]').click();
+  await expect(page.locator("#staff-dashboard:not(.d-none)")).toBeVisible();
+}
+
+module.exports = { apiOrigin, loginPatientInUi, loginStaffInUi, newPatient, registerPatient };

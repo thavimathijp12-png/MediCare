@@ -17,7 +17,7 @@ module.exports = defineConfig({
   webServer: {
     command: "node tests/e2e/serve-frontend.js",
     url: "http://127.0.0.1:5503",
-    reuseExistingServer: false,
+    reuseExistingServer: true,
     timeout: 30000
   }
 });

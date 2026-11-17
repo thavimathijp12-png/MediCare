@@ -1,8 +1,10 @@
+
 package com.medicare.service;
 
 import com.medicare.dto.AppointmentDto;
 import com.medicare.dto.CheckoutSessionResponse;
 import com.medicare.dto.PatientDashboardDto;
+import com.medicare.dto.PatientDto;
 import com.medicare.entity.Patient;
 import com.medicare.entity.Role;
 import com.medicare.exception.ResourceNotFoundException;
@@ -51,6 +53,42 @@ public class PatientPortalService {
 
     public AppointmentDto bookAppointment(String email, AppointmentDto request) {
         return appointmentService.bookForPatient(request, email);
+    }
+
+    @Transactional
+    public PatientDto updateProfile(String email, PatientDto updateDto) {
+        Patient patient = patientRepository.findByPatientAccount_EmailIgnoreCase(email)
+                .orElseThrow(() -> new ResourceNotFoundException("The patient profile was not found."));
+        if (updateDto.getName() != null && !updateDto.getName().isBlank()) {
+            patient.setName(updateDto.getName().trim());
+        }
+        if (updateDto.getPhone() != null && !updateDto.getPhone().isBlank()) {
+            patient.setPhone(updateDto.getPhone().trim());
+        }
+        if (updateDto.getAddress() != null) {
+            patient.setAddress(updateDto.getAddress().trim());
+        }
+        if (updateDto.getBloodGroup() != null) {
+            patient.setBloodGroup(updateDto.getBloodGroup().trim());
+        }
+        if (updateDto.getAge() > 0) {
+            patient.setAge(updateDto.getAge());
+        }
+        if (updateDto.getGender() != null && !updateDto.getGender().isBlank()) {
+            patient.setGender(updateDto.getGender().trim());
+        }
+        if (updateDto.getCondition() != null) {
+            patient.setCondition(updateDto.getCondition().trim());
+        }
+        Patient saved = patientRepository.save(patient);
+        return patientService.toDto(saved);
+    }
+
+    @Transactional
+    public AppointmentDto cancelAppointment(String appointmentId, String email) {
+        patientRepository.findByPatientAccount_EmailIgnoreCase(email)
+                .orElseThrow(() -> new ResourceNotFoundException("The patient profile was not found."));
+        return appointmentService.updateStatus(appointmentId, "Cancelled");
     }
 
     public CheckoutSessionResponse createInvoiceCheckout(String invoiceNumber, String email) {

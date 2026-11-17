@@ -1,7 +1,9 @@
+
 package com.medicare.controller;
 
 import com.medicare.dto.CheckoutSessionResponse;
 import com.medicare.dto.PatientDashboardDto;
+import com.medicare.dto.PatientDto;
 import com.medicare.dto.AppointmentDto;
 import com.medicare.service.PatientPortalService;
 import jakarta.validation.Valid;
@@ -13,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -46,5 +49,19 @@ public class PatientPortalController {
             @PathVariable String invoiceNumber,
             @AuthenticationPrincipal UserDetails user) {
         return patientPortalService.createInvoiceCheckout(invoiceNumber, user.getUsername());
+    }
+
+    @PutMapping("/profile")
+    public PatientDto updateOwnProfile(
+            @AuthenticationPrincipal UserDetails user,
+            @RequestBody PatientDto request) {
+        return patientPortalService.updateProfile(user.getUsername(), request);
+    }
+
+    @PutMapping("/appointments/{appointmentId}/cancel")
+    public AppointmentDto cancelOwnAppointment(
+            @PathVariable String appointmentId,
+            @AuthenticationPrincipal UserDetails user) {
+        return patientPortalService.cancelAppointment(appointmentId, user.getUsername());
     }
 }
