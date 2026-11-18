@@ -86,9 +86,7 @@ public class PatientPortalService {
 
     @Transactional
     public AppointmentDto cancelAppointment(String appointmentId, String email) {
-        patientRepository.findByPatientAccount_EmailIgnoreCase(email)
-                .orElseThrow(() -> new ResourceNotFoundException("The patient profile was not found."));
-        return appointmentService.updateStatus(appointmentId, "Cancelled");
+        return appointmentService.cancelForPatient(appointmentId, email);
     }
 
     public CheckoutSessionResponse createInvoiceCheckout(String invoiceNumber, String email) {

@@ -482,6 +482,53 @@ class MedicareApiIntegrationTest {
     }
 
     @Test
+    void patientsCanOnlyCancelAppointmentsLinkedToTheirOwnAccount() throws Exception {
+        String ownerEmail = "appointment-owner-" + UUID.randomUUID().toString().substring(0, 8)
+                + "@medicare.test";
+        String otherEmail = "appointment-other-" + UUID.randomUUID().toString().substring(0, 8)
+                + "@medicare.test";
+        String ownerPassword = randomPassword();
+        String otherPassword = randomPassword();
+
+        for (String email : List.of(ownerEmail, otherEmail)) {
+            RegisterRequest registration = new RegisterRequest(
+                    email, email.equals(ownerEmail) ? ownerPassword : otherPassword,
+                    "Appointment Patient", 36, "Other", "555-0155",
+                    "Test address", null);
+            mockMvc.perform(post("/api/auth/register")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(registration)))
+                    .andExpect(status().isCreated());
+        }
+
+        String ownerToken = login(ownerEmail, ownerPassword);
+        String otherToken = login(otherEmail, otherPassword);
+        AppointmentDto request = new AppointmentDto();
+        request.setPatientName("Untrusted submitted name");
+        request.setPatientPhone("555-0155");
+        request.setDoctorName(doctor.getName());
+        request.setDate(LocalDate.now().plusDays(333).toString());
+        request.setTime("12:45 AM");
+        MvcResult created = mockMvc.perform(post("/api/patient-portal/appointments")
+                        .header("Authorization", bearer(ownerToken))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.status").value("Pending"))
+                .andReturn();
+        String appointmentId = objectMapper.readTree(created.getResponse().getContentAsString())
+                .get("id").asText();
+
+        mockMvc.perform(put("/api/patient-portal/appointments/{appointmentId}/cancel", appointmentId)
+                        .header("Authorization", bearer(otherToken)))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(put("/api/patient-portal/appointments/{appointmentId}/cancel", appointmentId)
+                        .header("Authorization", bearer(ownerToken)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("Cancelled"));
+    }
+
+    @Test
     void newlyRegisteredPatientCanReadOnlyTheirLinkedPortalAndClinicalRecords() throws Exception {
         String email = "registered-" + UUID.randomUUID().toString().substring(0, 8) + "@medicare.test";
         String password = randomPassword();
