@@ -547,6 +547,14 @@ class MedicareApiIntegrationTest {
                 .andExpect(jsonPath("$.role").value("PATIENT"));
         mockMvc.perform(get("/api/patients").header("Authorization", bearer(patientToken)))
                 .andExpect(status().isForbidden());
+        mockMvc.perform(put("/api/patient-portal/profile")
+                        .header("Authorization", bearer(patientToken))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"name":"","phone":"invalid","age":131,"gender":""}
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Input validation error"));
 
         Patient ownProfile = patientRepository.findByPatientAccount_EmailIgnoreCase(email).orElseThrow();
         InvoiceDto invoice = new InvoiceDto();
