@@ -1,6 +1,8 @@
 package com.medicare.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 public class AppointmentDto {
     private String id; // "APT-2026-01"
@@ -8,11 +10,14 @@ public class AppointmentDto {
     private int tokenNumber;
 
     @NotBlank(message = "Patient name is required")
+    @Size(max = 120, message = "Patient name must not exceed 120 characters")
     private String patientName;
 
+    @Size(max = 40, message = "Patient phone must not exceed 40 characters")
     private String patientPhone;
 
     @NotBlank(message = "Doctor is required")
+    @Size(max = 120, message = "Doctor name must not exceed 120 characters")
     private String doctorName;
 
     private String department;
@@ -21,10 +26,15 @@ public class AppointmentDto {
     private String date;
 
     @NotBlank(message = "Time slot is required")
+    @Pattern(
+            regexp = "^(?:[01]\\d|2[0-3]):[0-5]\\d|(?:0?[1-9]|1[0-2]):[0-5]\\d\\s(?:AM|PM)$",
+            flags = Pattern.Flag.CASE_INSENSITIVE,
+            message = "Time must use HH:mm or h:mm AM/PM format")
     private String time;
 
     private String type = "In-Person";
     private String status = "Confirmed";
+    @Size(max = 1000, message = "Appointment reason must not exceed 1000 characters")
     private String reason;
 
     public AppointmentDto() {

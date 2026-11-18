@@ -508,6 +508,14 @@ class MedicareApiIntegrationTest {
         request.setPatientPhone("555-0155");
         request.setDoctorName(doctor.getName());
         request.setDate(LocalDate.now().plusDays(333).toString());
+        request.setTime("25:99");
+        mockMvc.perform(post("/api/patient-portal/appointments")
+                        .header("Authorization", bearer(ownerToken))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.details[0]")
+                        .value(containsString("Time must use HH:mm or h:mm AM/PM format")));
         request.setTime("12:45 AM");
         MvcResult created = mockMvc.perform(post("/api/patient-portal/appointments")
                         .header("Authorization", bearer(ownerToken))
