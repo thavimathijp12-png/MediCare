@@ -1,2 +1,3 @@
 - #1 `[docs]` update patient portal API documentation (2026-11-19 10:51:03)
 - #2 `[fix]` improve email validation regex in registration form (2026-11-19 10:51:40)
+- #4 `[feat]` add aria-live regions for screen reader announcements (2026-11-19 10:52:06)
