@@ -31,3 +31,4 @@
 - PR #31 `[FIX]` correct timezone offset formatting in appointment timestamps | Verified: 2026-11-19 11:25:41
 - PR #32 `[DOCS]` update README with local development and setup commands | Verified: 2026-11-19 11:25:57
 - PR #33 `[STYLE]` enhance typography hierarchy in patient summary cards | Verified: 2026-11-19 11:26:12
+- PR #34 `[PERF]` reduce unnecessary re-renders in doctor schedule list | Verified: 2026-11-19 11:26:28
