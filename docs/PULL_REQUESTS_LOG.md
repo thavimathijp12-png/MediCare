@@ -60,3 +60,4 @@
 - PR #60 `[STYLE]` polish empty state illustrations and helper messages | Verified: 2026-11-19 11:34:37
 - PR #62 `[REFACTOR]` decouple appointment status badge helper from DOM logic | Verified: 2026-11-19 11:35:43
 - PR #63 `[FEAT]` support dark mode toggle preference persistence | Verified: 2026-11-19 11:36:05
+- PR #65 `[PERF]` cache department lookup table in sessionStorage | Verified: 2026-11-19 11:38:18
