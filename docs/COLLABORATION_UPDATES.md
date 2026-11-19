@@ -6,3 +6,4 @@
 - PR #17 `[PERF]` optimize DOM selector caching in appointment modal (2026-11-19 12:58:04)
 - PR #18 `[TEST]` add unit assertion for phone number length format (2026-11-19 12:58:22)
 - PR #19 `[DOCS]` clarify doctor availability scheduling guidelines (2026-11-19 12:58:38)
+- PR #20 `[STYLE]` refine mobile responsive spacing for hero header (2026-11-19 12:58:54)
