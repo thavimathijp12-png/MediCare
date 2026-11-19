@@ -39,3 +39,4 @@
 - PR #39 `[DOCS]` add contributor guidelines and code review conventions | Verified: 2026-11-19 11:27:57
 - PR #40 `[STYLE]` fine-tune table padding and border radii across admin tables | Verified: 2026-11-19 11:28:12
 - PR #41 `[FEAT]` support quick filter by department in doctors directory | Verified: 2026-11-19 11:28:27
+- PR #42 `[REFACTOR]` simplify appointment status transition state machine | Verified: 2026-11-19 11:28:44
