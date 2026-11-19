@@ -9,3 +9,4 @@
 - #10 `[feat]` add keyboard escape key handler for dialog dismissal (2026-11-19 10:53:54)
 - #11 `[fix]` prevent duplicate form submissions on double click (2026-11-19 10:54:10)
 - #12 `[refactor]` modularize patient vitals chart configuration (2026-11-19 10:54:27)
+- #13 `[docs]` document Spring Security JWT expiration policy (2026-11-19 10:54:43)
