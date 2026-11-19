@@ -130,6 +130,11 @@ a:hover {
   color: var(--brand-primary-hover);
 }
 
+:focus-visible {
+  outline: 3px solid var(--brand-accent) !important;
+  outline-offset: 3px !important;
+}
+
 /* Custom Sleek Scrollbar */
 ::-webkit-scrollbar {
   width: 9px;
