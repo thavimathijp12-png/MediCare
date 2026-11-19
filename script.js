@@ -671,6 +671,7 @@ async function logoutPatient() {
   }
   patientState.token = null;
   patientState.dashboard = null;
+  sessionStorage.removeItem("medicare_patient_token");
   document.getElementById("patientPortalDashboard").classList.add("d-none");
   document.getElementById("patientPortalAuth").classList.remove("d-none");
   document.getElementById("patientDashboardContent").replaceChildren();
