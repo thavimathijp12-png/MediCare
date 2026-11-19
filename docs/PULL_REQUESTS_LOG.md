@@ -17,3 +17,4 @@
 - PR #17 `[FEAT]` add print stylesheet support for patient invoice receipts | Verified: 2026-11-19 11:20:26
 - PR #18 `[FIX]` sanitize appointment notes input against HTML tags | Verified: 2026-11-19 11:20:42
 - PR #19 `[REFACTOR]` streamline activity log event payload serializer | Verified: 2026-11-19 11:21:00
+- PR #20 `[DOCS]` add Flyway database migration workflow guide | Verified: 2026-11-19 11:21:26
