@@ -26,3 +26,4 @@
 - PR #26 `[DOCS]` document REST API error codes and exception handler mapping | Verified: 2026-11-19 11:24:10
 - PR #27 `[STYLE]` adjust modal backdrop opacity for cleaner visual focus | Verified: 2026-11-19 11:24:31
 - PR #28 `[REFACTOR]` consolidate patient portal route state manager | Verified: 2026-11-19 11:24:51
+- PR #29 `[FEAT]` add copy-to-clipboard button for invoice reference IDs | Verified: 2026-11-19 11:25:10
