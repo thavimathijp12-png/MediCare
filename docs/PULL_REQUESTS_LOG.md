@@ -37,3 +37,4 @@
 - PR #37 `[TEST]` add integration check for stripe webhook signature validation | Verified: 2026-11-19 11:27:25
 - PR #38 `[FIX]` ensure invoice status badge reflects 'Paid' state promptly | Verified: 2026-11-19 11:27:41
 - PR #39 `[DOCS]` add contributor guidelines and code review conventions | Verified: 2026-11-19 11:27:57
+- PR #40 `[STYLE]` fine-tune table padding and border radii across admin tables | Verified: 2026-11-19 11:28:12
