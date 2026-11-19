@@ -6,3 +6,4 @@
 - #7 `[test]` add unit assertion for phone number length format (2026-11-19 10:53:05)
 - #8 `[docs]` clarify doctor availability scheduling guidelines (2026-11-19 10:53:25)
 - #9 `[style]` refine mobile responsive spacing for hero header (2026-11-19 10:53:40)
+- #10 `[feat]` add keyboard escape key handler for dialog dismissal (2026-11-19 10:53:54)
