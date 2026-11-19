@@ -42,3 +42,4 @@
 - PR #42 `[REFACTOR]` simplify appointment status transition state machine | Verified: 2026-11-19 11:28:44
 - PR #43 `[TEST]` add negative tests for invalid JWT signature handling | Verified: 2026-11-19 11:29:03
 - PR #44 `[FIX]` prevent horizontal scrolling on 320px ultra-narrow screens | Verified: 2026-11-19 11:29:21
+- PR #45 `[DOCS]` add data dictionary for patient clinical records schema | Verified: 2026-11-19 11:29:41
