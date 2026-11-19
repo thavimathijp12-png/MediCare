@@ -10,3 +10,4 @@
 - #11 `[fix]` prevent duplicate form submissions on double click (2026-11-19 10:54:10)
 - #12 `[refactor]` modularize patient vitals chart configuration (2026-11-19 10:54:27)
 - #13 `[docs]` document Spring Security JWT expiration policy (2026-11-19 10:54:43)
+- #14 `[style]` enhance badge contrast ratio for accessibility compliance (2026-11-19 10:55:08)
