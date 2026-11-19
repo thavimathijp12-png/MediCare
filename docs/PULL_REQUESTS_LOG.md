@@ -7,3 +7,4 @@
 - PR #7 `[TEST]` add unit assertion for phone number length format | Verified: 2026-11-19 11:17:46
 - PR #8 `[DOCS]` clarify doctor availability scheduling guidelines | Verified: 2026-11-19 11:18:02
 - PR #9 `[STYLE]` refine mobile responsive spacing for hero header | Verified: 2026-11-19 11:18:17
+- PR #10 `[FEAT]` add keyboard escape key handler for dialog dismissal | Verified: 2026-11-19 11:18:32
