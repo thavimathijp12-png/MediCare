@@ -26,3 +26,4 @@
 - PR #60 `[TEST]` validate doctor specialty dropdown options completeness (2026-11-19 14:08:31)
 - PR #61 `[DOCS]` finalize release notes for MediCare v1.0.0 production milestone (2026-11-19 14:08:54)
 - PR #62 `[FEAT]` add blood pressure vitals trend visual indicators (2026-11-19 14:09:12)
+- PR #63 `[FIX]` validate doctor consultation time slots overlap (2026-11-19 14:09:28)
