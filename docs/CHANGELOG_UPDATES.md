@@ -18,3 +18,4 @@
 - #19 `[refactor]` streamline activity log event payload serializer (2026-11-19 10:56:41)
 - #20 `[docs]` add Flyway database migration workflow guide (2026-11-19 10:56:59)
 - #21 `[style]` improve active state styling for sidebar navigation (2026-11-19 10:57:23)
+- #22 `[feat]` support auto-closing alert notifications after 5 seconds (2026-11-19 10:57:37)
