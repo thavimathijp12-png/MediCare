@@ -508,7 +508,7 @@ class MedicareApiIntegrationTest {
         request.setPatientPhone("555-0155");
         request.setDoctorName(doctor.getName());
         request.setDate(LocalDate.now().plusDays(333).toString());
-        request.setTime("25:99");
+        request.setTime("09:00junk");
         mockMvc.perform(post("/api/patient-portal/appointments")
                         .header("Authorization", bearer(ownerToken))
                         .contentType(MediaType.APPLICATION_JSON)

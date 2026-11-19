@@ -27,7 +27,7 @@ public class AppointmentDto {
 
     @NotBlank(message = "Time slot is required")
     @Pattern(
-            regexp = "^(?:[01]\\d|2[0-3]):[0-5]\\d|(?:0?[1-9]|1[0-2]):[0-5]\\d\\s(?:AM|PM)$",
+            regexp = "^(?:(?:[01]\\d|2[0-3]):[0-5]\\d|(?:0?[1-9]|1[0-2]):[0-5]\\d\\s(?:AM|PM))$",
             flags = Pattern.Flag.CASE_INSENSITIVE,
             message = "Time must use HH:mm or h:mm AM/PM format")
     private String time;
