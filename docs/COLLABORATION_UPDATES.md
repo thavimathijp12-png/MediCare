@@ -32,3 +32,4 @@
 - PR #66 `[REFACTOR]` unify date parser across patient and admin views (2026-11-19 14:10:15)
 - PR #67 `[PERF]` minimize CSS bundle layout repaints on scroll (2026-11-19 14:10:28)
 - PR #68 `[FEAT]` add quick action button to reschedule appointments (2026-11-19 14:10:41)
+- PR #69 `[FIX]` trim whitespace from patient search queries (2026-11-19 14:10:54)
