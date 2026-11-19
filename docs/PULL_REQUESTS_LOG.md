@@ -16,3 +16,4 @@
 - PR #16 `[PERF]` debounce real-time search input filter | Verified: 2026-11-19 11:20:10
 - PR #17 `[FEAT]` add print stylesheet support for patient invoice receipts | Verified: 2026-11-19 11:20:26
 - PR #18 `[FIX]` sanitize appointment notes input against HTML tags | Verified: 2026-11-19 11:20:42
+- PR #19 `[REFACTOR]` streamline activity log event payload serializer | Verified: 2026-11-19 11:21:00
