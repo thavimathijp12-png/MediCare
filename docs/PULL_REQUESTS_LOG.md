@@ -36,3 +36,4 @@
 - PR #36 `[REFACTOR]` clean up unused CSS utility classes | Verified: 2026-11-19 11:27:04
 - PR #37 `[TEST]` add integration check for stripe webhook signature validation | Verified: 2026-11-19 11:27:25
 - PR #38 `[FIX]` ensure invoice status badge reflects 'Paid' state promptly | Verified: 2026-11-19 11:27:41
+- PR #39 `[DOCS]` add contributor guidelines and code review conventions | Verified: 2026-11-19 11:27:57
