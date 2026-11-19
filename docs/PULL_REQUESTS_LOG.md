@@ -28,3 +28,4 @@
 - PR #28 `[REFACTOR]` consolidate patient portal route state manager | Verified: 2026-11-19 11:24:51
 - PR #29 `[FEAT]` add copy-to-clipboard button for invoice reference IDs | Verified: 2026-11-19 11:25:10
 - PR #30 `[TEST]` verify role-based authorization for nurse care tasks | Verified: 2026-11-19 11:25:26
+- PR #31 `[FIX]` correct timezone offset formatting in appointment timestamps | Verified: 2026-11-19 11:25:41
