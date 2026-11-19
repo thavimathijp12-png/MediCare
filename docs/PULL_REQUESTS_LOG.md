@@ -52,3 +52,4 @@
 - PR #52 `[FIX]` validate doctor consultation time slots overlap | Verified: 2026-11-19 11:31:45
 - PR #53 `[STYLE]` align hospital department icon badges with text labels | Verified: 2026-11-19 11:32:18
 - PR #54 `[DOCS]` document patient medical history export workflow | Verified: 2026-11-19 11:32:43
+- PR #55 `[REFACTOR]` unify date parser across patient and admin views | Verified: 2026-11-19 11:33:06
