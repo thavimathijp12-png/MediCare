@@ -25,3 +25,4 @@
 - PR #25 `[PERF]` lazy load doctor profile avatar images | Verified: 2026-11-19 11:23:51
 - PR #26 `[DOCS]` document REST API error codes and exception handler mapping | Verified: 2026-11-19 11:24:10
 - PR #27 `[STYLE]` adjust modal backdrop opacity for cleaner visual focus | Verified: 2026-11-19 11:24:31
+- PR #28 `[REFACTOR]` consolidate patient portal route state manager | Verified: 2026-11-19 11:24:51
