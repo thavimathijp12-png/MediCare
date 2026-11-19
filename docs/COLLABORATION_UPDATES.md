@@ -1,1 +1,2 @@
 - PR #12 `[DOCS]` update patient portal API documentation (2026-11-19 12:56:38)
+- PR #13 `[FIX]` improve email validation regex in registration form (2026-11-19 12:56:57)
