@@ -1,0 +1,1 @@
+- PR #1 `[DOCS]` update patient portal API documentation | Verified: 2026-11-19 11:16:08
