@@ -47,14 +47,19 @@ public class DashboardService {
 
     public DashboardStatsDto getDashboardStats() {
         DashboardStatsDto stats = new DashboardStatsDto();
+        LocalDate today = LocalDate.now();
 
         stats.setTotalPatients(patientRepository.count());
         stats.setTotalDoctors(doctorRepository.count());
-        stats.setTodayAppointments(appointmentRepository.countByDate(LocalDate.now()));
         stats.setTotalRevenue(invoiceRepository.sumPaid());
 
         List<Appointment> appointments = appointmentRepository.findAll();
         List<Patient> patients = patientRepository.findAll();
+        stats.setTodayAppointments(appointments.stream()
+                .filter(appointment -> today.equals(appointment.getDate()))
+                .filter(this::isNotCancelled)
+                .count());
+
         List<AppointmentDto> recentAppts = appointments.stream()
                 .sorted(Comparator.comparing(Appointment::getDate,
                         Comparator.nullsLast(Comparator.reverseOrder()))
@@ -72,13 +77,16 @@ public class DashboardService {
 
         List<LocalDate> lastSevenDays = new ArrayList<>();
         for (int offset = 6; offset >= 0; offset--) {
-            lastSevenDays.add(LocalDate.now().minusDays(offset));
+            lastSevenDays.add(today.minusDays(offset));
         }
         stats.setWeeklyDays(lastSevenDays.stream()
                 .map(day -> day.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.US))
                 .collect(Collectors.toList()));
         stats.setWeeklyAppointments(lastSevenDays.stream()
-                .map(day -> Math.toIntExact(appointments.stream().filter(a -> day.equals(a.getDate())).count()))
+                .map(day -> Math.toIntExact(appointments.stream()
+                        .filter(appointment -> day.equals(appointment.getDate()))
+                        .filter(this::isNotCancelled)
+                        .count()))
                 .collect(Collectors.toList()));
         stats.setWeeklyAdmissions(lastSevenDays.stream()
                 .map(day -> Math.toIntExact(patients.stream()
@@ -102,6 +110,10 @@ public class DashboardService {
         stats.setDepartmentShare(departmentShare);
 
         return stats;
+    }
+
+    private boolean isNotCancelled(Appointment appointment) {
+        return !"Cancelled".equalsIgnoreCase(appointment.getStatus());
     }
 
     private AppointmentDto toAppointmentDto(Appointment a) {
