@@ -1,0 +1,1 @@
+- #1 `[docs]` update patient portal API documentation (2026-11-19 10:51:03)
