@@ -23,3 +23,4 @@
 - PR #57 `[STYLE]` improve loading spinner animation consistency (2026-11-19 14:07:23)
 - PR #58 `[FEAT]` add reset filters button in patient search dashboard (2026-11-19 14:07:45)
 - PR #59 `[REFACTOR]` isolate token storage keys to dedicated config constant (2026-11-19 14:08:10)
+- PR #60 `[TEST]` validate doctor specialty dropdown options completeness (2026-11-19 14:08:31)
