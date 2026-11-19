@@ -11,3 +11,4 @@
 - PR #11 `[FIX]` prevent duplicate form submissions on double click | Verified: 2026-11-19 11:18:47
 - PR #12 `[REFACTOR]` modularize patient vitals chart configuration | Verified: 2026-11-19 11:19:01
 - PR #13 `[DOCS]` document Spring Security JWT expiration policy | Verified: 2026-11-19 11:19:21
+- PR #14 `[STYLE]` enhance badge contrast ratio for accessibility compliance | Verified: 2026-11-19 11:19:37
