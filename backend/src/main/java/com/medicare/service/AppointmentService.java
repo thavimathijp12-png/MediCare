@@ -504,6 +504,26 @@ public class AppointmentService {
         updateStatus(appointmentId, "Cancelled");
     }
 
+    @Transactional
+    public AppointmentDto cancelForPatient(String appointmentId, String email) {
+        Patient patient = patientRepository
+                .findByPatientAccount_EmailIgnoreCase(email)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "The patient profile was not found."));
+        Appointment appointment = appointmentRepository
+                .findByAppointmentIdIgnoreCase(appointmentId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Appointment " + appointmentId + " was not found."));
+
+        if (appointment.getPatient() == null
+                || !appointment.getPatient().getId().equals(patient.getId())) {
+            throw new AccessDeniedException(
+                    "The appointment is not linked to this patient account.");
+        }
+
+        return updateStatus(appointmentId, "Cancelled");
+    }
+
     private User findUser(String email) {
         return userRepository.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new ResourceNotFoundException(

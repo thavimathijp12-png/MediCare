@@ -18,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -104,7 +106,8 @@ public class PatientService {
         } else {
             isNew = true;
             patient = new Patient();
-            patient.setPatientId(String.format("PAT-%03d", patientRepository.count() + 1));
+            patient.setPatientId("PAT-" + UUID.randomUUID().toString()
+                    .replace("-", "").substring(0, 20).toUpperCase(Locale.ROOT));
         }
 
         patient.setName(dto.getName());

@@ -55,6 +55,14 @@ const authState = { token: null, user: null };
 const patientState = { token: null, dashboard: null };
 let activeClinicalPatientId = null;
 let activeClinicalData = null;
+
+function getLocalDateString(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 const appData = {
   active_view: "public",
   active_tab: "dashboard",
@@ -663,6 +671,7 @@ async function logoutPatient() {
   }
   patientState.token = null;
   patientState.dashboard = null;
+  sessionStorage.removeItem("medicare_patient_token");
   document.getElementById("patientPortalDashboard").classList.add("d-none");
   document.getElementById("patientPortalAuth").classList.remove("d-none");
   document.getElementById("patientDashboardContent").replaceChildren();
@@ -2043,7 +2052,7 @@ function updateDashboardStats() {
   }
 
   // Today's appointments (filter today or show pending/confirmed count)
-  const todayDate = new Date().toISOString().slice(0, 10);
+  const todayDate = getLocalDateString(new Date());
   const todayApts = appointments.filter(a => a.date === todayDate);
   const aptStat = document.getElementById("stat-today-appointments");
   if (aptStat) aptStat.textContent = stats ? stats.todayAppointments : todayApts.length;
@@ -3946,7 +3955,7 @@ async function createInvoice(event) {
     patientId: selectedPatient.id,
     patientName: selectedPatient.name,
     department: document.getElementById("invoiceDepartmentInput").value,
-    date: new Date().toISOString().slice(0, 10),
+    date: getLocalDateString(new Date()),
     amount,
     method: document.getElementById("invoiceMethodInput").value,
     items: [{ desc: descriptionInput.value, cost: amount }]

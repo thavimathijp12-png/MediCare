@@ -32,7 +32,10 @@ test("patient can register, handle a bad password, and read the saved profile af
   await expect(page.locator("#patientDashboardName")).toContainText(patient.fullName);
 
   await page.getByRole("button", { name: "Sign out" }).click();
+  await page.reload();
   await page.getByRole("button", { name: "Patient Portal" }).first().click();
+  await expect(page.locator("#patientLoginForm")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "My health dashboard" })).toHaveCount(0);
   await page.locator("#patientLoginEmail").fill(patient.email);
   await page.locator("#patientLoginPassword").fill("incorrect-password");
   await page.getByRole("button", { name: "Sign in securely" }).click();

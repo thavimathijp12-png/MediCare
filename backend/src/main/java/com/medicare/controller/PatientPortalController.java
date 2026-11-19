@@ -4,6 +4,7 @@ package com.medicare.controller;
 import com.medicare.dto.CheckoutSessionResponse;
 import com.medicare.dto.PatientDashboardDto;
 import com.medicare.dto.PatientDto;
+import com.medicare.dto.PatientProfileUpdateRequest;
 import com.medicare.dto.AppointmentDto;
 import com.medicare.service.PatientPortalService;
 import jakarta.validation.Valid;
@@ -54,7 +55,7 @@ public class PatientPortalController {
     @PutMapping("/profile")
     public PatientDto updateOwnProfile(
             @AuthenticationPrincipal UserDetails user,
-            @RequestBody PatientDto request) {
+            @Valid @RequestBody PatientProfileUpdateRequest request) {
         return patientPortalService.updateProfile(user.getUsername(), request);
     }
 
