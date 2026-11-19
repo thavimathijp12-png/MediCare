@@ -22,3 +22,4 @@
 - #23 `[test]` verify CSRF and CORS header configurations (2026-11-19 10:57:53)
 - #24 `[fix]` handle null emergency contact fields gracefully (2026-11-19 10:58:07)
 - #25 `[perf]` lazy load doctor profile avatar images (2026-11-19 10:58:22)
+- #26 `[docs]` document REST API error codes and exception handler mapping (2026-11-19 10:58:40)
