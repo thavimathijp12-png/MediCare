@@ -27,3 +27,4 @@
 - PR #61 `[DOCS]` finalize release notes for MediCare v1.0.0 production milestone (2026-11-19 14:08:54)
 - PR #62 `[FEAT]` add blood pressure vitals trend visual indicators (2026-11-19 14:09:12)
 - PR #63 `[FIX]` validate doctor consultation time slots overlap (2026-11-19 14:09:28)
+- PR #64 `[STYLE]` align hospital department icon badges with text labels (2026-11-19 14:09:45)
