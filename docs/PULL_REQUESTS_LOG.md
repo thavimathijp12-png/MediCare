@@ -22,3 +22,4 @@
 - PR #22 `[FEAT]` support auto-closing alert notifications after 5 seconds | Verified: 2026-11-19 11:22:28
 - PR #23 `[TEST]` verify CSRF and CORS header configurations | Verified: 2026-11-19 11:22:55
 - PR #24 `[FIX]` handle null emergency contact fields gracefully | Verified: 2026-11-19 11:23:19
+- PR #25 `[PERF]` lazy load doctor profile avatar images | Verified: 2026-11-19 11:23:51
