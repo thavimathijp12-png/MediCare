@@ -17,3 +17,4 @@
 - PR #28 `[FEAT]` add print stylesheet support for patient invoice receipts (2026-11-19 13:01:21)
 - PR #29 `[FIX]` sanitize appointment notes input against HTML tags (2026-11-19 13:01:36)
 - PR #53 `[REFACTOR]` simplify appointment status transition state machine (2026-11-19 14:05:56)
+- PR #54 `[TEST]` add negative tests for invalid JWT signature handling (2026-11-19 14:06:17)
