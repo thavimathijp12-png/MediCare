@@ -17,3 +17,4 @@
 - #18 `[fix]` sanitize appointment notes input against HTML tags (2026-11-19 10:56:26)
 - #19 `[refactor]` streamline activity log event payload serializer (2026-11-19 10:56:41)
 - #20 `[docs]` add Flyway database migration workflow guide (2026-11-19 10:56:59)
+- #21 `[style]` improve active state styling for sidebar navigation (2026-11-19 10:57:23)
