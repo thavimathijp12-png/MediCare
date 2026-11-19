@@ -1,3 +1,4 @@
 - PR #12 `[DOCS]` update patient portal API documentation (2026-11-19 12:56:38)
 - PR #13 `[FIX]` improve email validation regex in registration form (2026-11-19 12:56:57)
 - PR #14 `[STYLE]` standardize button hover transition timings (2026-11-19 12:57:14)
+- PR #15 `[FEAT]` add aria-live regions for screen reader announcements (2026-11-19 12:57:32)
