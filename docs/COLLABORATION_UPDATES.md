@@ -35,3 +35,4 @@
 - PR #69 `[FIX]` trim whitespace from patient search queries (2026-11-19 14:10:54)
 - PR #70 `[TEST]` add unit tests for prescription dosage frequency calculation (2026-11-19 14:11:07)
 - PR #71 `[STYLE]` polish empty state illustrations and helper messages (2026-11-19 14:11:20)
+- PR #72 `[DOCS]` add security guidelines for handling patient PHI data (2026-11-19 14:11:36)
