@@ -63,3 +63,4 @@
 - PR #65 `[PERF]` cache department lookup table in sessionStorage | Verified: 2026-11-19 11:38:18
 - PR #66 `[TEST]` add test coverage for patient invoice discount calculations | Verified: 2026-11-19 11:38:42
 - PR #67 `[STYLE]` standardize modal footer button ordering | Verified: 2026-11-19 11:38:58
+- PR #68 `[DOCS]` document Docker container build and run commands | Verified: 2026-11-19 11:39:15
