@@ -12,3 +12,4 @@
 - PR #12 `[REFACTOR]` modularize patient vitals chart configuration | Verified: 2026-11-19 11:19:01
 - PR #13 `[DOCS]` document Spring Security JWT expiration policy | Verified: 2026-11-19 11:19:21
 - PR #14 `[STYLE]` enhance badge contrast ratio for accessibility compliance | Verified: 2026-11-19 11:19:37
+- PR #15 `[TEST]` add boundary validation tests for doctor consultation fees | Verified: 2026-11-19 11:19:53
