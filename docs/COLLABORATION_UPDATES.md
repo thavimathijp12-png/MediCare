@@ -22,3 +22,4 @@
 - PR #56 `[DOCS]` add data dictionary for patient clinical records schema (2026-11-19 14:06:58)
 - PR #57 `[STYLE]` improve loading spinner animation consistency (2026-11-19 14:07:23)
 - PR #58 `[FEAT]` add reset filters button in patient search dashboard (2026-11-19 14:07:45)
+- PR #59 `[REFACTOR]` isolate token storage keys to dedicated config constant (2026-11-19 14:08:10)
