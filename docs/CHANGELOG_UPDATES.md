@@ -2,3 +2,4 @@
 - #2 `[fix]` improve email validation regex in registration form (2026-11-19 10:51:40)
 - #4 `[feat]` add aria-live regions for screen reader announcements (2026-11-19 10:52:06)
 - #5 `[refactor]` extract reusable currency formatter in billing view (2026-11-19 10:52:29)
+- #6 `[perf]` optimize DOM selector caching in appointment modal (2026-11-19 10:52:48)
