@@ -3,3 +3,4 @@
 - PR #14 `[STYLE]` standardize button hover transition timings (2026-11-19 12:57:14)
 - PR #15 `[FEAT]` add aria-live regions for screen reader announcements (2026-11-19 12:57:32)
 - PR #16 `[REFACTOR]` extract reusable currency formatter in billing view (2026-11-19 12:57:49)
+- PR #17 `[PERF]` optimize DOM selector caching in appointment modal (2026-11-19 12:58:04)
