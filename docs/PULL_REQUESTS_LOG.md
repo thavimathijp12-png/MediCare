@@ -65,3 +65,4 @@
 - PR #67 `[STYLE]` standardize modal footer button ordering | Verified: 2026-11-19 11:38:58
 - PR #68 `[DOCS]` document Docker container build and run commands | Verified: 2026-11-19 11:39:15
 - PR #69 `[REFACTOR]` extract shared modal lifecycle event listeners | Verified: 2026-11-19 11:39:32
+- PR #70 `[FEAT]` add confirmation prompt before cancelling booked appointments | Verified: 2026-11-19 11:39:51
