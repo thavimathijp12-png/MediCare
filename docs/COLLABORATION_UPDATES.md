@@ -15,3 +15,4 @@
 - PR #26 `[TEST]` add boundary validation tests for doctor consultation fees (2026-11-19 13:00:32)
 - PR #27 `[PERF]` debounce real-time search input filter (2026-11-19 13:01:04)
 - PR #28 `[FEAT]` add print stylesheet support for patient invoice receipts (2026-11-19 13:01:21)
+- PR #52 `[FEAT]` support quick filter by department in doctors directory (2026-11-19 14:05:19)
