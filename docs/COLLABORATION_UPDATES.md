@@ -20,3 +20,4 @@
 - PR #54 `[TEST]` add negative tests for invalid JWT signature handling (2026-11-19 14:06:17)
 - PR #55 `[FIX]` prevent horizontal scrolling on 320px ultra-narrow screens (2026-11-19 14:06:35)
 - PR #56 `[DOCS]` add data dictionary for patient clinical records schema (2026-11-19 14:06:58)
+- PR #57 `[STYLE]` improve loading spinner animation consistency (2026-11-19 14:07:23)
