@@ -14,3 +14,4 @@
 - #15 `[test]` add boundary validation tests for doctor consultation fees (2026-11-19 10:55:30)
 - #16 `[perf]` debounce real-time search input filter (2026-11-19 10:55:46)
 - #17 `[feat]` add print stylesheet support for patient invoice receipts (2026-11-19 10:56:10)
+- #18 `[fix]` sanitize appointment notes input against HTML tags (2026-11-19 10:56:26)
