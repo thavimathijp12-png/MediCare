@@ -19,3 +19,4 @@
 - PR #19 `[REFACTOR]` streamline activity log event payload serializer | Verified: 2026-11-19 11:21:00
 - PR #20 `[DOCS]` add Flyway database migration workflow guide | Verified: 2026-11-19 11:21:26
 - PR #21 `[STYLE]` improve active state styling for sidebar navigation | Verified: 2026-11-19 11:22:03
+- PR #22 `[FEAT]` support auto-closing alert notifications after 5 seconds | Verified: 2026-11-19 11:22:28
