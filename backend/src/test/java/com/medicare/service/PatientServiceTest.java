@@ -18,6 +18,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -51,7 +52,6 @@ class PatientServiceTest {
 
     @Test
     void persistsNewPatientAndLinksTheSelectedDoctor() {
-        when(patientRepository.count()).thenReturn(0L);
         Doctor doctor = new Doctor(1L, "DOC-101", "Dr. Test Doctor", "MD", "Cardiology", 5,
                 BigDecimal.valueOf(100), null, null, "Available", BigDecimal.valueOf(4.5), 1, null, null);
         when(doctorRepository.findByNameIgnoreCase("Dr. Test Doctor")).thenReturn(Optional.of(doctor));
@@ -68,6 +68,23 @@ class PatientServiceTest {
         assertNotNull(saved.getId());
         assertTrue(saved.getId().startsWith("PAT-"));
         assertEquals("Dr. Test Doctor", saved.getDoctor());
+    }
+
+    @Test
+    void generatesDifferentPatientIdsWhenTheRecordCountDoesNotChange() {
+        when(patientRepository.save(any(Patient.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        PatientDto first = new PatientDto();
+        first.setName("First Test Patient");
+        first.setAge(32);
+        first.setGender("Other");
+        first.setPhone("555-0201");
+        PatientDto second = new PatientDto();
+        second.setName("Second Test Patient");
+        second.setAge(33);
+        second.setGender("Other");
+        second.setPhone("555-0202");
+
+        assertNotEquals(patientService.save(first).getId(), patientService.save(second).getId());
     }
 
     @Test
