@@ -23,3 +23,4 @@
 - PR #23 `[TEST]` verify CSRF and CORS header configurations | Verified: 2026-11-19 11:22:55
 - PR #24 `[FIX]` handle null emergency contact fields gracefully | Verified: 2026-11-19 11:23:19
 - PR #25 `[PERF]` lazy load doctor profile avatar images | Verified: 2026-11-19 11:23:51
+- PR #26 `[DOCS]` document REST API error codes and exception handler mapping | Verified: 2026-11-19 11:24:10
