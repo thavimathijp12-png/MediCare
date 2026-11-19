@@ -20,3 +20,4 @@
 - #21 `[style]` improve active state styling for sidebar navigation (2026-11-19 10:57:23)
 - #22 `[feat]` support auto-closing alert notifications after 5 seconds (2026-11-19 10:57:37)
 - #23 `[test]` verify CSRF and CORS header configurations (2026-11-19 10:57:53)
+- #24 `[fix]` handle null emergency contact fields gracefully (2026-11-19 10:58:07)
