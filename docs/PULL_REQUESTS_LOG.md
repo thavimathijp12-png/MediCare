@@ -58,3 +58,4 @@
 - PR #58 `[FIX]` trim whitespace from patient search queries | Verified: 2026-11-19 11:34:03
 - PR #59 `[TEST]` add unit tests for prescription dosage frequency calculation | Verified: 2026-11-19 11:34:21
 - PR #60 `[STYLE]` polish empty state illustrations and helper messages | Verified: 2026-11-19 11:34:37
+- PR #62 `[REFACTOR]` decouple appointment status badge helper from DOM logic | Verified: 2026-11-19 11:35:43
