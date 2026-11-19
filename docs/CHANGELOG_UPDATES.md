@@ -4,3 +4,4 @@
 - #5 `[refactor]` extract reusable currency formatter in billing view (2026-11-19 10:52:29)
 - #6 `[perf]` optimize DOM selector caching in appointment modal (2026-11-19 10:52:48)
 - #7 `[test]` add unit assertion for phone number length format (2026-11-19 10:53:05)
+- #8 `[docs]` clarify doctor availability scheduling guidelines (2026-11-19 10:53:25)
