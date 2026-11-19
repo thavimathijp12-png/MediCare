@@ -32,3 +32,4 @@
 - PR #32 `[DOCS]` update README with local development and setup commands | Verified: 2026-11-19 11:25:57
 - PR #33 `[STYLE]` enhance typography hierarchy in patient summary cards | Verified: 2026-11-19 11:26:12
 - PR #34 `[PERF]` reduce unnecessary re-renders in doctor schedule list | Verified: 2026-11-19 11:26:28
+- PR #35 `[FEAT]` add offline network detection banner indicator | Verified: 2026-11-19 11:26:44
