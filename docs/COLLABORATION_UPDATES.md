@@ -14,3 +14,4 @@
 - PR #25 `[STYLE]` enhance badge contrast ratio for accessibility compliance (2026-11-19 13:00:15)
 - PR #26 `[TEST]` add boundary validation tests for doctor consultation fees (2026-11-19 13:00:32)
 - PR #27 `[PERF]` debounce real-time search input filter (2026-11-19 13:01:04)
+- PR #28 `[FEAT]` add print stylesheet support for patient invoice receipts (2026-11-19 13:01:21)
