@@ -12,3 +12,4 @@
 - #13 `[docs]` document Spring Security JWT expiration policy (2026-11-19 10:54:43)
 - #14 `[style]` enhance badge contrast ratio for accessibility compliance (2026-11-19 10:55:08)
 - #15 `[test]` add boundary validation tests for doctor consultation fees (2026-11-19 10:55:30)
+- #16 `[perf]` debounce real-time search input filter (2026-11-19 10:55:46)
