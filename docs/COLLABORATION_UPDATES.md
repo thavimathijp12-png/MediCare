@@ -31,3 +31,4 @@
 - PR #65 `[DOCS]` document patient medical history export workflow (2026-11-19 14:10:00)
 - PR #66 `[REFACTOR]` unify date parser across patient and admin views (2026-11-19 14:10:15)
 - PR #67 `[PERF]` minimize CSS bundle layout repaints on scroll (2026-11-19 14:10:28)
+- PR #68 `[FEAT]` add quick action button to reschedule appointments (2026-11-19 14:10:41)
