@@ -9,3 +9,4 @@
 - PR #9 `[STYLE]` refine mobile responsive spacing for hero header | Verified: 2026-11-19 11:18:17
 - PR #10 `[FEAT]` add keyboard escape key handler for dialog dismissal | Verified: 2026-11-19 11:18:32
 - PR #11 `[FIX]` prevent duplicate form submissions on double click | Verified: 2026-11-19 11:18:47
+- PR #12 `[REFACTOR]` modularize patient vitals chart configuration | Verified: 2026-11-19 11:19:01
